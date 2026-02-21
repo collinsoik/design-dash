@@ -51,7 +51,7 @@ credentials-file: /root/.cloudflared/${TUNNEL_ID}.json
 
 ingress:
   - hostname: dash-api.collinsoik.dev
-    service: http://localhost:3001
+    service: http://localhost:3002
     originRequest:
       noTLSVerify: true
   - service: http_status:404
@@ -68,7 +68,7 @@ sudo systemctl start cloudflared
 echo ""
 echo "=== Done! ==="
 echo "Cloudflare Tunnel is running."
-echo "dash-api.collinsoik.dev → localhost:3001"
+echo "dash-api.collinsoik.dev → localhost:3002"
 echo ""
 echo "To check status: sudo systemctl status cloudflared"
 echo "To view logs:    sudo journalctl -u cloudflared -f"

@@ -23,6 +23,6 @@ RUN npm run build --workspace=apps/server
 # Create data directory for SQLite
 RUN mkdir -p /app/data
 
-EXPOSE 3001
+EXPOSE 3002
 
 CMD ["node", "apps/server/dist/index.js"]

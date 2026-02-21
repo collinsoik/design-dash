@@ -1,14 +1,13 @@
-version: "3.8"
 services:
   game-server:
     build:
       context: ../../
       dockerfile: apps/server/Dockerfile
     ports:
-      - "3001:3001"
+      - "3002:3002"
     environment:
       - NODE_ENV=production
-      - PORT=3001
+      - PORT=3002
       - CORS_ORIGIN=https://design-dash-two.vercel.app
       - DB_PATH=/app/data/designdash.db
     volumes:
