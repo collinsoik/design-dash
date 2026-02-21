@@ -11,6 +11,7 @@ import {
 } from "@design-dash/shared";
 import type { Room, Team, DecisionPoint, PlayerDecision } from "@design-dash/shared";
 import JudgePanel from "@/components/voting/JudgePanel";
+import ProductPreviewGrid from "@/components/preview/ProductPreviewGrid";
 
 export default function VotePage() {
   const params = useParams();
@@ -162,6 +163,15 @@ export default function VotePage() {
         </div>
       ) : (
         <>
+          {/* Product Preview Phones */}
+          {gameState && (
+            <ProductPreviewGrid
+              teams={activeTeams}
+              gameState={gameState}
+              myTeamId={myTeamId}
+            />
+          )}
+
           {/* Team Decision Review Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto mb-10">
             {activeTeams.map((team) => {
