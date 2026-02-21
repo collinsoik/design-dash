@@ -3,71 +3,133 @@ interface MelodifyHomeProps {
 }
 
 function ActivityBased() {
+  const activities = [
+    { label: "Morning Commute", time: "7:30 AM", gradient: "from-amber-200 to-orange-200", icon: "sun" },
+    { label: "Focus Work", time: "10:00 AM", gradient: "from-sky-200 to-blue-200", icon: "brain" },
+    { label: "Workout", time: "5:30 PM", gradient: "from-rose-200 to-pink-200", icon: "bolt" },
+    { label: "Wind Down", time: "9:00 PM", gradient: "from-violet-200 to-indigo-200", icon: "moon" },
+  ];
   return (
-    <div className="space-y-1.5">
-      <p className="text-[5px] font-bold text-gray-400 uppercase">Good Morning</p>
-      {/* Time-of-day rows */}
-      {[
-        { icon: "morning", color: "bg-amber-100", accent: "text-amber-500" },
-        { icon: "afternoon", color: "bg-blue-100", accent: "text-blue-500" },
-        { icon: "evening", color: "bg-purple-100", accent: "text-purple-500" },
-      ].map((row) => (
-        <div key={row.icon} className={`flex items-center gap-1 ${row.color} rounded-md px-1.5 py-1.5`}>
-          <svg viewBox="0 0 16 16" className={`w-3 h-3 ${row.accent} shrink-0`}>
-            {row.icon === "morning" && (
-              <circle cx="8" cy="8" r="4" fill="currentColor" opacity="0.8" />
+    <div className="space-y-1">
+      <p className="text-[5px] font-bold text-gray-400 uppercase">Good Morning, Alex</p>
+      {activities.map((a) => (
+        <div key={a.label} className={`flex items-center gap-1.5 bg-gradient-to-r ${a.gradient} rounded-lg px-1.5 py-1.5`}>
+          <div className="w-5 h-5 rounded-md bg-white/60 flex items-center justify-center shrink-0">
+            {a.icon === "sun" && (
+              <svg viewBox="0 0 16 16" className="w-3 h-3 text-amber-500">
+                <circle cx="8" cy="8" r="3.5" fill="currentColor" />
+                {[0,45,90,135,180,225,270,315].map(r => (
+                  <line key={r} x1="8" y1="1.5" x2="8" y2="3" stroke="currentColor" strokeWidth="1" strokeLinecap="round" transform={`rotate(${r} 8 8)`} />
+                ))}
+              </svg>
             )}
-            {row.icon === "afternoon" && (
-              <circle cx="8" cy="8" r="4" fill="currentColor" opacity="0.6" />
+            {a.icon === "brain" && (
+              <svg viewBox="0 0 16 16" className="w-3 h-3 text-blue-500">
+                <circle cx="8" cy="6" r="4" fill="none" stroke="currentColor" strokeWidth="1.2" />
+                <path d="M6 10v3M10 10v3M8 10v4" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+              </svg>
             )}
-            {row.icon === "evening" && (
-              <path d="M10 2a6 6 0 1 0 0 12 6 6 0 0 0 0-12z" fill="currentColor" opacity="0.7" />
+            {a.icon === "bolt" && (
+              <svg viewBox="0 0 16 16" className="w-3 h-3 text-rose-500">
+                <path d="M9 1L4 9h4l-1 6 5-8H8l1-6z" fill="currentColor" />
+              </svg>
             )}
-          </svg>
-          <div className="flex-1 space-y-0.5">
-            <div className="h-1 bg-gray-300 rounded-full w-3/4" />
-            <div className="h-1 bg-gray-200 rounded-full w-1/2" />
+            {a.icon === "moon" && (
+              <svg viewBox="0 0 16 16" className="w-3 h-3 text-violet-500">
+                <path d="M12 10A6 6 0 0 1 6 4a6 6 0 1 0 6 6z" fill="currentColor" />
+              </svg>
+            )}
           </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-[5px] font-bold text-gray-700 truncate">{a.label}</p>
+            <p className="text-[4px] text-gray-500">{a.time}</p>
+          </div>
+          <svg viewBox="0 0 12 12" className="w-2.5 h-2.5 text-gray-400 shrink-0">
+            <polygon points="2,1 10,6 2,11" fill="currentColor" />
+          </svg>
         </div>
       ))}
+      <div className="flex items-center gap-1 mt-0.5">
+        <div className="h-px bg-gray-200 flex-1" />
+        <p className="text-[4px] text-gray-300">Personalized for you</p>
+        <div className="h-px bg-gray-200 flex-1" />
+      </div>
     </div>
   );
 }
 
 function SocialFeed() {
+  const friends = [
+    { name: "Maya", initials: "M", color: "bg-pink-300", song: "Blinding Lights", artist: "The Weeknd" },
+    { name: "Jake", initials: "J", color: "bg-blue-300", song: "Flowers", artist: "Miley Cyrus" },
+    { name: "Ava", initials: "A", color: "bg-emerald-300", song: "Anti-Hero", artist: "Taylor Swift" },
+    { name: "Leo", initials: "L", color: "bg-amber-300", song: "As It Was", artist: "Harry Styles" },
+  ];
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-1">
       <p className="text-[5px] font-bold text-gray-400 uppercase">Friends Listening</p>
-      {[1, 2, 3, 4].map((i) => (
-        <div key={i} className="flex items-center gap-1.5">
-          <div className="w-4 h-4 rounded-full bg-gray-200 shrink-0" />
-          <div className="flex-1 space-y-0.5">
-            <div className="h-1 bg-gray-300 rounded-full w-4/5" />
-            <div className="h-1 bg-gray-200 rounded-full w-3/5" />
+      {friends.map((f) => (
+        <div key={f.name} className="flex items-center gap-1.5 bg-gray-50 rounded-lg px-1.5 py-1">
+          <div className={`w-5 h-5 rounded-full ${f.color} flex items-center justify-center text-[5px] font-bold text-white shrink-0`}>
+            {f.initials}
           </div>
-          <svg viewBox="0 0 12 12" className="w-2.5 h-2.5 text-gray-300 shrink-0">
+          <div className="flex-1 min-w-0">
+            <p className="text-[5px] font-semibold text-gray-700 truncate">{f.song}</p>
+            <p className="text-[4px] text-gray-400 truncate">{f.artist}</p>
+          </div>
+          <svg viewBox="0 0 12 12" className="w-2.5 h-2.5 text-emerald-400 shrink-0">
             <polygon points="2,1 10,6 2,11" fill="currentColor" />
           </svg>
         </div>
       ))}
+      <div className="bg-violet-50 rounded-lg px-1.5 py-1">
+        <p className="text-[5px] font-semibold text-violet-600">Shared Playlist</p>
+        <p className="text-[4px] text-violet-400">Road Trip Mix - 24 songs</p>
+      </div>
     </div>
   );
 }
 
 function LibraryFirst() {
+  const albums = [
+    { title: "Chill Vibes", gradient: "from-indigo-300 to-purple-400" },
+    { title: "Workout", gradient: "from-rose-300 to-red-400" },
+    { title: "Focus", gradient: "from-emerald-300 to-teal-400" },
+    { title: "Party", gradient: "from-amber-300 to-orange-400" },
+  ];
   return (
     <div className="space-y-1.5">
       <p className="text-[5px] font-bold text-gray-400 uppercase">Your Library</p>
       <div className="grid grid-cols-2 gap-1">
-        {["bg-indigo-200", "bg-rose-200", "bg-emerald-200", "bg-amber-200"].map((color, i) => (
-          <div key={i} className={`aspect-square rounded-md ${color}`} />
+        {albums.map((a, i) => (
+          <div key={i} className={`aspect-square rounded-lg bg-gradient-to-br ${a.gradient} flex items-end p-1 relative overflow-hidden`}>
+            <svg viewBox="0 0 20 20" className="absolute top-1 right-1 w-2.5 h-2.5 text-white/40">
+              <circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" strokeWidth="1.5" />
+              <circle cx="10" cy="10" r="3" fill="currentColor" />
+            </svg>
+            <p className="text-[4px] font-bold text-white leading-tight">{a.title}</p>
+          </div>
         ))}
       </div>
-      <p className="text-[5px] text-gray-400 mt-1">Recently Played</p>
-      <div className="flex gap-0.5">
-        {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="w-2 h-2 rounded-full bg-gray-200" />
+      <p className="text-[5px] font-semibold text-gray-400">Recently Played</p>
+      <div className="flex gap-1">
+        {["bg-sky-200", "bg-pink-200", "bg-lime-200", "bg-orange-200"].map((c, i) => (
+          <div key={i} className={`w-5 h-5 rounded-md ${c} shrink-0`} />
         ))}
+        <div className="w-5 h-5 rounded-md bg-gray-100 flex items-center justify-center shrink-0">
+          <p className="text-[5px] text-gray-400">+12</p>
+        </div>
+      </div>
+      <div className="flex items-center gap-1 bg-gray-50 rounded-lg px-1.5 py-1">
+        <div className="w-4 h-4 rounded-sm bg-gradient-to-br from-indigo-300 to-purple-400 shrink-0" />
+        <div className="flex-1 min-w-0">
+          <p className="text-[5px] font-semibold text-gray-600 truncate">Chill Vibes</p>
+          <p className="text-[4px] text-gray-400">Now playing</p>
+        </div>
+        <svg viewBox="0 0 12 12" className="w-2.5 h-2.5 text-emerald-400 shrink-0">
+          <rect x="2" y="2" width="3" height="8" rx="0.5" fill="currentColor" />
+          <rect x="7" y="2" width="3" height="8" rx="0.5" fill="currentColor" />
+        </svg>
       </div>
     </div>
   );
@@ -77,18 +139,36 @@ function DiscoveryEngine() {
   return (
     <div className="space-y-1.5">
       <p className="text-[5px] font-bold text-gray-400 uppercase">For You</p>
-      <div className="rounded-lg bg-gradient-to-br from-violet-300 to-pink-300 p-2 h-16 flex items-end">
-        <div className="space-y-0.5">
-          <div className="h-1.5 bg-white/80 rounded-full w-12" />
-          <div className="h-1 bg-white/50 rounded-full w-8" />
+      <div className="rounded-lg bg-gradient-to-br from-violet-400 to-pink-400 p-2 relative overflow-hidden">
+        <svg viewBox="0 0 40 40" className="absolute right-0 top-0 w-10 h-10 text-white/20">
+          <circle cx="20" cy="20" r="15" fill="none" stroke="currentColor" strokeWidth="2" />
+          <circle cx="20" cy="20" r="8" fill="none" stroke="currentColor" strokeWidth="2" />
+          <circle cx="20" cy="20" r="3" fill="currentColor" />
+        </svg>
+        <p className="text-[6px] font-bold text-white">Daily Mix #1</p>
+        <p className="text-[4px] text-white/70 mt-0.5">Based on your listening</p>
+        <div className="flex gap-0.5 mt-1.5">
+          {["bg-white/40", "bg-white/30", "bg-white/20"].map((c, i) => (
+            <div key={i} className={`w-4 h-4 rounded-sm ${c}`} />
+          ))}
         </div>
       </div>
+      <p className="text-[5px] font-semibold text-gray-400">New Releases</p>
       <div className="flex gap-1">
-        {["bg-sky-100", "bg-orange-100", "bg-green-100"].map((color, i) => (
-          <div key={i} className={`flex-1 rounded-md ${color} px-1 py-1.5`}>
-            <div className="h-1 bg-gray-300 rounded-full w-full" />
+        {[
+          { title: "Indie", gradient: "from-cyan-200 to-blue-300" },
+          { title: "Pop", gradient: "from-pink-200 to-rose-300" },
+          { title: "Lo-fi", gradient: "from-emerald-200 to-teal-300" },
+        ].map((m, i) => (
+          <div key={i} className={`flex-1 rounded-lg bg-gradient-to-br ${m.gradient} p-1 py-1.5`}>
+            <p className="text-[4px] font-bold text-white">{m.title}</p>
+            <p className="text-[3px] text-white/60">12 songs</p>
           </div>
         ))}
+      </div>
+      <div className="bg-amber-50 rounded-lg px-1.5 py-1">
+        <p className="text-[5px] font-semibold text-amber-700">Discover Weekly</p>
+        <p className="text-[4px] text-amber-500">30 new songs picked for you</p>
       </div>
     </div>
   );
