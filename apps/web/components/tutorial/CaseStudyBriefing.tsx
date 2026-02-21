@@ -36,14 +36,14 @@ export default function CaseStudyBriefing({ caseStudy, onReady }: CaseStudyBrief
             </h1>
           </div>
 
-          {/* Business Info */}
+          {/* Product Info */}
           <div className="text-center space-y-2">
             <h2 className="font-pixel text-base text-game-yellow">
-              {caseStudy.businessName}
+              {caseStudy.productName}
             </h2>
             <div className="flex items-center justify-center gap-3">
               <span className="font-pixel text-[8px] bg-game-blue/40 text-white px-2 py-1 rounded">
-                {caseStudy.businessType}
+                {caseStudy.productType}
               </span>
               <span className={`font-pixel text-[8px] px-2 py-1 rounded ${difficulty.className}`}>
                 {difficulty.label}
@@ -58,10 +58,48 @@ export default function CaseStudyBriefing({ caseStudy, onReady }: CaseStudyBrief
             </p>
           </div>
 
-          {/* What's Broken */}
+          {/* Persona Card */}
+          <div className="space-y-3">
+            <h3 className="font-pixel text-[10px] text-game-purple">
+              YOUR USER PERSONA
+            </h3>
+            <div className="bg-game-purple/10 border border-game-purple/30 rounded p-4 space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-game-purple/30 border-2 border-game-purple/50 flex items-center justify-center">
+                  <span className="font-pixel text-[10px] text-game-purple">
+                    {caseStudy.persona.name.split(" ").map(n => n[0]).join("")}
+                  </span>
+                </div>
+                <div>
+                  <p className="font-pixel text-[10px] text-white">
+                    {caseStudy.persona.name}, {caseStudy.persona.age}
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    {caseStudy.persona.occupation}
+                  </p>
+                </div>
+              </div>
+              <p className="font-sans text-sm text-gray-300 leading-relaxed">
+                {caseStudy.persona.bio}
+              </p>
+              <div>
+                <p className="font-pixel text-[8px] text-game-purple mb-1">GOALS:</p>
+                <ul className="space-y-1">
+                  {caseStudy.persona.goals.map((goal, i) => (
+                    <li key={i} className="flex items-start gap-2 text-xs text-gray-300">
+                      <span className="text-game-purple mt-0.5">*</span>
+                      <span>{goal}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* What's Broken / Challenges */}
           <div className="space-y-3">
             <h3 className="font-pixel text-[10px] text-game-red">
-              {"WHAT'S BROKEN"}
+              KEY CHALLENGES
             </h3>
             <ul className="space-y-2">
               {caseStudy.whatsBroken.map((item, i) => (
@@ -77,10 +115,10 @@ export default function CaseStudyBriefing({ caseStudy, onReady }: CaseStudyBrief
             </ul>
           </div>
 
-          {/* Your Mission */}
+          {/* Learning Objectives */}
           <div className="space-y-3">
             <h3 className="font-pixel text-[10px] text-game-green">
-              YOUR MISSION
+              WHAT YOU'LL LEARN
             </h3>
             <ul className="space-y-2">
               {caseStudy.learningObjectives.map((item, i) => (
@@ -118,30 +156,34 @@ export default function CaseStudyBriefing({ caseStudy, onReady }: CaseStudyBrief
           {/* Fun Fact */}
           <div className="bg-game-purple/20 border border-game-purple/40 rounded p-4">
             <p className="font-sans text-sm text-gray-200">
-              <span className="mr-2" aria-hidden="true">💡</span>
+              <span className="mr-2" aria-hidden="true">&#x1f4a1;</span>
               {caseStudy.funFact}
             </p>
           </div>
 
-          {/* Section Guide */}
+          {/* Decision Overview */}
           <div className="space-y-3">
             <h3 className="font-pixel text-[10px] text-game-green">
-              SECTION GUIDE
+              DECISIONS AHEAD
             </h3>
             <div className="grid gap-2">
-              {caseStudy.brokenSections.map((section) => (
+              {caseStudy.decisions.map((decision) => (
                 <div
-                  key={section.id}
+                  key={decision.id}
                   className="bg-game-blue/20 border border-game-blue/30 rounded p-3"
                 >
-                  <p className="font-pixel text-[8px] text-game-yellow mb-1">
-                    {section.label}
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-pixel text-[7px] text-gray-500">
+                      ROUND {decision.round + 1}
+                    </span>
+                    <span className="font-pixel text-[7px] text-game-blue">
+                      {decision.type === "multiple_choice" ? "MULTIPLE CHOICE" :
+                       decision.type === "tradeoff_slider" ? "TRADEOFF" : "BRANCHING PATH"}
+                    </span>
+                  </div>
+                  <p className="font-sans text-xs text-gray-300">
+                    {decision.scenarioText}
                   </p>
-                  {caseStudy.designTips[section.id] && (
-                    <p className="font-sans text-xs text-gray-300">
-                      {caseStudy.designTips[section.id]}
-                    </p>
-                  )}
                 </div>
               ))}
             </div>

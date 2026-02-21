@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useGameStore } from "@/lib/game-store";
 import { getSocket } from "@/lib/socket";
-import type { BrainstormMessage } from "@/lib/types";
+import type { BrainstormMessage } from "@design-dash/shared";
 
 export default function BrainstormPanel() {
   const room = useGameStore((s) => s.room);
@@ -25,6 +25,12 @@ export default function BrainstormPanel() {
     if (!room || !myTeamId) return "#16c79a";
     return room.teams[myTeamId]?.color ?? "#16c79a";
   }, [room, myTeamId]);
+
+  // Check if it's the current player's turn
+  const isMyTurn = useMemo(() => {
+    if (!room?.gameState?.currentTurn || !myTeamId || !playerId) return false;
+    return room.gameState.currentTurn.activePlayerIds[myTeamId] === playerId;
+  }, [room, myTeamId, playerId]);
 
   // Listen for brainstorm messages from socket
   useEffect(() => {
@@ -125,25 +131,32 @@ export default function BrainstormPanel() {
             TEAM CHAT
           </h3>
         </div>
-        <button
-          onClick={() => setIsCollapsed(true)}
-          className="p-0.5 hover:bg-game-blue/20 rounded transition-colors"
-          title="Collapse chat"
-        >
-          <svg
-            className="w-3.5 h-3.5 text-gray-500"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+        <div className="flex items-center gap-3">
+          <span className="font-pixel text-[7px] text-gray-500">
+            {isMyTurn
+              ? "DISCUSS WHILE DECIDING"
+              : "SUGGEST IDEAS FOR YOUR TEAM"}
+          </span>
+          <button
+            onClick={() => setIsCollapsed(true)}
+            className="p-0.5 hover:bg-game-blue/20 rounded transition-colors"
+            title="Collapse chat"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 9l-7 7-7-7"
-            />
-          </svg>
-        </button>
+            <svg
+              className="w-3.5 h-3.5 text-gray-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* Messages + Input */}

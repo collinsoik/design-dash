@@ -1,5 +1,6 @@
 // ==========================================
 // Core Game Types for DesignDash
+// Product Design Decision Game
 // ==========================================
 
 export interface Player {
@@ -20,31 +21,60 @@ export interface Team {
   finalScore: number;
 }
 
-export interface SectionSlot {
+// ── Decision Types ──────────────────────────
+
+export type DecisionType = "multiple_choice" | "tradeoff_slider" | "branching_path";
+
+export interface ChoiceOption {
   id: string;
   label: string;
-  assignedTo: string | null; // playerId
-  turnOrder: number;
-  placedComponent: PlacedComponent | null;
-  status: "empty" | "placed" | "locked";
+  description: string;
 }
 
-export interface PlacedComponent {
-  registryId: string;
-  customizations?: Record<string, string>;
+export interface TradeoffConfig {
+  leftLabel: string;
+  rightLabel: string;
+  leftDescription: string;
+  rightDescription: string;
 }
 
-export interface WebsiteState {
-  sections: SectionSlot[];
+export interface BranchOption {
+  id: string;
+  label: string;
+  description: string;
+  followUp: {
+    scenarioText: string;
+    choices: ChoiceOption[];
+  };
+}
+
+export interface DecisionPoint {
+  id: string;
+  order: number;
+  round: number;
+  type: DecisionType;
+  scenarioText: string;
+  context?: string;
+  choices?: ChoiceOption[];       // for multiple_choice
+  tradeoff?: TradeoffConfig;      // for tradeoff_slider
+  branches?: BranchOption[];      // for branching_path
+}
+
+export interface UserPersona {
+  name: string;
+  age: number;
+  occupation: string;
+  bio: string;
+  goals: string[];
 }
 
 export interface CaseStudy {
   id: string;
-  businessName: string;
-  businessType: string;
+  productName: string;
+  productType: string;
   story: string;
-  brokenSections: SectionSlot[];
-  idealCategories: Record<string, string[]>;
+  persona: UserPersona;
+  decisions: DecisionPoint[];
   scoringCriteria: string[];
   difficulty: "beginner" | "intermediate" | "advanced";
   learningObjectives: string[];
@@ -54,9 +84,11 @@ export interface CaseStudy {
   funFact: string;
 }
 
+// ── Game State ──────────────────────────────
+
 export interface RoomConfig {
   teamSize: number;
-  turnTimer: number; // seconds
+  turnTimer: number; // seconds per round
   caseStudyId: string;
   peerVoteWeight: number; // 0-100, percentage
   judgeWeight: number; // 0-100, percentage
@@ -75,18 +107,32 @@ export interface Room {
 
 export type GamePhase = "lobby" | "playing" | "voting" | "results";
 
+export interface PlayerDecision {
+  decisionPointId: string;
+  type: DecisionType;
+  choiceId?: string;        // for multiple_choice
+  sliderValue?: number;     // for tradeoff_slider (0-100)
+  branchId?: string;        // for branching_path
+  followUpChoiceId?: string; // for branching_path follow-up
+  submittedAt: number;
+}
+
+export interface TeamDecisionState {
+  decisions: Record<string, PlayerDecision>; // decisionPointId -> decision
+}
+
 export interface GameState {
   caseStudy: CaseStudy;
-  teamWebsites: Record<string, WebsiteState>; // teamId -> website
+  teamDecisions: Record<string, TeamDecisionState>; // teamId -> decisions
   currentTurn: TurnState;
-  totalTurns: number;
+  totalRounds: number;
 }
 
 export interface TurnState {
-  turnNumber: number;
+  round: number;
   activePlayerIds: Record<string, string>; // teamId -> playerId
   timeRemaining: number;
-  assignedSlots: Record<string, string[]>; // playerId -> slotIds
+  submittedTeams: string[]; // teamIds that have submitted this round
 }
 
 export interface BrainstormMessage {
@@ -97,6 +143,8 @@ export interface BrainstormMessage {
   text: string;
   timestamp: number;
 }
+
+// ── Voting & Results ────────────────────────
 
 export interface Vote {
   voterId: string;
@@ -112,7 +160,7 @@ export interface JudgeScore {
 
 export interface GameResults {
   teams: TeamResult[];
-  bestSections: BestSectionAward[];
+  bestDecisions: BestDecisionAward[];
 }
 
 export interface TeamResult {
@@ -124,48 +172,14 @@ export interface TeamResult {
   rank: number;
 }
 
-export interface BestSectionAward {
-  sectionLabel: string;
+export interface BestDecisionAward {
+  decisionLabel: string;
   teamId: string;
   teamName: string;
-  componentId: string;
 }
 
-// Component Registry Types
-export interface ComponentEntry {
-  id: string;
-  name: string;
-  category: ComponentCategory;
-  preview: string; // path to PNG
-  jsx: string; // path to JSX file
-}
+// ── Constants ───────────────────────────────
 
-export type ComponentCategory =
-  | "headers"
-  | "hero_sections"
-  | "feature_sections"
-  | "content_sections"
-  | "cta_sections"
-  | "pricing_sections"
-  | "testimonials"
-  | "team_sections"
-  | "stats_sections"
-  | "contact_sections"
-  | "newsletter_sections"
-  | "blog_sections"
-  | "footers"
-  | "logo_clouds"
-  | "faqs"
-  | "banners"
-  | "bento_grids"
-  | "about_pages"
-  | "404_pages"
-  | "flyout_menus"
-  | "header_sections"
-  | "landing_pages"
-  | "pricing_pages";
-
-// Team color presets
 export const TEAM_COLORS = [
   "#e94560", // Red
   "#0f3460", // Blue

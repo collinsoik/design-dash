@@ -18,7 +18,7 @@ export default function TeamSidebar() {
     return room.teams[myTeamId] ?? null;
   }, [room, myTeamId]);
 
-  // Active player for this team in the current turn
+  // Active player for this team in the current round
   const activePlayerId = useMemo(() => {
     if (!room?.gameState?.currentTurn || !myTeamId) return null;
     return room.gameState.currentTurn.activePlayerIds[myTeamId] ?? null;
@@ -63,7 +63,7 @@ export default function TeamSidebar() {
       </div>
 
       <div className="flex-1 overflow-y-auto p-3 space-y-4">
-        {/* ── Team Members ───────────────────────── */}
+        {/* Team Members */}
         <div>
           <h4 className="font-pixel text-[9px] text-gray-400 mb-2">
             MEMBERS
@@ -146,7 +146,7 @@ export default function TeamSidebar() {
           </div>
         </div>
 
-        {/* ── Case Study ────────────────────── */}
+        {/* Mission */}
         <div className="pt-3 border-t border-gray-700">
           <h4 className="font-pixel text-[9px] text-gray-400 mb-2">
             MISSION
@@ -155,14 +155,13 @@ export default function TeamSidebar() {
             <div className="space-y-2">
               <div className="px-2 py-2 bg-game-blue/10 border border-game-blue/30 rounded">
                 <p className="font-pixel text-[9px] text-game-yellow mb-1">
-                  {caseStudy.businessName}
+                  {caseStudy.productName}
                 </p>
                 <p className="text-xs text-gray-400">
-                  {caseStudy.businessType}
+                  {caseStudy.productType}
                 </p>
               </div>
 
-              {/* Fun fact - keeps it light */}
               {caseStudy.funFact && (
                 <div className="px-2 py-2 bg-game-yellow/5 border border-game-yellow/20 rounded">
                   <p className="text-xs text-gray-300 leading-relaxed">
@@ -178,7 +177,27 @@ export default function TeamSidebar() {
           )}
         </div>
 
-        {/* ── Team Score ─────────────────────────── */}
+        {/* Scoring Criteria */}
+        {caseStudy && caseStudy.scoringCriteria.length > 0 && (
+          <div className="pt-3 border-t border-gray-700">
+            <h4 className="font-pixel text-[8px] text-gray-400 mb-2">
+              SCORING CRITERIA
+            </h4>
+            <ul className="space-y-0.5">
+              {caseStudy.scoringCriteria.map((criteria, i) => (
+                <li
+                  key={i}
+                  className="flex items-start gap-1.5 text-[10px] text-gray-500"
+                >
+                  <span className="text-game-green mt-0.5">*</span>
+                  <span>{criteria}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Team Score */}
         {team && (team.peerScore > 0 || team.judgeScore > 0) && (
           <div className="pt-3 border-t border-gray-700">
             <h4 className="font-pixel text-[9px] text-gray-400 mb-2">

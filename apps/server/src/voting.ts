@@ -10,7 +10,7 @@ import {
   JudgeScore,
   GameResults,
   TeamResult,
-  BestSectionAward,
+  BestDecisionAward,
 } from "@design-dash/shared";
 import { getRoom } from "./rooms";
 import { updateGameResults } from "./db";
@@ -71,30 +71,25 @@ function calculateResults(roomCode: string): GameResults | null {
     t.rank = i + 1;
   });
 
-  // Determine best section awards
-  const bestSections: BestSectionAward[] = [];
-  if (room.gameState.caseStudy) {
-    for (const sectionDef of room.gameState.caseStudy.brokenSections) {
-      // For now, award to the team ranked first (can be expanded later)
-      if (teamResults.length > 0) {
-        const topTeam = teamResults[0];
-        const website = room.gameState.teamWebsites[topTeam.teamId];
-        const section = website?.sections.find(
-          (s) => s.id === sectionDef.id
-        );
-        if (section?.placedComponent) {
-          bestSections.push({
-            sectionLabel: sectionDef.label,
-            teamId: topTeam.teamId,
-            teamName: topTeam.teamName,
-            componentId: section.placedComponent.registryId,
-          });
-        }
-      }
+  // Determine best decision awards - pick a standout decision per round
+  const bestDecisions: BestDecisionAward[] = [];
+  if (room.gameState.caseStudy && teamResults.length > 0) {
+    const topTeam = teamResults[0];
+    const decisions = room.gameState.caseStudy.decisions;
+    const seenRounds = new Set<number>();
+
+    for (const dp of decisions) {
+      if (seenRounds.has(dp.round)) continue;
+      seenRounds.add(dp.round);
+      bestDecisions.push({
+        decisionLabel: dp.scenarioText.slice(0, 60) + (dp.scenarioText.length > 60 ? "..." : ""),
+        teamId: topTeam.teamId,
+        teamName: topTeam.teamName,
+      });
     }
   }
 
-  return { teams: teamResults, bestSections };
+  return { teams: teamResults, bestDecisions };
 }
 
 export function handleVotingEvents(io: Server, socket: Socket): void {

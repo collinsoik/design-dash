@@ -1,11 +1,11 @@
-import { Room, GameState, WebsiteState, SectionSlot } from "@design-dash/shared";
+import { Room, GameState, TeamDecisionState, PlayerDecision } from "@design-dash/shared";
 
-export function getTeamWebsite(
+export function getTeamDecisions(
   room: Room,
   teamId: string
-): WebsiteState | null {
+): TeamDecisionState | null {
   if (!room.gameState) return null;
-  return room.gameState.teamWebsites[teamId] || null;
+  return room.gameState.teamDecisions[teamId] || null;
 }
 
 export function isPlayerActive(room: Room, playerId: string): boolean {
@@ -20,7 +20,20 @@ export function getPlayerTeamId(room: Room, playerId: string): string | null {
   return player?.teamId || null;
 }
 
-export function getAssignedSlots(room: Room, playerId: string): string[] {
+export function getDecisionsForRound(
+  room: Room,
+  teamId: string,
+  round: number
+): PlayerDecision[] {
   if (!room.gameState) return [];
-  return room.gameState.currentTurn.assignedSlots[playerId] || [];
+  const teamState = room.gameState.teamDecisions[teamId];
+  if (!teamState) return [];
+
+  const roundDecisionIds = room.gameState.caseStudy.decisions
+    .filter((d) => d.round === round)
+    .map((d) => d.id);
+
+  return roundDecisionIds
+    .map((id) => teamState.decisions[id])
+    .filter(Boolean);
 }

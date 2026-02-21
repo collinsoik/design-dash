@@ -2,543 +2,653 @@ import { CaseStudy } from "./types";
 
 export const CASE_STUDIES: CaseStudy[] = [
   {
-    id: "byte-burger",
-    businessName: "Byte Burger",
-    businessType: "Restaurant",
+    id: "melodify",
+    productName: "Melodify",
+    productType: "Music Streaming App",
     story:
-      "Byte Burger has been flipping the BEST burgers in town for 10 years — people line up around the block just for their famous Pixel Patty! But here's the problem: their nephew tried to build them a website and... yikes. The navigation is a jumbled mess, there's no mouth-watering hero image to make you hungry, the menu is just a boring wall of text, and the footer links are totally broken. Your mission? Save Byte Burger's online reputation and make their site as tasty as their food!",
-    brokenSections: [
+      "Melodify is a growing music streaming service competing with Spotify and Apple Music. They've got a solid catalog but are struggling to differentiate. Your team has been hired as the product design consultants to make key UX decisions that will shape the next major release.",
+    persona: {
+      name: "Alex Chen",
+      age: 28,
+      occupation: "Marketing Coordinator",
+      bio: "Alex is a casual listener who primarily uses music during their daily commute and workout sessions. They don't want to spend time curating playlists — they just want music that fits the moment.",
+      goals: [
+        "Quickly find music that matches their activity",
+        "Discover new songs without effort",
+        "Simple, non-overwhelming interface",
+      ],
+    },
+    decisions: [
       {
-        id: "slot-header",
-        label: "Header / Navigation",
-        assignedTo: null,
-        turnOrder: 0,
-        placedComponent: null,
-        status: "empty",
+        id: "melodify-home-layout",
+        order: 0,
+        round: 0,
+        type: "multiple_choice",
+        scenarioText:
+          "Alex opens the app for the first time after updating. What should the home screen prioritize?",
+        context:
+          "Data shows 60% of users play the same 20 songs repeatedly. 25% explore new music weekly. The current home screen is a grid of album art with no personalization.",
+        choices: [
+          {
+            id: "activity-based",
+            label: "Activity-Based Home",
+            description:
+              "Show contextual suggestions based on time of day and activity (commute, workout, focus). Minimal browsing required.",
+          },
+          {
+            id: "social-feed",
+            label: "Social Feed Home",
+            description:
+              "Show what friends are listening to, trending tracks, and collaborative playlists front-and-center.",
+          },
+          {
+            id: "library-first",
+            label: "Library-First Home",
+            description:
+              "Prioritize the user's own playlists, recently played, and saved albums. Familiar and fast.",
+          },
+          {
+            id: "discovery-engine",
+            label: "Discovery Engine Home",
+            description:
+              "AI-curated daily mixes, genre explorations, and \"new releases for you\" dominate the screen.",
+          },
+        ],
       },
       {
-        id: "slot-hero",
-        label: "Hero Section",
-        assignedTo: null,
-        turnOrder: 0,
-        placedComponent: null,
-        status: "empty",
+        id: "melodify-nav-complexity",
+        order: 1,
+        round: 0,
+        type: "tradeoff_slider",
+        scenarioText:
+          "How should Melodify balance navigation simplicity vs. feature richness?",
+        context:
+          "Power users complain there aren't enough features accessible from the main nav. Casual users say the app feels cluttered. You need to find the right balance.",
+        tradeoff: {
+          leftLabel: "Minimal Nav",
+          rightLabel: "Feature-Rich Nav",
+          leftDescription:
+            "3 tabs only: Home, Search, Library. Clean and simple. Advanced features buried in menus.",
+          rightDescription:
+            "6+ tabs: Home, Explore, Radio, Social, Library, Profile. Everything one tap away but busier.",
+        },
       },
       {
-        id: "slot-features",
-        label: "Menu / Features",
-        assignedTo: null,
-        turnOrder: 1,
-        placedComponent: null,
-        status: "empty",
+        id: "melodify-social",
+        order: 2,
+        round: 1,
+        type: "branching_path",
+        scenarioText:
+          "The CEO wants to add social features. What direction should Melodify take?",
+        context:
+          "Competitors are adding social features. Melodify has none currently. Users aged 18-24 request social features most. Users 25+ are split — some want it, many don't care.",
+        branches: [
+          {
+            id: "passive-social",
+            label: "Passive Social",
+            description:
+              "Show listening activity subtly — friends' recently played, shared taste scores. No messaging or posting.",
+            followUp: {
+              scenarioText:
+                "Where should the passive social data appear in the app?",
+              choices: [
+                {
+                  id: "home-widget",
+                  label: "Home Screen Widget",
+                  description: "A small \"Friends Listening\" card on the home screen.",
+                },
+                {
+                  id: "dedicated-tab",
+                  label: "Dedicated Activity Tab",
+                  description: "A separate tab showing all friend activity in a feed.",
+                },
+                {
+                  id: "inline-tracks",
+                  label: "Inline on Tracks",
+                  description: "Show friend avatars on tracks/playlists they've listened to.",
+                },
+              ],
+            },
+          },
+          {
+            id: "active-social",
+            label: "Active Social",
+            description:
+              "Full social features — collaborative playlists, comments on songs, sharing stories, friend messaging.",
+            followUp: {
+              scenarioText:
+                "How do you handle social feature adoption without overwhelming existing users?",
+              choices: [
+                {
+                  id: "opt-in-gradual",
+                  label: "Gradual Opt-In",
+                  description: "Social features hidden by default. Prompt users to enable after 2 weeks.",
+                },
+                {
+                  id: "onboarding-choice",
+                  label: "Onboarding Choice",
+                  description: "During onboarding, ask users to pick \"Social\" or \"Solo\" mode.",
+                },
+                {
+                  id: "always-on",
+                  label: "Always On",
+                  description: "Social features enabled for everyone. Users can mute/hide if they want.",
+                },
+              ],
+            },
+          },
+          {
+            id: "no-social",
+            label: "Skip Social Entirely",
+            description:
+              "Focus resources on music quality, better recommendations, and offline features instead.",
+            followUp: {
+              scenarioText:
+                "If not social, what should Melodify invest in to differentiate?",
+              choices: [
+                {
+                  id: "ai-dj",
+                  label: "AI DJ Mode",
+                  description: "An AI that creates seamless transitions between songs like a real DJ.",
+                },
+                {
+                  id: "lossless-audio",
+                  label: "Lossless Audio Focus",
+                  description: "Market-leading audio quality with equipment-specific tuning.",
+                },
+                {
+                  id: "mood-engine",
+                  label: "Mood Engine",
+                  description: "Detect mood from phone sensors and play matching music automatically.",
+                },
+              ],
+            },
+          },
+        ],
       },
       {
-        id: "slot-testimonials",
-        label: "Reviews / Testimonials",
-        assignedTo: null,
-        turnOrder: 1,
-        placedComponent: null,
-        status: "empty",
-      },
-      {
-        id: "slot-cta",
-        label: "Call to Action",
-        assignedTo: null,
-        turnOrder: 2,
-        placedComponent: null,
-        status: "empty",
-      },
-      {
-        id: "slot-footer",
-        label: "Footer",
-        assignedTo: null,
-        turnOrder: 2,
-        placedComponent: null,
-        status: "empty",
+        id: "melodify-onboarding",
+        order: 3,
+        round: 2,
+        type: "multiple_choice",
+        scenarioText:
+          "Design the new-user onboarding flow. Alex just downloaded Melodify. What happens first?",
+        context:
+          "Current onboarding asks users to pick 5 favorite artists from a grid of 50. Completion rate is only 40%. Users who skip onboarding have 3x higher churn in the first week.",
+        choices: [
+          {
+            id: "quick-listen",
+            label: "Quick Listen Test",
+            description:
+              "Play 10-second clips of varied songs. User taps thumbs up/down. Takes 60 seconds, feels fun.",
+          },
+          {
+            id: "import-library",
+            label: "Import & Go",
+            description:
+              "Connect Spotify/Apple Music to import existing taste. Instant personalization, zero effort.",
+          },
+          {
+            id: "genre-mood-picker",
+            label: "Genre + Mood Picker",
+            description:
+              "Pick 3 genres and 2 moods from a visual grid (8 options each). Simple but less precise.",
+          },
+          {
+            id: "skip-and-learn",
+            label: "Skip Everything",
+            description:
+              "No onboarding. Start with popular/trending and learn preferences from actual listening behavior over time.",
+          },
+        ],
       },
     ],
-    idealCategories: {
-      "slot-header": ["headers"],
-      "slot-hero": ["hero_sections"],
-      "slot-features": ["feature_sections", "bento_grids"],
-      "slot-testimonials": ["testimonials"],
-      "slot-cta": ["cta_sections"],
-      "slot-footer": ["footers"],
-    },
     scoringCriteria: [
-      "Clear navigation with restaurant name visible",
-      "Appetizing hero image or visual",
-      "Menu items are easy to read and organized",
-      "Customer reviews build trust",
-      "Clear call-to-action (Order Now, Visit Us)",
-      "Footer has contact info and hours",
+      "User-centric decision making",
+      "Consistency across decisions",
+      "Understanding tradeoffs",
+      "Design reasoning quality",
     ],
     difficulty: "beginner",
     learningObjectives: [
-      "Understand what a website header/nav does and why it matters",
-      "Learn how hero sections grab a visitor's attention",
-      "See how organizing content (like a menu) makes it easier to read",
-      "Discover why footers need working links and contact info",
+      "Understand how home screen design affects user engagement and retention",
+      "Learn to balance simplicity vs. feature richness in navigation",
+      "Explore the tradeoffs of adding social features to a content app",
+      "See how onboarding design impacts long-term user behavior",
     ],
     whatsBroken: [
-      "The navigation bar is confusing — visitors can't find anything!",
-      "There's no hero image — the site looks boring and doesn't make you hungry",
-      "The menu section is a wall of text with no organization",
-      "Footer links are broken and there's no way to find the address or hours",
+      "The home screen is a generic grid with no personalization — users can't find relevant music quickly",
+      "Navigation tries to do too much, overwhelming casual users while hiding key features from power users",
+      "No social features at all — missing a key engagement driver for younger demographics",
+      "Onboarding has a 60% drop-off rate — too many choices, not enough guidance",
     ],
     successHints: [
-      "Look for headers that clearly show a business name and have simple navigation links",
-      "Pick a hero section with space for a big, bold image — food places NEED appetizing visuals!",
-      "Choose a features section that organizes items into columns or cards — nobody wants to read a text wall",
-      "Make sure your footer has room for an address, phone number, and hours",
+      "Think about Alex's use case — they want music that fits the moment, not endless browsing",
+      "Consider the 60/25 split: most users replay favorites, but a quarter want discovery",
+      "Social features should match the app's core value — listening — not become a separate social network",
+      "Good onboarding is fast, fun, and gives the algorithm enough signal to personalize immediately",
     ],
     designTips: {
-      "slot-header":
-        "Pick a header that shows the restaurant name BIG and CLEAR. Visitors should know they're at Byte Burger within 2 seconds! Look for one with easy navigation links.",
-      "slot-hero":
-        "This is the FIRST thing people see! Choose a hero with a big image area — imagine a juicy burger photo here. It should make people say 'I NEED to eat there!'",
-      "slot-features":
-        "The menu needs to be organized! Look for a features section with cards, columns, or grids. Each menu item should be easy to scan — no one reads a giant paragraph when they're hungry.",
-      "slot-testimonials":
-        "Customer reviews build TRUST. Pick a testimonial section that shows star ratings or quotes. When people see others loving the food, they want to try it too!",
-      "slot-cta":
-        "CTA means 'Call to Action' — it's the part that tells visitors what to DO. Pick one that could say 'Order Now' or 'Visit Us Today' with a big, clickable button.",
-      "slot-footer":
-        "The footer is at the bottom of every website. It should have the restaurant's address, phone number, hours, and social media links. Pick one that's clean and organized.",
+      "melodify-home-layout":
+        "The best home screen for a casual listener reduces decision fatigue. Think about what Alex needs at 7:30am on the train vs. 6pm at the gym.",
+      "melodify-nav-complexity":
+        "Research shows mobile apps with 3-5 nav items have the best usability scores. But hiding features can hurt discoverability.",
+      "melodify-social":
+        "Social features in music apps work best when they enhance discovery, not distract from listening. Consider your persona's goals.",
+      "melodify-onboarding":
+        "The best onboarding balances data collection with user patience. If it feels like a chore, users skip it — but if they skip it, the app can't personalize.",
     },
     funFact:
-      "Did you know? The average person decides whether to stay on a website or leave within just 3 seconds! That's why the hero section is SO important — it's your first impression!",
+      "Did you know? Spotify's Discover Weekly playlist, which uses AI to recommend music, has generated over 2.3 billion hours of listening. Personalization isn't just nice — it's the #1 driver of music app engagement!",
   },
   {
-    id: "technova",
-    businessName: "TechNova",
-    businessType: "SaaS Startup",
+    id: "greenplate",
+    productName: "GreenPlate",
+    productType: "Meal Planning & Grocery App",
     story:
-      "TechNova built an AMAZING project management app that helps small teams get stuff done — think of it like a super-powered to-do list for groups! But their website was thrown together during a 24-hour hackathon (a coding marathon), and it shows. There's no clear explanation of what the app actually DOES, the features are hidden in walls of text, pricing is nowhere to be found, and there's no sign-up button. They're losing potential customers every single day! Can your team create a landing page that makes people want to try TechNova?",
-    brokenSections: [
+      "GreenPlate helps busy families plan weekly meals and auto-generates grocery lists. The app has strong reviews but low retention — users love it for the first month then drop off. Your team needs to make design decisions that improve long-term engagement.",
+    persona: {
+      name: "Sarah Mitchell",
+      age: 35,
+      occupation: "Working Parent (Teacher)",
+      bio: "Sarah has two kids (ages 6 and 9), works full time, and handles most of the meal planning. She wants healthy meals that her picky kids will eat, and she needs shopping to be fast.",
+      goals: [
+        "Plan a week of meals in under 10 minutes",
+        "Minimize food waste",
+        "Get kids to eat healthier without complaints",
+      ],
+    },
+    decisions: [
       {
-        id: "slot-header",
-        label: "Header / Navigation",
-        assignedTo: null,
-        turnOrder: 0,
-        placedComponent: null,
-        status: "empty",
+        id: "greenplate-planning-ui",
+        order: 0,
+        round: 0,
+        type: "multiple_choice",
+        scenarioText:
+          "Sarah opens the meal planner on Sunday evening. How should the weekly planning interface work?",
+        context:
+          "Users spend an average of 22 minutes planning a week of meals. 70% plan on Sunday. The biggest drop-off point is when users have to choose recipes — too many options cause decision fatigue.",
+        choices: [
+          {
+            id: "ai-auto-plan",
+            label: "Auto-Plan with AI",
+            description:
+              "AI generates a full week based on preferences, dietary needs, and past likes. User just approves or swaps individual meals.",
+          },
+          {
+            id: "drag-calendar",
+            label: "Drag-to-Calendar",
+            description:
+              "Visual calendar view. Browse recipes and drag them onto days. Full control, but slower.",
+          },
+          {
+            id: "quick-picks",
+            label: "Quick Pick Slots",
+            description:
+              "For each meal slot, show 3 curated options. Tap to select. Fast but less variety.",
+          },
+        ],
       },
       {
-        id: "slot-hero",
-        label: "Hero Section",
-        assignedTo: null,
-        turnOrder: 0,
-        placedComponent: null,
-        status: "empty",
+        id: "greenplate-picky-eaters",
+        order: 1,
+        round: 0,
+        type: "branching_path",
+        scenarioText:
+          "Sarah's kids reject half the meals she plans. How should GreenPlate handle picky eaters?",
+        context:
+          "35% of users cite picky family members as a top frustration. No current feature addresses this directly.",
+        branches: [
+          {
+            id: "kid-profiles",
+            label: "Kid Taste Profiles",
+            description:
+              "Create individual profiles for each family member. The app learns what each person likes/dislikes and filters recipes accordingly.",
+            followUp: {
+              scenarioText: "How should kid profiles collect taste data?",
+              choices: [
+                {
+                  id: "thumbs-rating",
+                  label: "Post-Meal Thumbs Up/Down",
+                  description: "After each meal, quick thumbs up/down per family member.",
+                },
+                {
+                  id: "ingredient-prefs",
+                  label: "Ingredient Preference Setup",
+                  description: "During setup, mark ingredients each kid likes, dislikes, or is allergic to.",
+                },
+                {
+                  id: "fun-quiz",
+                  label: "Fun Food Quiz for Kids",
+                  description: "A gamified quiz kids fill out themselves with food pictures and emoji reactions.",
+                },
+              ],
+            },
+          },
+          {
+            id: "sneaky-healthy",
+            label: "\"Sneaky Healthy\" Recipes",
+            description:
+              "Curate recipes that hide vegetables and healthy ingredients in kid-friendly dishes. No profiles needed.",
+            followUp: {
+              scenarioText: "How should sneaky healthy recipes be presented?",
+              choices: [
+                {
+                  id: "labeled-badge",
+                  label: "\"Kid Approved\" Badge",
+                  description: "Mark recipes with a badge. Parents can filter for them.",
+                },
+                {
+                  id: "integrated-default",
+                  label: "Default in Suggestions",
+                  description: "Auto-prioritize these recipes in suggestions without labeling them specially.",
+                },
+                {
+                  id: "separate-section",
+                  label: "Dedicated Kids Section",
+                  description: "A separate \"Family Friendly\" section in the recipe browser.",
+                },
+              ],
+            },
+          },
+        ],
       },
       {
-        id: "slot-features",
-        label: "Features Section",
-        assignedTo: null,
-        turnOrder: 1,
-        placedComponent: null,
-        status: "empty",
+        id: "greenplate-grocery",
+        order: 2,
+        round: 1,
+        type: "tradeoff_slider",
+        scenarioText:
+          "Balance the grocery list between optimization and user control.",
+        context:
+          "The auto-generated grocery list sometimes combines ingredients in confusing ways (\"2.5 lbs chicken\" across 3 recipes). Some users want exact per-recipe breakdowns. Others want the most efficient list possible.",
+        tradeoff: {
+          leftLabel: "Per-Recipe Lists",
+          rightLabel: "Optimized Combined",
+          leftDescription:
+            "Show ingredients grouped by recipe. Clear what goes where. But the shopping list is longer and has duplicates.",
+          rightDescription:
+            "Combine all ingredients into one optimized list grouped by store aisle. Shorter but harder to trace back to recipes.",
+        },
       },
       {
-        id: "slot-pricing",
-        label: "Pricing Section",
-        assignedTo: null,
-        turnOrder: 1,
-        placedComponent: null,
-        status: "empty",
-      },
-      {
-        id: "slot-cta",
-        label: "Call to Action",
-        assignedTo: null,
-        turnOrder: 2,
-        placedComponent: null,
-        status: "empty",
-      },
-      {
-        id: "slot-footer",
-        label: "Footer",
-        assignedTo: null,
-        turnOrder: 2,
-        placedComponent: null,
-        status: "empty",
+        id: "greenplate-retention",
+        order: 3,
+        round: 2,
+        type: "multiple_choice",
+        scenarioText:
+          "It's week 5 and Sarah hasn't opened GreenPlate in 4 days. What should the app do to re-engage her?",
+        context:
+          "Retention drops 45% between week 4-6. Push notification open rate is 12%. Users say they \"forgot\" or \"got too busy.\"",
+        choices: [
+          {
+            id: "smart-reminder",
+            label: "Smart Sunday Reminder",
+            description:
+              "Send a notification Sunday morning: \"Plan this week's meals in 3 minutes — we pre-filled based on your favorites.\"",
+          },
+          {
+            id: "leftover-helper",
+            label: "Leftover Helper",
+            description:
+              "Mid-week notification: \"Got leftover chicken from Monday? Here are 3 quick meals to make with it.\"",
+          },
+          {
+            id: "streak-gamification",
+            label: "Planning Streak",
+            description:
+              "Gamify weekly planning with streaks, badges, and family stats (\"You've cooked 80% of planned meals!\").",
+          },
+          {
+            id: "do-nothing",
+            label: "Don't Push — Improve Core",
+            description:
+              "Skip re-engagement tricks. Instead, invest in making the core planning experience so fast it becomes habit naturally.",
+          },
+        ],
       },
     ],
-    idealCategories: {
-      "slot-header": ["headers"],
-      "slot-hero": ["hero_sections"],
-      "slot-features": ["feature_sections", "bento_grids"],
-      "slot-pricing": ["pricing_sections"],
-      "slot-cta": ["cta_sections"],
-      "slot-footer": ["footers"],
-    },
     scoringCriteria: [
-      "Clear value proposition in hero",
-      "Features are scannable, not walls of text",
-      "Pricing is transparent and easy to compare",
-      "Strong CTA (Start Free Trial, Sign Up)",
-      "Professional, trustworthy appearance",
-      "Footer includes legal and contact links",
+      "User-centric decision making",
+      "Consistency across decisions",
+      "Understanding tradeoffs",
+      "Design reasoning quality",
     ],
     difficulty: "intermediate",
     learningObjectives: [
-      "Learn how to communicate a product's value clearly (value proposition)",
-      "Understand how to present features so they're easy to scan",
-      "See why transparent pricing helps customers make decisions",
-      "Discover what makes a 'Call to Action' button effective",
+      "Learn how to reduce decision fatigue in complex planning interfaces",
+      "Understand how personalization features affect different user segments",
+      "See how data presentation choices impact usability in grocery/shopping flows",
+      "Explore retention strategies and their ethical tradeoffs",
     ],
     whatsBroken: [
-      "No clear value proposition — visitors have no idea what TechNova does!",
-      "Features are buried in huge paragraphs that nobody will read",
-      "There's zero pricing information — people don't trust that",
-      "No sign-up or free trial button anywhere — how do you even start using it?!",
+      "Meal planning takes 22 minutes — too long for busy parents like Sarah",
+      "No way to account for picky eaters — 35% of users are frustrated by this gap",
+      "The grocery list is confusing — combined ingredients don't map back to recipes",
+      "Retention crashes after week 4 — the app fails to become a habit",
     ],
     successHints: [
-      "The hero should explain WHAT TechNova does and WHY it's awesome in one sentence",
-      "Features work best as short bullet points or icon cards — keep it scannable",
-      "Show pricing tiers side by side so users can compare easily",
-      "Your CTA should say something action-oriented like 'Start Free Trial' — make it impossible to miss",
+      "Sarah's #1 goal is speed — any planning UI that takes more than 10 minutes will lose her",
+      "Kids are unpredictable — the best picky eater solution collects data over time, not just upfront",
+      "Think about Sarah in the grocery store aisle — which list format helps her shop fastest?",
+      "The best retention strategy feels helpful, not pushy — Sarah already has enough notifications",
     ],
     designTips: {
-      "slot-header":
-        "A SaaS (Software as a Service) site needs a clean, professional header. Look for one with a logo area and navigation links like 'Features', 'Pricing', and 'Sign Up'.",
-      "slot-hero":
-        "The hero needs to answer ONE question: 'What does this app do and why should I care?' Pick one with space for a headline, a short description, and a big CTA button.",
-      "slot-features":
-        "This is where you show off what TechNova can do! Pick a features section with icons or images next to short descriptions. Think: 'Task Tracking', 'Team Chat', 'File Sharing'.",
-      "slot-pricing":
-        "People want to know the cost BEFORE they sign up. Choose a pricing section with 2-3 tiers side by side (like Free, Pro, Team). Make it easy to compare!",
-      "slot-cta":
-        "This is your last chance to convince someone to sign up! Pick a CTA section with a strong headline and a button that says something like 'Get Started Free'.",
-      "slot-footer":
-        "A professional footer for a tech company should have links to legal stuff (Privacy Policy, Terms), social media, and maybe a 'Contact Us' option.",
+      "greenplate-planning-ui":
+        "Decision fatigue is real. When people face too many choices, they choose nothing. The best meal planning UIs limit options while preserving a sense of control.",
+      "greenplate-picky-eaters":
+        "Personalization that learns over time is more accurate than upfront preferences. But upfront data gives faster results. Consider which matters more for Sarah.",
+      "greenplate-grocery":
+        "There's no universally 'right' answer for list format. The key is matching the mental model of your user. How does Sarah think about groceries?",
+      "greenplate-retention":
+        "Re-engagement notifications have diminishing returns. The apps with highest retention make the core experience so valuable that users come back on their own.",
     },
     funFact:
-      "Did you know? Companies that show transparent pricing on their website get up to 2x more sign-ups than those that hide it. That's why the pricing section is so important!",
+      "Did you know? The average family throws away $1,500 worth of food per year. Meal planning apps that reduce food waste by even 20% save families over $300 annually — that's a powerful value proposition!",
   },
   {
-    id: "greenleaf-studio",
-    businessName: "GreenLeaf Studio",
-    businessType: "Design Agency",
+    id: "parkwise",
+    productName: "ParkWise",
+    productType: "Smart Parking Finder App",
     story:
-      "GreenLeaf Studio is a creative design agency that makes logos, websites, and brand identities for other businesses — they're basically the artists of the internet! But here's the ironic part: their OWN website looks terrible. The layout is cluttered and messy, there's no portfolio showing off their amazing work, the team page is completely missing (so you don't know who these people are), and the footer is ugly. There's a saying: 'the cobbler's children have no shoes' — meaning experts sometimes forget to help themselves! Prove them wrong and build GreenLeaf a site that screams CREATIVITY.",
-    brokenSections: [
+      "ParkWise helps drivers find available parking spots in real-time using sensor data and crowdsourcing. They have great data but the app experience is frustrating — users say it's slow, hard to use while driving, and the map is overwhelming. Your team needs to redesign the core experience.",
+    persona: {
+      name: "Jordan Rivera",
+      age: 42,
+      occupation: "Freelance Photographer",
+      bio: "Jordan drives to different locations daily for shoots. They're often in unfamiliar neighborhoods with expensive equipment in the car. Finding safe, convenient parking quickly is critical.",
+      goals: [
+        "Find parking within 2 minutes of arriving",
+        "Know the price before committing",
+        "Feel confident the spot is safe for their equipment",
+      ],
+    },
+    decisions: [
       {
-        id: "slot-header",
-        label: "Header / Navigation",
-        assignedTo: null,
-        turnOrder: 0,
-        placedComponent: null,
-        status: "empty",
+        id: "parkwise-core-ui",
+        order: 0,
+        round: 0,
+        type: "multiple_choice",
+        scenarioText:
+          "Jordan is driving to a photoshoot in an unfamiliar area. What should the primary parking search interface look like?",
+        context:
+          "Users interact with the app while driving (dangerous!) or as a passenger. Current interface is a full map with 200+ pins. Average time-to-park after opening app: 4 minutes. Competitor apps average 2.5 minutes.",
+        choices: [
+          {
+            id: "voice-first",
+            label: "Voice-First Interface",
+            description:
+              "\"Find parking near me\" — voice command returns top 3 options read aloud with one-tap navigation.",
+          },
+          {
+            id: "smart-list",
+            label: "Smart List View",
+            description:
+              "Sorted list of nearby spots with price, distance, and safety rating. No map by default — tap to see map.",
+          },
+          {
+            id: "simplified-map",
+            label: "Simplified Map",
+            description:
+              "Map with max 5 highlighted spots (best matches). Color-coded by availability. Large, tappable pins.",
+          },
+          {
+            id: "auto-navigate",
+            label: "Auto-Navigate Mode",
+            description:
+              "App automatically picks the best spot and starts navigation. User can reject and get the next option.",
+          },
+        ],
       },
       {
-        id: "slot-hero",
-        label: "Hero Section",
-        assignedTo: null,
-        turnOrder: 0,
-        placedComponent: null,
-        status: "empty",
+        id: "parkwise-trust",
+        order: 1,
+        round: 1,
+        type: "tradeoff_slider",
+        scenarioText:
+          "How should ParkWise balance real-time accuracy vs. broader coverage?",
+        context:
+          "Sensor data covers 30% of city spots with 95% accuracy. Crowdsourced data covers 80% but is only 60% accurate. Users hate arriving at a \"available\" spot that's taken. But limited coverage means the app is useless in many areas.",
+        tradeoff: {
+          leftLabel: "Accuracy First",
+          rightLabel: "Coverage First",
+          leftDescription:
+            "Only show sensor-verified spots. Fewer options but almost never wrong. Risk: app feels empty in many areas.",
+          rightDescription:
+            "Show all data including crowdsourced. More options but some spots will be taken when you arrive. Risk: user frustration.",
+        },
       },
       {
-        id: "slot-content",
-        label: "Portfolio / Content",
-        assignedTo: null,
-        turnOrder: 1,
-        placedComponent: null,
-        status: "empty",
+        id: "parkwise-safety",
+        order: 2,
+        round: 1,
+        type: "branching_path",
+        scenarioText:
+          "Jordan asks: \"How do I know if a spot is safe?\" How should ParkWise address parking safety?",
+        context:
+          "In surveys, 40% of users say safety influences their parking choice. No current safety data in the app. Potential data sources: crime stats, user reviews, street lighting data, and car break-in reports.",
+        branches: [
+          {
+            id: "safety-score",
+            label: "Safety Score System",
+            description:
+              "Show a 1-5 safety score per spot based on crime data and user reports. Clear and actionable.",
+            followUp: {
+              scenarioText: "How should safety scores be displayed to avoid bias or alarm?",
+              choices: [
+                {
+                  id: "color-shield",
+                  label: "Color-Coded Shield Icon",
+                  description: "Green/yellow/red shield icon on each spot. Simple but could stigmatize areas.",
+                },
+                {
+                  id: "neutral-info",
+                  label: "Neutral Info Panel",
+                  description: "Tap a spot to see \"Area Info\" with lighting, foot traffic, and nearby businesses. No explicit score.",
+                },
+                {
+                  id: "comparative",
+                  label: "Comparative Label",
+                  description: "\"Safer than 70% of nearby options\" — relative, not absolute scoring.",
+                },
+              ],
+            },
+          },
+          {
+            id: "community-reviews",
+            label: "Community Reviews Only",
+            description:
+              "Let users leave safety reviews and tips. \"Well-lit, busy street\" or \"Avoid after 10pm\". Organic and nuanced.",
+            followUp: {
+              scenarioText: "How do you handle moderation of community safety reviews?",
+              choices: [
+                {
+                  id: "ai-moderation",
+                  label: "AI Auto-Moderation",
+                  description: "Auto-filter biased or discriminatory reviews using AI. Fast but may miss nuance.",
+                },
+                {
+                  id: "verified-only",
+                  label: "Verified Parkers Only",
+                  description: "Only users who actually parked there can leave reviews. Slower data but more trustworthy.",
+                },
+                {
+                  id: "upvote-system",
+                  label: "Community Upvotes",
+                  description: "Anyone can review, but community upvotes surface the most helpful ones.",
+                },
+              ],
+            },
+          },
+        ],
       },
       {
-        id: "slot-team",
-        label: "Team Section",
-        assignedTo: null,
-        turnOrder: 1,
-        placedComponent: null,
-        status: "empty",
-      },
-      {
-        id: "slot-contact",
-        label: "Contact Section",
-        assignedTo: null,
-        turnOrder: 2,
-        placedComponent: null,
-        status: "empty",
-      },
-      {
-        id: "slot-footer",
-        label: "Footer",
-        assignedTo: null,
-        turnOrder: 2,
-        placedComponent: null,
-        status: "empty",
+        id: "parkwise-pricing",
+        order: 3,
+        round: 2,
+        type: "multiple_choice",
+        scenarioText:
+          "ParkWise wants to add a reservation feature. How should pricing be presented?",
+        context:
+          "Some parking garages offer discounts for reservations. Street parking is free/metered. Users currently can't compare costs across types. 55% of users say price is their #1 factor.",
+        choices: [
+          {
+            id: "total-cost",
+            label: "Total Trip Cost",
+            description:
+              "Show estimated total cost (parking + gas to get there) for each option. Holistic but requires assumptions.",
+          },
+          {
+            id: "comparison-table",
+            label: "Side-by-Side Compare",
+            description:
+              "Table comparing top 3 options: price, walk distance, safety, availability. Detailed but complex.",
+          },
+          {
+            id: "budget-filter",
+            label: "Budget Mode",
+            description:
+              "Set a budget (e.g., under $10). Only show spots within budget, sorted by convenience. Simple filtering.",
+          },
+        ],
       },
     ],
-    idealCategories: {
-      "slot-header": ["headers"],
-      "slot-hero": ["hero_sections"],
-      "slot-content": ["content_sections", "blog_sections", "bento_grids"],
-      "slot-team": ["team_sections"],
-      "slot-contact": ["contact_sections"],
-      "slot-footer": ["footers"],
-    },
     scoringCriteria: [
-      "Clean, modern navigation",
-      "Visually striking hero that shows creativity",
-      "Portfolio/work showcase is organized",
-      "Team section builds personal connection",
-      "Easy to contact the agency",
-      "Footer is clean and professional",
+      "User-centric decision making",
+      "Consistency across decisions",
+      "Understanding tradeoffs",
+      "Design reasoning quality",
     ],
     difficulty: "advanced",
     learningObjectives: [
-      "Learn how visual design communicates creativity and trust",
-      "Understand how portfolios showcase work to attract clients",
-      "See why a team section builds personal connection with visitors",
-      "Discover how a design agency's site should reflect their own skills",
+      "Learn how to design for distracted or constrained users (driving context)",
+      "Understand the tradeoff between data accuracy and coverage in real-time apps",
+      "Explore the ethical implications of safety scoring in location-based services",
+      "See how pricing presentation affects user decision-making and trust",
     ],
     whatsBroken: [
-      "The layout is cluttered — nothing has breathing room or visual hierarchy",
-      "There's no portfolio section — how can a design agency NOT show their work?!",
-      "The team page is missing — clients want to know who they'll be working with",
-      "The footer looks rushed and unprofessional — not great for a company that sells design!",
+      "The map shows 200+ pins — impossible to parse while driving or in a hurry",
+      "No way to gauge accuracy — users arrive at 'available' spots that are taken",
+      "No safety information — Jordan can't tell if a spot is safe for their equipment",
+      "Pricing is hidden until you tap into a spot — price-sensitive users waste time exploring",
     ],
     successHints: [
-      "A design agency site should FEEL creative — pick components with bold layouts and lots of white space",
-      "The portfolio/content section should display work in a grid or gallery format",
-      "The team section should show faces and names — people trust people, not logos",
-      "Even the footer matters! A design agency's footer should be as polished as everything else",
+      "Jordan is often driving — the interface must be usable with minimal attention and few taps",
+      "Consider that showing fewer, more reliable options may be better than showing everything",
+      "Safety features have ethical implications — scores can reinforce bias against certain neighborhoods",
+      "Price transparency builds trust — but too much information can slow down decision-making",
     ],
     designTips: {
-      "slot-header":
-        "A design agency's header should be minimal and elegant. Less is more! Pick one that lets the work speak for itself — clean fonts, simple navigation.",
-      "slot-hero":
-        "Go BIG and BOLD with the hero! A design agency needs to show off their creativity right away. Look for a hero with a striking visual layout.",
-      "slot-content":
-        "This is the PORTFOLIO section — the most important part! Pick a content section that displays images or projects in a beautiful grid. Think of it like an art gallery.",
-      "slot-team":
-        "People hire people, not companies. Choose a team section that shows photos, names, and roles. It makes the agency feel friendly and trustworthy.",
-      "slot-contact":
-        "Clients need to reach out easily! Pick a contact section with a form, email, phone, and maybe a map. Make it inviting, not intimidating.",
-      "slot-footer":
-        "The footer should be as beautiful as the rest of the site. A design agency can't have an ugly footer — it's like a chef serving dessert on a paper plate!",
+      "parkwise-core-ui":
+        "Driving context changes everything. Users can't scroll, pinch-zoom, or read fine text. The best in-car interfaces minimize cognitive load and physical interaction.",
+      "parkwise-trust":
+        "In data-driven products, users prefer fewer accurate results over many unreliable ones. But empty results destroy trust too. Consider a hybrid approach.",
+      "parkwise-safety":
+        "Safety scoring is powerful but ethically complex. Scores based on crime data can encode systemic biases. Think about how to inform without stigmatizing.",
+      "parkwise-pricing":
+        "Price is the #1 factor for 55% of users, but presenting too many variables makes comparison harder. The best pricing UIs simplify without hiding costs.",
     },
     funFact:
-      "Did you know? It takes only 0.05 seconds (50 milliseconds!) for a visitor to form an opinion about a website's design. That's faster than a blink of an eye! That's why visual design matters SO much.",
-  },
-  {
-    id: "fittrack",
-    businessName: "FitTrack",
-    businessType: "Fitness App",
-    story:
-      "FitTrack is a fitness tracking app that helps people set goals, track workouts, and crush their health targets — like having a personal trainer in your pocket! But their landing page is a total mess. There's no social proof showing how many people already use it, the pricing tiers are confusing, the features aren't explained well, and there's no obvious download button. They're losing potential users every single day because people visit the site, get confused, and leave. Your team needs to build a landing page that makes people want to download FitTrack RIGHT NOW!",
-    brokenSections: [
-      {
-        id: "slot-header",
-        label: "Header / Navigation",
-        assignedTo: null,
-        turnOrder: 0,
-        placedComponent: null,
-        status: "empty",
-      },
-      {
-        id: "slot-hero",
-        label: "Hero Section",
-        assignedTo: null,
-        turnOrder: 0,
-        placedComponent: null,
-        status: "empty",
-      },
-      {
-        id: "slot-features",
-        label: "App Features",
-        assignedTo: null,
-        turnOrder: 1,
-        placedComponent: null,
-        status: "empty",
-      },
-      {
-        id: "slot-testimonials",
-        label: "Testimonials",
-        assignedTo: null,
-        turnOrder: 1,
-        placedComponent: null,
-        status: "empty",
-      },
-      {
-        id: "slot-stats",
-        label: "Stats / Social Proof",
-        assignedTo: null,
-        turnOrder: 2,
-        placedComponent: null,
-        status: "empty",
-      },
-      {
-        id: "slot-footer",
-        label: "Footer",
-        assignedTo: null,
-        turnOrder: 2,
-        placedComponent: null,
-        status: "empty",
-      },
-    ],
-    idealCategories: {
-      "slot-header": ["headers"],
-      "slot-hero": ["hero_sections"],
-      "slot-features": ["feature_sections"],
-      "slot-testimonials": ["testimonials"],
-      "slot-stats": ["stats_sections", "logo_clouds"],
-      "slot-footer": ["footers"],
-    },
-    scoringCriteria: [
-      "Clear app branding in header",
-      "Hero makes you want to download the app",
-      "Features show app benefits clearly",
-      "Testimonials feel authentic and motivating",
-      "Stats build credibility (users, downloads, etc.)",
-      "Footer has download links and social media",
-    ],
-    difficulty: "intermediate",
-    learningObjectives: [
-      "Learn how social proof (stats, testimonials) builds trust",
-      "Understand how to present app features visually",
-      "See how a strong hero section drives app downloads",
-      "Discover why stats and numbers are more convincing than just words",
-    ],
-    whatsBroken: [
-      "No social proof — visitors don't know if anyone actually uses this app",
-      "Pricing tiers are confusing and hard to compare",
-      "Features aren't explained clearly — what does this app actually do?",
-      "There's no download button! People can't figure out how to get the app!",
-    ],
-    successHints: [
-      "Use a hero that makes fitness feel exciting and achievable — show the app in action!",
-      "Feature sections with icons work great for apps — each feature gets its own card",
-      "Testimonials from real users are GOLD — pick ones that show names and photos",
-      "Stats sections with big numbers (like '500K+ Users') instantly build credibility",
-    ],
-    designTips: {
-      "slot-header":
-        "A fitness app header should feel energetic and motivating! Look for one with a clean logo area and links like 'Features', 'Pricing', and 'Download'.",
-      "slot-hero":
-        "The hero is everything! Pick one that could show the app on a phone screen with a big 'Download Now' button. It should make people feel motivated!",
-      "slot-features":
-        "Show what FitTrack can do! Choose a features section with icons — think: 'Workout Tracking', 'Goal Setting', 'Progress Charts', 'Community Challenges'.",
-      "slot-testimonials":
-        "Pick testimonials that feel real and personal. Look for a section with photos, names, and star ratings. Real stories from real users = instant trust!",
-      "slot-stats":
-        "Numbers are POWERFUL. Pick a stats section that can show things like '500K+ Downloads', '4.8 Rating', '50M+ Workouts Logged'. Big numbers = big credibility!",
-      "slot-footer":
-        "A fitness app footer should have download links (App Store, Google Play), social media, and maybe a newsletter signup.",
-    },
-    funFact:
-      "Did you know? Websites with customer testimonials see a 34% increase in conversions (meaning more people take action). Social proof is like peer pressure, but for websites — and it works!",
-  },
-  {
-    id: "pawpals",
-    businessName: "PawPals",
-    businessType: "Pet Adoption Nonprofit",
-    story:
-      "PawPals is a local animal shelter with the most adorable rescue pets you've ever seen — from playful puppies to chill cats to the occasional quirky hamster! Their mission is to find every animal a loving forever home. But their website hasn't been updated in YEARS. There's no story about their mission, no team page showing the amazing volunteers, and their adoption stats (like how many animals they've saved) are hidden. People visit the site and leave without adopting or donating because the site doesn't pull at their heartstrings. Help PawPals tell their story and save more furry lives!",
-    brokenSections: [
-      {
-        id: "slot-header",
-        label: "Header / Navigation",
-        assignedTo: null,
-        turnOrder: 0,
-        placedComponent: null,
-        status: "empty",
-      },
-      {
-        id: "slot-hero",
-        label: "Hero Section",
-        assignedTo: null,
-        turnOrder: 0,
-        placedComponent: null,
-        status: "empty",
-      },
-      {
-        id: "slot-about",
-        label: "About / Mission",
-        assignedTo: null,
-        turnOrder: 1,
-        placedComponent: null,
-        status: "empty",
-      },
-      {
-        id: "slot-stats",
-        label: "Adoption Stats",
-        assignedTo: null,
-        turnOrder: 1,
-        placedComponent: null,
-        status: "empty",
-      },
-      {
-        id: "slot-cta",
-        label: "Donate / Adopt CTA",
-        assignedTo: null,
-        turnOrder: 2,
-        placedComponent: null,
-        status: "empty",
-      },
-      {
-        id: "slot-footer",
-        label: "Footer",
-        assignedTo: null,
-        turnOrder: 2,
-        placedComponent: null,
-        status: "empty",
-      },
-    ],
-    idealCategories: {
-      "slot-header": ["headers"],
-      "slot-hero": ["hero_sections"],
-      "slot-about": ["content_sections", "header_sections"],
-      "slot-stats": ["stats_sections"],
-      "slot-cta": ["cta_sections", "newsletter_sections"],
-      "slot-footer": ["footers"],
-    },
-    scoringCriteria: [
-      "Warm, inviting navigation with shelter name",
-      "Emotional hero that connects with visitors",
-      "Clear mission statement and story",
-      "Impactful stats (animals saved, adopted, etc.)",
-      "Strong CTA to donate or adopt",
-      "Footer with address, hours, and social links",
-    ],
-    difficulty: "beginner",
-    learningObjectives: [
-      "Learn how emotional storytelling connects with website visitors",
-      "Understand why an 'About/Mission' section builds trust for nonprofits",
-      "See how statistics make an organization's impact feel real",
-      "Discover how a strong CTA drives donations and adoptions",
-    ],
-    whatsBroken: [
-      "There's no mission statement — visitors don't understand what PawPals does or why",
-      "No team page — the amazing volunteers and staff are invisible!",
-      "Adoption stats are hidden — people don't see the shelter's incredible impact",
-      "There's no clear way to donate or start the adoption process",
-    ],
-    successHints: [
-      "The hero should be emotional — think cute animal photos with a heartfelt headline",
-      "The about/mission section should tell PawPals' story: why they exist and what they believe",
-      "Use a stats section to show impact: '2,000+ Pets Adopted', '500+ Volunteers', etc.",
-      "The CTA should make it super easy to donate or start adopting — one big button!",
-    ],
-    designTips: {
-      "slot-header":
-        "A nonprofit shelter header should feel warm and welcoming. Look for one with a friendly style — not too corporate. Navigation links like 'About', 'Adopt', 'Donate' work great.",
-      "slot-hero":
-        "This is where you pull at heartstrings! Pick a hero that could show an adorable rescue pet with a headline like 'Every Pet Deserves a Home'. Make people feel something!",
-      "slot-about":
-        "The mission section tells PawPals' story. Pick a content section with space for a paragraph explaining WHY PawPals exists, how many years they've been helping animals, etc.",
-      "slot-stats":
-        "Show the impact with BIG numbers! Choose a stats section for things like '2,500+ Pets Adopted', '98% Adoption Rate', '15 Years of Love'. Numbers make the mission feel REAL.",
-      "slot-cta":
-        "This is the most important section for a nonprofit! Pick a CTA that drives action — 'Adopt Today', 'Donate Now', or 'Foster a Pet'. Make the button BIG and impossible to miss!",
-      "slot-footer":
-        "The shelter footer should have the address, visiting hours, phone number, and links to social media (people love following shelter pets on Instagram!).",
-    },
-    funFact:
-      "Did you know? Animal shelters that have modern, well-designed websites see up to 40% more adoption applications! A good website literally saves lives!",
+      "Did you know? The average driver in a major city spends 17 hours per year searching for parking — that's more than 2 full work days! And cruising for parking accounts for 30% of urban traffic congestion.",
   },
 ];
