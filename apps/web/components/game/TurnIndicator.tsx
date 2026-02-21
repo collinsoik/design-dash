@@ -88,7 +88,7 @@ export default function TurnIndicator() {
             style={{ backgroundColor: teamColor }}
           />
           <span className={`text-sm font-semibold ${isMyTurn ? "text-accent-green" : "text-text-primary"}`}>
-            {isMyTurn ? "Your Turn!" : `${activePlayerName}'s turn`}
+            {isMyTurn ? "It's your turn — make your choice!" : `${activePlayerName} is choosing...`}
           </span>
         </div>
 
@@ -105,12 +105,12 @@ export default function TurnIndicator() {
             onClick={handleSubmitTurn}
             className="btn-green text-sm"
           >
-            Submit Round
+            Done — Next Round
           </button>
         )}
         {hasSubmitted && (
           <span className="text-sm font-medium text-accent-green">
-            Submitted — waiting for others
+            Choices locked in — waiting for other teams...
           </span>
         )}
       </div>

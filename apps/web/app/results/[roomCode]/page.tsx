@@ -8,7 +8,7 @@ import { connectSocket } from "@/lib/socket";
 import { SERVER_EVENTS, TEAM_COLORS } from "@design-dash/shared";
 import type { Room, GameResults, DecisionPoint, PlayerDecision } from "@design-dash/shared";
 
-const TROPHY_ICONS = ["1st", "2nd", "3rd"];
+const TROPHY_ICONS = ["1st Place!", "2nd Place!", "3rd Place!"];
 const RANK_STYLES = [
   { border: "border-accent-yellow", bg: "bg-accent-yellow-light", text: "text-accent-yellow" },
   { border: "border-text-tertiary", bg: "bg-surface-tertiary", text: "text-text-secondary" },
@@ -86,9 +86,9 @@ export default function ResultsPage() {
       {/* Header */}
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold text-text-primary mb-3">
-          Results
+          And the Winners Are...
         </h1>
-        <p className="text-lg text-text-secondary">Final Scoreboard</p>
+        <p className="text-lg text-text-secondary">Great job, everyone! Here&apos;s how the teams did.</p>
         <p className="text-sm text-text-tertiary mt-2">Room: {roomCode}</p>
       </div>
 
@@ -112,17 +112,18 @@ export default function ResultsPage() {
           {/* Leaderboard */}
           <div className="max-w-3xl mx-auto mb-12">
             <h2 className="text-lg font-semibold text-text-primary mb-6 text-center">
-              Leaderboard
+              Final Standings
             </h2>
             <div className="space-y-4">
               {teamResults.map((team, idx) => (
                 <div
                   key={team.teamId}
-                  className={`flex items-center gap-4 p-4 border rounded-xl shadow-soft ${
+                  className={`flex items-center gap-4 p-4 border rounded-xl shadow-soft animate-slide-up ${
                     idx < 3
                       ? `${RANK_STYLES[idx].border} ${RANK_STYLES[idx].bg}`
                       : "border-border-primary bg-white"
                   }`}
+                  style={{ animationDelay: `${idx * 150}ms`, animationFillMode: 'both' }}
                 >
                   {/* Rank */}
                   <div className="w-16 text-center">
@@ -261,17 +262,17 @@ export default function ResultsPage() {
           {/* Score Legend */}
           <div className="max-w-md mx-auto mb-12 card">
             <h3 className="text-sm font-medium text-text-tertiary mb-3 text-center uppercase tracking-wide">
-              Scoring Breakdown
+              How Scores Work
             </h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-text-secondary">Peer Votes (40%)</span>
+                <span className="text-text-secondary">Your classmates&apos; votes</span>
                 <span className="text-accent-green font-semibold">
                   {room?.config.peerVoteWeight || 40}%
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-text-secondary">Judge Score (60%)</span>
+                <span className="text-text-secondary">Teacher&apos;s score</span>
                 <span className="text-accent-blue font-semibold">
                   {room?.config.judgeWeight || 60}%
                 </span>
@@ -287,7 +288,7 @@ export default function ResultsPage() {
           Play Again
         </Link>
         <p className="text-xs text-text-disabled mt-4">
-          Thanks for playing DesignDash!
+          Thanks for playing! Every round you get better at design thinking.
         </p>
       </div>
     </main>

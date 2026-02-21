@@ -36,8 +36,11 @@ export default function LandingPage() {
         <h1 className="text-5xl md:text-6xl font-bold text-text-primary mb-4 tracking-tight">
           DesignDash
         </h1>
-        <p className="text-lg text-text-secondary">
-          Make Design Decisions. Together.
+        <p className="text-lg text-text-secondary mb-2">
+          The team game where YOU design the app.
+        </p>
+        <p className="text-sm text-text-tertiary max-w-md mx-auto">
+          Pick a real app, make design choices with your team, and see who builds the best experience!
         </p>
       </div>
 
@@ -96,8 +99,8 @@ export default function LandingPage() {
             Host Game
           </h2>
           <p className="text-text-secondary text-sm text-center mb-8 leading-relaxed">
-            Create a new game room, choose a product scenario, and invite your
-            players to join.
+            Set up a new game, pick an app to redesign, and invite your
+            friends to play!
           </p>
           <Link href="/host" className="btn-green inline-block text-center">
             Create Room
@@ -118,7 +121,7 @@ export default function LandingPage() {
       {/* Footer */}
       <div className="mt-8 text-center relative z-10">
         <p className="text-xs text-text-disabled">
-          A multiplayer product design game
+          A multiplayer design game for creative thinkers
         </p>
       </div>
 

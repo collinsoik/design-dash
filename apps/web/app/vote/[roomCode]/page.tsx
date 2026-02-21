@@ -120,10 +120,13 @@ export default function VotePage() {
       {/* Header */}
       <div className="text-center mb-10">
         <h1 className="text-4xl font-bold text-text-primary mb-2">
-          Vote
+          Time to Vote!
         </h1>
         <p className="text-sm text-text-secondary">
-          Rate each team&apos;s design decisions
+          Look at what each team chose and rate their designs
+        </p>
+        <p className="text-xs text-text-tertiary mt-1">
+          Think about: Did they make choices that help the user? Do their decisions make sense together?
         </p>
         <p className="text-xs text-text-tertiary mt-2">Room: {roomCode}</p>
       </div>
@@ -146,10 +149,10 @@ export default function VotePage() {
       {submitted ? (
         <div className="flex flex-col items-center justify-center py-20">
           <div className="text-2xl font-bold text-accent-green mb-4">
-            Votes Submitted!
+            Votes Sent!
           </div>
           <p className="text-text-secondary text-sm">
-            Waiting for the host to finalize scores...
+            Waiting for your teacher to finish scoring...
           </p>
           <div className="mt-6 flex gap-1">
             {[0, 1, 2].map((i) => (
@@ -237,6 +240,9 @@ export default function VotePage() {
                         <p className="text-xs font-medium text-text-tertiary uppercase tracking-wide">
                           Your Rating
                         </p>
+                        <p className="text-xs text-text-disabled">
+                          1 = not great, 5 = amazing
+                        </p>
                         <div className="flex items-center gap-1">
                           {[1, 2, 3, 4, 5].map((star) => {
                             const isActive = star <= (votes[team.id] || 0);
@@ -285,11 +291,11 @@ export default function VotePage() {
                 disabled={!allVoted}
                 className="btn-primary px-10 py-4 disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                Submit Votes
+                Send My Votes
               </button>
               {!allVoted && (
                 <p className="text-xs text-text-disabled mt-3">
-                  Rate all teams to submit
+                  Rate every team before you can submit
                 </p>
               )}
             </div>

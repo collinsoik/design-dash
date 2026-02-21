@@ -133,8 +133,8 @@ export default function BrainstormPanel() {
         <div className="flex items-center gap-3">
           <span className="text-xs text-text-tertiary">
             {isMyTurn
-              ? "Discuss while deciding"
-              : "Suggest ideas for your team"}
+              ? "Ask your team for help!"
+              : "Tell your teammate what you think!"}
           </span>
           <button
             onClick={() => setIsCollapsed(true)}
@@ -163,9 +163,14 @@ export default function BrainstormPanel() {
         {/* Message list */}
         <div className="flex-1 bg-white border border-border-primary rounded-lg p-2 overflow-y-auto">
           {messages.length === 0 ? (
-            <p className="text-text-disabled text-xs italic">
-              Chat with your team here!
-            </p>
+            <div className="space-y-1">
+              <p className="text-text-disabled text-xs italic">
+                Chat with your team here! Try saying:
+              </p>
+              <p className="text-text-disabled text-xs italic">
+                &quot;I think we should pick...&quot; or &quot;What about option...?&quot;
+              </p>
+            </div>
           ) : (
             <div className="space-y-1.5">
               {messages.map((msg) => (

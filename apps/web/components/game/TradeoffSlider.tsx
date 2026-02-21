@@ -30,6 +30,10 @@ export default function TradeoffSlider({
 
   return (
     <div className="space-y-4">
+      {/* Instruction */}
+      <p className="text-xs text-text-tertiary text-center">
+        Drag the slider to find the right balance between these two options:
+      </p>
       {/* End labels */}
       <div className="flex justify-between items-center">
         <span className="text-sm font-semibold text-accent-red">

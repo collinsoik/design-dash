@@ -3,10 +3,16 @@
 import { useMemo, useState, useCallback } from "react";
 import { useGameStore } from "@/lib/game-store";
 import { getSocket } from "@/lib/socket";
-import type { DecisionPoint } from "@design-dash/shared";
+import type { DecisionPoint, CaseStudy } from "@design-dash/shared";
 import MultipleChoiceDecision from "./MultipleChoiceDecision";
 import TradeoffSlider from "./TradeoffSlider";
 import BranchingPath from "./BranchingPath";
+
+const DECISION_TYPE_LABELS: Record<string, string> = {
+  multiple_choice: "Pick One",
+  tradeoff_slider: "Slide to Balance",
+  branching_path: "Choose a Path",
+};
 
 export default function ScenarioView() {
   const room = useGameStore((s) => s.room);
@@ -59,16 +65,17 @@ export default function ScenarioView() {
           decision={decision}
           isMyTurn={isMyTurn}
           existingDecision={teamDecisions[decision.id] ?? null}
+          designTip={caseStudy?.designTips?.[decision.id]}
         />
       ))}
 
       {!isMyTurn && (
-        <div className="text-center py-4">
-          <p className="text-sm font-medium text-text-tertiary">
-            Waiting for your teammate to decide...
+        <div className="text-center py-4 bg-accent-blue-light border border-accent-blue/20 rounded-lg mx-2">
+          <p className="text-sm font-medium text-accent-blue">
+            Your teammate is choosing right now...
           </p>
-          <p className="text-sm text-text-disabled mt-1">
-            Use the team chat to suggest ideas!
+          <p className="text-sm text-text-secondary mt-1">
+            Use the team chat below to tell them what you think!
           </p>
         </div>
       )}
@@ -82,9 +89,10 @@ interface DecisionBlockProps {
   decision: DecisionPoint;
   isMyTurn: boolean;
   existingDecision: { choiceId?: string; sliderValue?: number; branchId?: string; followUpChoiceId?: string } | null;
+  designTip?: string;
 }
 
-function DecisionBlock({ decision, isMyTurn, existingDecision }: DecisionBlockProps) {
+function DecisionBlock({ decision, isMyTurn, existingDecision, designTip }: DecisionBlockProps) {
   const [selectedChoiceId, setSelectedChoiceId] = useState<string | null>(
     existingDecision?.choiceId ?? null
   );
@@ -134,22 +142,35 @@ function DecisionBlock({ decision, isMyTurn, existingDecision }: DecisionBlockPr
       {/* Scenario text */}
       <div className="mb-4">
         <div className="flex items-center gap-2 mb-2">
-          <span className="text-xs font-medium text-text-tertiary uppercase tracking-wide">
-            {decision.type.replace("_", " ")}
+          <span className={`badge ${
+            decision.type === "multiple_choice" ? "badge-blue" :
+            decision.type === "tradeoff_slider" ? "badge-yellow" :
+            "badge-purple"
+          }`}>
+            {DECISION_TYPE_LABELS[decision.type] || decision.type}
           </span>
           {submitted && (
             <span className="badge-green">
-              Submitted
+              Locked In
             </span>
           )}
         </div>
-        <p className="text-base text-text-primary leading-relaxed">
+        <p className="text-base font-medium text-text-primary leading-relaxed">
           {decision.scenarioText}
         </p>
         {decision.context && (
           <p className="text-sm text-text-tertiary mt-1 italic">
             {decision.context}
           </p>
+        )}
+        {/* Design tip hint */}
+        {designTip && !submitted && (
+          <div className="mt-2 px-3 py-2 bg-accent-yellow-light border border-accent-yellow/20 rounded-lg">
+            <p className="text-xs text-text-secondary">
+              <span className="font-semibold text-accent-yellow">Hint: </span>
+              {designTip}
+            </p>
+          </div>
         )}
       </div>
 
@@ -188,9 +209,9 @@ function DecisionBlock({ decision, isMyTurn, existingDecision }: DecisionBlockPr
         <div className="mt-4 flex justify-end">
           <button
             onClick={handleSubmit}
-            className="btn-green"
+            className="btn-green px-6"
           >
-            Lock In
+            Lock In My Choice
           </button>
         </div>
       )}

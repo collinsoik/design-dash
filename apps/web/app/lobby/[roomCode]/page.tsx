@@ -155,7 +155,7 @@ export default function LobbyPage() {
           </span>
         </div>
         <p className="text-xs text-text-disabled mt-3">
-          Share this code with your players
+          Share this code with your class to join!
         </p>
       </div>
 

@@ -16,6 +16,12 @@ const DIFFICULTY_COLORS = {
   advanced: "badge-red",
 } as const;
 
+const DIFFICULTY_LABELS = {
+  beginner: "Starter",
+  intermediate: "Challenger",
+  advanced: "Expert",
+} as const;
+
 export default function HostPage() {
   const router = useRouter();
   const { setRoom, setPlayerId } = useGameStore();
@@ -92,7 +98,7 @@ export default function HostPage() {
         {/* Team Size */}
         <section className="card">
           <h2 className="text-lg font-semibold text-text-primary mb-4">Team Size</h2>
-          <p className="text-text-secondary text-sm mb-4">How many players per team?</p>
+          <p className="text-text-secondary text-sm mb-4">How many people on each team?</p>
           <div className="flex gap-3">
             {[2, 3, 4, 5, 6].map((size) => (
               <button
@@ -112,8 +118,8 @@ export default function HostPage() {
 
         {/* Round Timer */}
         <section className="card">
-          <h2 className="text-lg font-semibold text-text-primary mb-4">Round Timer</h2>
-          <p className="text-text-secondary text-sm mb-4">Seconds per round for each decision.</p>
+          <h2 className="text-lg font-semibold text-text-primary mb-4">Time Per Round</h2>
+          <p className="text-text-secondary text-sm mb-4">How long does each team get to make their choices?</p>
           <div className="flex flex-wrap gap-3">
             {TIMER_OPTIONS.map((seconds) => (
               <button
@@ -133,9 +139,9 @@ export default function HostPage() {
 
         {/* Case Study Selection */}
         <section>
-          <h2 className="text-lg font-semibold text-text-primary mb-4">Select Product</h2>
+          <h2 className="text-lg font-semibold text-text-primary mb-4">Pick Your App</h2>
           <p className="text-text-secondary text-sm mb-6">
-            Choose the product your teams will make design decisions for.
+            Which app will your teams redesign? Start with Starter if this is your first time!
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {CASE_STUDIES.map((cs) => (
@@ -157,7 +163,7 @@ export default function HostPage() {
                     {cs.productName}
                   </h3>
                   <span className={DIFFICULTY_COLORS[cs.difficulty]}>
-                    {cs.difficulty.charAt(0).toUpperCase() + cs.difficulty.slice(1)}
+                    {DIFFICULTY_LABELS[cs.difficulty]}
                   </span>
                 </div>
                 <p className="text-sm font-medium text-accent-primary mb-2">

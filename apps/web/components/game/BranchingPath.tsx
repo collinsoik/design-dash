@@ -28,7 +28,7 @@ export default function BranchingPath({
       {/* Branch selection */}
       <div>
         <p className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-2">
-          Choose Your Direction
+          Step 1: Pick a direction
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {branches.map((branch) => {
@@ -74,7 +74,7 @@ export default function BranchingPath({
         <div className="mt-4 pt-4 border-t border-border-primary">
           <div className="mb-3 px-3 py-2 bg-accent-yellow-light border border-accent-yellow/20 rounded-lg">
             <p className="text-xs font-semibold text-accent-yellow uppercase tracking-wide mb-1">
-              Follow-up
+              Step 2: Follow-up question
             </p>
             <p className="text-sm text-text-secondary leading-relaxed">
               {selectedBranch.followUp.scenarioText}

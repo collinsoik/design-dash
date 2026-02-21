@@ -32,7 +32,7 @@ export default function ScenarioHeader() {
     <div className="flex flex-col h-full overflow-y-auto">
       {/* Product Info */}
       <div className="p-3 border-b border-border-primary">
-        <p className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-1">Product</p>
+        <p className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-1">The App</p>
         <h2 className="text-lg font-semibold text-text-primary">
           {caseStudy?.productName ?? "Loading..."}
         </h2>
