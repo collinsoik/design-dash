@@ -10,10 +10,12 @@ const app = express();
 const httpServer = createServer(app);
 
 const CORS_ORIGIN = process.env.CORS_ORIGIN || "http://localhost:3000";
+// Support comma-separated origins for multiple Vercel preview URLs
+const allowedOrigins = CORS_ORIGIN.split(",").map((s) => s.trim());
 
 const io = new Server(httpServer, {
   cors: {
-    origin: CORS_ORIGIN,
+    origin: allowedOrigins.length === 1 ? allowedOrigins[0] : allowedOrigins,
     methods: ["GET", "POST"],
   },
 });

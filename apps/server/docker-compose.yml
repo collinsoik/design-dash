@@ -9,7 +9,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3001
-      - CORS_ORIGIN=https://dash.collinsoik.dev
+      - CORS_ORIGIN=https://design-dash-two.vercel.app
       - DB_PATH=/app/data/designdash.db
     volumes:
       - ./data:/app/data
