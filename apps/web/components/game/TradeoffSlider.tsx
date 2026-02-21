@@ -10,6 +10,17 @@ interface TradeoffSliderProps {
   disabled?: boolean;
 }
 
+function getSliderLabel(value: number, leftLabel: string, rightLabel: string): string {
+  switch (value) {
+    case 0: return `Strongly ${leftLabel}`;
+    case 25: return `Lean ${leftLabel}`;
+    case 50: return "Balanced";
+    case 75: return `Lean ${rightLabel}`;
+    case 100: return `Strongly ${rightLabel}`;
+    default: return "Balanced";
+  }
+}
+
 export default function TradeoffSlider({
   tradeoff,
   value,
@@ -46,12 +57,26 @@ export default function TradeoffSlider({
         </div>
       </div>
 
-      {/* Slider track */}
+      {/* Slider track with tick marks */}
       <div className="relative px-1">
+        {/* Tick marks */}
+        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-[9px] pointer-events-none">
+          {[0, 25, 50, 75, 100].map((tick) => (
+            <div
+              key={tick}
+              className={`w-2.5 h-2.5 rounded-full border-2 ${
+                tick === localValue
+                  ? "bg-white border-accent-primary"
+                  : "bg-white border-border-secondary"
+              }`}
+            />
+          ))}
+        </div>
         <input
           type="range"
           min={0}
           max={100}
+          step={25}
           value={localValue}
           onChange={handleChange}
           disabled={disabled}
@@ -83,14 +108,7 @@ export default function TradeoffSlider({
       {/* Value indicator */}
       <div className="text-center">
         <span className="text-lg font-bold text-accent-primary">
-          {localValue}%
-        </span>
-        <span className="text-sm text-text-tertiary ml-2">
-          {localValue < 30
-            ? `Leaning ${tradeoff.leftLabel}`
-            : localValue > 70
-            ? `Leaning ${tradeoff.rightLabel}`
-            : "Balanced"}
+          {getSliderLabel(localValue, tradeoff.leftLabel, tradeoff.rightLabel)}
         </span>
       </div>
     </div>

@@ -60,11 +60,11 @@ export default function ResultsPage() {
           answer = dp.choices.find((c) => c.id === pd.choiceId)?.label ?? null;
         } else if (dp.type === "tradeoff_slider" && pd.sliderValue != null && dp.tradeoff) {
           const pct = pd.sliderValue;
-          answer = pct <= 33
-            ? dp.tradeoff.leftLabel
-            : pct >= 67
-              ? dp.tradeoff.rightLabel
-              : `${dp.tradeoff.leftLabel} / ${dp.tradeoff.rightLabel}`;
+          if (pct <= 12) answer = dp.tradeoff.leftLabel;
+          else if (pct <= 37) answer = `Lean ${dp.tradeoff.leftLabel}`;
+          else if (pct <= 62) answer = "Balanced";
+          else if (pct <= 87) answer = `Lean ${dp.tradeoff.rightLabel}`;
+          else answer = dp.tradeoff.rightLabel;
         } else if (dp.type === "branching_path" && pd.branchId && dp.branches) {
           const branch = dp.branches.find((b) => b.id === pd.branchId);
           if (branch) {
