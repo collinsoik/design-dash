@@ -1,0 +1,130 @@
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@300;400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-game-dark text-white font-sans;
+  }
+}
+
+@layer components {
+  .pixel-border {
+    border: 3px solid #e94560;
+    box-shadow:
+      3px 3px 0px #0f3460,
+      -1px -1px 0px #0f3460,
+      1px -1px 0px #0f3460,
+      -1px 1px 0px #0f3460;
+  }
+
+  .pixel-border-green {
+    border: 3px solid #16c79a;
+    box-shadow:
+      3px 3px 0px #0f3460,
+      -1px -1px 0px #0f3460,
+      1px -1px 0px #0f3460,
+      -1px 1px 0px #0f3460;
+  }
+
+  .pixel-border-yellow {
+    border: 3px solid #f5c518;
+    box-shadow:
+      3px 3px 0px #0f3460,
+      -1px -1px 0px #0f3460,
+      1px -1px 0px #0f3460,
+      -1px 1px 0px #0f3460;
+  }
+
+  .pixel-border-purple {
+    border: 3px solid #9b59b6;
+    box-shadow:
+      3px 3px 0px #0f3460,
+      -1px -1px 0px #0f3460,
+      1px -1px 0px #0f3460,
+      -1px 1px 0px #0f3460;
+  }
+
+  .pixel-btn {
+    @apply font-pixel text-xs px-6 py-3 uppercase tracking-wider transition-all duration-150;
+    border: 3px solid currentColor;
+    box-shadow:
+      4px 4px 0px #0f3460;
+    position: relative;
+  }
+
+  .pixel-btn:hover {
+    transform: translate(2px, 2px);
+    box-shadow:
+      2px 2px 0px #0f3460;
+  }
+
+  .pixel-btn:active {
+    transform: translate(4px, 4px);
+    box-shadow: none;
+  }
+
+  .pixel-btn-red {
+    @apply pixel-btn bg-game-red text-white border-game-red;
+  }
+
+  .pixel-btn-green {
+    @apply pixel-btn bg-game-green text-game-dark border-game-green;
+  }
+
+  .pixel-btn-yellow {
+    @apply pixel-btn bg-game-yellow text-game-dark border-game-yellow;
+  }
+
+  .pixel-btn-blue {
+    @apply pixel-btn bg-game-blue text-white border-game-blue;
+  }
+
+  .pixel-shadow {
+    box-shadow:
+      4px 4px 0px #0f3460,
+      -1px -1px 0px #0f3460;
+  }
+
+  .pixel-card {
+    @apply bg-game-blue/30 p-4 pixel-border;
+  }
+
+  .neon-text-red {
+    text-shadow:
+      0 0 7px #e94560,
+      0 0 10px #e94560,
+      0 0 21px #e94560;
+  }
+
+  .neon-text-green {
+    text-shadow:
+      0 0 7px #16c79a,
+      0 0 10px #16c79a,
+      0 0 21px #16c79a;
+  }
+
+  .neon-text-yellow {
+    text-shadow:
+      0 0 7px #f5c518,
+      0 0 10px #f5c518,
+      0 0 21px #f5c518;
+  }
+}
+
+@layer utilities {
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .animate-blink {
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+}

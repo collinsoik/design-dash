@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+  game-server:
+    build:
+      context: ../../
+      dockerfile: apps/server/Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - CORS_ORIGIN=https://dash.collinsoik.dev
+      - DB_PATH=/app/data/designdash.db
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
