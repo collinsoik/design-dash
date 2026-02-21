@@ -33,10 +33,27 @@ export default function HostPage() {
 
     const socket = connectSocket();
 
+    // Timeout if server doesn't respond within 8 seconds
+    const timeout = setTimeout(() => {
+      setError("Could not connect to game server. Please try again.");
+      setIsCreating(false);
+    }, 8000);
+
+    // Handle connection errors
+    const onConnectError = (err: Error) => {
+      clearTimeout(timeout);
+      setError(`Connection failed: ${err.message}`);
+      setIsCreating(false);
+      socket.off("connect_error", onConnectError);
+    };
+    socket.on("connect_error", onConnectError);
+
     socket.emit(
       CLIENT_EVENTS.ROOM_CREATE,
       { teamSize, turnTimer, caseStudyId: selectedCaseStudy },
       (response: { success: boolean; roomCode?: string; room?: any; error?: string }) => {
+        clearTimeout(timeout);
+        socket.off("connect_error", onConnectError);
         if (response.success && response.roomCode) {
           setRoom(response.room);
           setPlayerId(socket.id!);

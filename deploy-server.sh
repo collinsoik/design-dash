@@ -21,8 +21,8 @@ docker compose -f apps/server/docker-compose.yml up -d
 
 echo "[3/3] Verifying server health..."
 sleep 3
-if curl -s http://localhost:3001/health | grep -q '"status":"ok"'; then
-  echo "Game server is running on port 3001!"
+if curl -s http://localhost:3002/health | grep -q '"status":"ok"'; then
+  echo "Game server is running on port 3002!"
 else
   echo "WARNING: Server may not have started correctly. Check logs:"
   echo "  docker compose -f apps/server/docker-compose.yml logs"
@@ -30,5 +30,5 @@ fi
 
 echo ""
 echo "=== Next Steps ==="
-echo "Set up Cloudflare Tunnel to expose port 3001 as dash-api.collinsoik.dev"
+echo "Set up Cloudflare Tunnel to expose port 3002 as dash-api.collinsoik.dev"
 echo "See: setup-cloudflare-tunnel.sh"
