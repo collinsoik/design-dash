@@ -165,6 +165,33 @@ export default function ComponentPalette() {
     0
   );
 
+  // Get the design tip for the currently active slot
+  const activeSlotTip = useMemo(() => {
+    const caseStudy = room?.gameState?.caseStudy;
+    const playerId = useGameStore.getState().playerId;
+    const turnState = room?.gameState?.currentTurn;
+    if (!caseStudy?.designTips || !turnState || !playerId) return null;
+
+    const assignedSlots = turnState.assignedSlots[playerId] ?? [];
+    if (assignedSlots.length === 0) return null;
+
+    // Get the first assigned slot that's still empty
+    const teamId = room.players[playerId]?.teamId;
+    if (!teamId) return null;
+    const teamWebsite = room.gameState?.teamWebsites[teamId];
+    if (!teamWebsite) return null;
+
+    for (const slotId of assignedSlots) {
+      const section = teamWebsite.sections.find((s) => s.id === slotId);
+      if (section && section.status === "empty" && caseStudy.designTips[slotId]) {
+        return { label: section.label, tip: caseStudy.designTips[slotId] };
+      }
+    }
+    return assignedSlots[0] && caseStudy.designTips[assignedSlots[0]]
+      ? { label: teamWebsite.sections.find((s) => s.id === assignedSlots[0])?.label ?? "", tip: caseStudy.designTips[assignedSlots[0]] }
+      : null;
+  }, [room]);
+
   return (
     <aside className="w-64 border-r-3 border-game-blue bg-game-dark/80 flex flex-col h-full">
       {/* Header */}
@@ -218,6 +245,18 @@ export default function ComponentPalette() {
           )}
         </div>
       </div>
+
+      {/* Active Slot Design Tip */}
+      {activeSlotTip && (
+        <div className="p-2 border-b border-game-yellow/30 bg-game-yellow/5">
+          <p className="font-pixel text-[6px] text-game-yellow mb-1">
+            TIP: {activeSlotTip.label}
+          </p>
+          <p className="text-[10px] text-gray-300 leading-relaxed">
+            {activeSlotTip.tip}
+          </p>
+        </div>
+      )}
 
       {/* Category list */}
       <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-game-blue scrollbar-track-transparent">
