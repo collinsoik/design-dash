@@ -36,6 +36,7 @@ export interface TradeoffConfig {
   rightLabel: string;
   leftDescription: string;
   rightDescription: string;
+  points: [string, string, string, string, string]; // descriptions for 0, 25, 50, 75, 100
 }
 
 export interface BranchOption {

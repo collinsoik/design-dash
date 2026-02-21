@@ -72,6 +72,13 @@ export const CASE_STUDIES: CaseStudy[] = [
             "3 tabs: Home, Search, Library. Clean and simple. Advanced features in menus.",
           rightDescription:
             "6+ tabs: Home, Explore, Radio, Social, Library, Profile. Everything one tap away.",
+          points: [
+            "3 tabs only",
+            "3 tabs + overflow menu",
+            "4–5 tabs balanced",
+            "5 tabs + extras",
+            "6+ tabs, all visible",
+          ],
         },
       },
       {
@@ -370,6 +377,13 @@ export const CASE_STUDIES: CaseStudy[] = [
             "Ingredients grouped by recipe. Clear what goes where. Longer list with duplicates.",
           rightDescription:
             "One optimized list grouped by aisle. Shorter but harder to trace to recipes.",
+          points: [
+            "Grouped by recipe",
+            "By recipe, deduped",
+            "Hybrid grouping",
+            "By aisle, recipe tags",
+            "One optimized list",
+          ],
         },
       },
       {
@@ -517,6 +531,13 @@ export const CASE_STUDIES: CaseStudy[] = [
             "Only sensor-verified spots. Fewer options, almost never wrong. May feel empty in some areas.",
           rightDescription:
             "All data including crowdsourced. More options, but some spots may be taken on arrival.",
+          points: [
+            "Sensor-verified only",
+            "Sensors + vetted reports",
+            "Balanced mix",
+            "All sources, flagged",
+            "All crowdsourced data",
+          ],
         },
       },
       {

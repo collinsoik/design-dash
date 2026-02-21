@@ -10,16 +10,7 @@ interface TradeoffSliderProps {
   disabled?: boolean;
 }
 
-function getSliderLabel(value: number, leftLabel: string, rightLabel: string): string {
-  switch (value) {
-    case 0: return `Strongly ${leftLabel}`;
-    case 25: return `Lean ${leftLabel}`;
-    case 50: return "Balanced";
-    case 75: return `Lean ${rightLabel}`;
-    case 100: return `Strongly ${rightLabel}`;
-    default: return "Balanced";
-  }
-}
+const TICK_VALUES = [0, 25, 50, 75, 100] as const;
 
 export default function TradeoffSlider({
   tradeoff,
@@ -35,33 +26,25 @@ export default function TradeoffSlider({
     onChange(v);
   }
 
+  const selectedIndex = TICK_VALUES.indexOf(localValue as (typeof TICK_VALUES)[number]);
+
   return (
     <div className="space-y-4">
-      {/* Labels */}
-      <div className="flex justify-between items-start gap-4">
-        <div className="flex-1 text-left">
-          <p className="text-sm font-semibold text-accent-red mb-1">
-            {tradeoff.leftLabel}
-          </p>
-          <p className="text-xs text-text-tertiary leading-relaxed">
-            {tradeoff.leftDescription}
-          </p>
-        </div>
-        <div className="flex-1 text-right">
-          <p className="text-sm font-semibold text-accent-green mb-1">
-            {tradeoff.rightLabel}
-          </p>
-          <p className="text-xs text-text-tertiary leading-relaxed">
-            {tradeoff.rightDescription}
-          </p>
-        </div>
+      {/* End labels */}
+      <div className="flex justify-between items-center">
+        <span className="text-sm font-semibold text-accent-red">
+          {tradeoff.leftLabel}
+        </span>
+        <span className="text-sm font-semibold text-accent-green">
+          {tradeoff.rightLabel}
+        </span>
       </div>
 
       {/* Slider track with tick marks */}
       <div className="relative px-1">
         {/* Tick marks */}
         <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-[9px] pointer-events-none">
-          {[0, 25, 50, 75, 100].map((tick) => (
+          {TICK_VALUES.map((tick) => (
             <div
               key={tick}
               className={`w-2.5 h-2.5 rounded-full border-2 ${
@@ -105,11 +88,20 @@ export default function TradeoffSlider({
         />
       </div>
 
-      {/* Value indicator */}
-      <div className="text-center">
-        <span className="text-lg font-bold text-accent-primary">
-          {getSliderLabel(localValue, tradeoff.leftLabel, tradeoff.rightLabel)}
-        </span>
+      {/* Point descriptions row */}
+      <div className="flex justify-between">
+        {tradeoff.points.map((desc, i) => (
+          <div
+            key={i}
+            className={`flex-1 text-center px-0.5 ${
+              i === selectedIndex
+                ? "text-accent-primary font-semibold"
+                : "text-text-tertiary"
+            }`}
+          >
+            <span className="text-xs leading-tight block">{desc}</span>
+          </div>
+        ))}
       </div>
     </div>
   );
