@@ -10,9 +10,11 @@ import {
   SERVER_EVENTS,
   TEAM_COLORS,
   TEAM_NAMES,
+  CASE_STUDIES,
 } from "@design-dash/shared";
 import type { Room, Player, Team } from "@design-dash/shared";
 import TeamDisplay from "@/components/lobby/TeamDisplay";
+import CaseStudyBriefing from "@/components/tutorial/CaseStudyBriefing";
 
 export default function LobbyPage() {
   const params = useParams();
@@ -23,6 +25,7 @@ export default function LobbyPage() {
 
   const { room, playerId, setRoom, setPlayerId } = useGameStore();
   const [dots, setDots] = useState("");
+  const [showBriefing, setShowBriefing] = useState(true);
 
   const isHost = room?.hostId === playerId;
 
@@ -164,6 +167,18 @@ export default function LobbyPage() {
         ))}
       </div>
 
+      {/* View Briefing Button */}
+      {room?.config?.caseStudyId && (
+        <div className="text-center mb-4">
+          <button
+            onClick={() => setShowBriefing(true)}
+            className="pixel-btn-yellow text-[10px]"
+          >
+            VIEW MISSION BRIEFING
+          </button>
+        </div>
+      )}
+
       {/* Status Bar */}
       <div className="text-center space-y-4">
         <p className="font-pixel text-xs text-gray-400">
@@ -193,6 +208,14 @@ export default function LobbyPage() {
           </div>
         )}
       </div>
+
+      {/* Case Study Briefing Modal */}
+      {showBriefing && room?.config?.caseStudyId && (() => {
+        const cs = CASE_STUDIES.find((c) => c.id === room.config.caseStudyId);
+        return cs ? (
+          <CaseStudyBriefing caseStudy={cs} onReady={() => setShowBriefing(false)} />
+        ) : null;
+      })()}
     </main>
   );
 }

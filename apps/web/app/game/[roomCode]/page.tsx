@@ -21,6 +21,7 @@ import Canvas from "@/components/game/Canvas";
 import TurnIndicator from "@/components/game/TurnIndicator";
 import TeamSidebar from "@/components/game/TeamSidebar";
 import BrainstormPanel from "@/components/game/BrainstormPanel";
+import HowToPlay from "@/components/tutorial/HowToPlay";
 import Image from "next/image";
 import { getComponentById } from "@design-dash/shared";
 
@@ -29,6 +30,7 @@ export default function GamePage() {
   const router = useRouter();
   const roomCode = params.roomCode as string;
   const [activeDragId, setActiveDragId] = useState<string | null>(null);
+  const [showHelp, setShowHelp] = useState(false);
 
   const {
     room,
@@ -149,7 +151,17 @@ export default function GamePage() {
     >
       <div className="h-screen flex flex-col overflow-hidden">
         {/* Top Bar */}
-        <TurnIndicator />
+        <div className="relative">
+          <TurnIndicator />
+          {/* Help button */}
+          <button
+            onClick={() => setShowHelp(true)}
+            className="absolute top-1/2 right-3 -translate-y-1/2 z-20 w-7 h-7 flex items-center justify-center font-pixel text-[10px] text-game-yellow border-2 border-game-yellow/50 rounded bg-game-dark/80 hover:bg-game-yellow/20 hover:border-game-yellow transition-colors"
+            title="How to play"
+          >
+            ?
+          </button>
+        </div>
 
         {/* Main Content */}
         <div className="flex-1 flex overflow-hidden">
@@ -172,6 +184,9 @@ export default function GamePage() {
           </aside>
         </div>
       </div>
+
+      {/* Help Modal */}
+      {showHelp && <HowToPlay onClose={() => setShowHelp(false)} />}
 
       {/* Drag Overlay */}
       <DragOverlay>

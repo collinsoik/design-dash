@@ -3,12 +3,14 @@
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import HowToPlay from "@/components/tutorial/HowToPlay";
 
 export default function LandingPage() {
   const router = useRouter();
   const [roomCode, setRoomCode] = useState("");
   const [playerName, setPlayerName] = useState("");
   const [isJoining, setIsJoining] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
 
   function handleRoomCodeChange(value: string) {
     // Auto-format: uppercase, max 8 chars, insert dash after DASH
@@ -112,12 +114,25 @@ export default function LandingPage() {
         </div>
       </div>
 
+      {/* How to Play Button */}
+      <div className="mt-10 relative z-10">
+        <button
+          onClick={() => setShowTutorial(true)}
+          className="pixel-btn-yellow text-xs"
+        >
+          HOW TO PLAY
+        </button>
+      </div>
+
       {/* Footer */}
-      <div className="mt-16 text-center relative z-10">
+      <div className="mt-8 text-center relative z-10">
         <p className="font-pixel text-[8px] text-gray-600">
           A MULTIPLAYER WEB DESIGN CHALLENGE
         </p>
       </div>
+
+      {/* Tutorial Modal */}
+      {showTutorial && <HowToPlay onClose={() => setShowTutorial(false)} />}
     </main>
   );
 }

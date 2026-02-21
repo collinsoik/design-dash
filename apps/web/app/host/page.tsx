@@ -6,8 +6,15 @@ import Link from "next/link";
 import { connectSocket } from "@/lib/socket";
 import { useGameStore } from "@/lib/game-store";
 import { CASE_STUDIES, CLIENT_EVENTS } from "@design-dash/shared";
+import CaseStudyBriefing from "@/components/tutorial/CaseStudyBriefing";
 
 const TIMER_OPTIONS = [60, 90, 120, 150, 180];
+
+const DIFFICULTY_COLORS = {
+  beginner: "bg-game-green text-game-dark",
+  intermediate: "bg-game-yellow text-game-dark",
+  advanced: "bg-game-red text-white",
+} as const;
 
 export default function HostPage() {
   const router = useRouter();
@@ -17,6 +24,7 @@ export default function HostPage() {
   const [selectedCaseStudy, setSelectedCaseStudy] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showBriefing, setShowBriefing] = useState(false);
 
   function handleCreate() {
     if (!selectedCaseStudy) return;
@@ -123,13 +131,18 @@ export default function HostPage() {
                     : "border-game-blue bg-game-blue/20 hover:border-game-purple"
                 }`}
               >
-                <h3
-                  className={`font-pixel text-[10px] mb-1 ${
-                    selectedCaseStudy === cs.id ? "text-game-green" : "text-game-red"
-                  }`}
-                >
-                  {cs.businessName}
-                </h3>
+                <div className="flex items-center justify-between mb-1">
+                  <h3
+                    className={`font-pixel text-[10px] ${
+                      selectedCaseStudy === cs.id ? "text-game-green" : "text-game-red"
+                    }`}
+                  >
+                    {cs.businessName}
+                  </h3>
+                  <span className={`font-pixel text-[6px] px-1.5 py-0.5 rounded ${DIFFICULTY_COLORS[cs.difficulty]}`}>
+                    {cs.difficulty.toUpperCase()}
+                  </span>
+                </div>
                 <p className="font-pixel text-[8px] text-game-yellow mb-3">
                   {cs.businessType}
                 </p>
@@ -139,6 +152,18 @@ export default function HostPage() {
               </button>
             ))}
           </div>
+
+          {/* View Briefing Button */}
+          {selectedCaseStudy && (
+            <div className="text-center mt-4">
+              <button
+                onClick={() => setShowBriefing(true)}
+                className="pixel-btn-yellow text-[10px]"
+              >
+                VIEW MISSION BRIEFING
+              </button>
+            </div>
+          )}
         </section>
 
         {/* Create Button */}
@@ -157,6 +182,14 @@ export default function HostPage() {
           )}
         </div>
       </div>
+
+      {/* Case Study Briefing Modal */}
+      {showBriefing && selectedCaseStudy && (() => {
+        const cs = CASE_STUDIES.find((c) => c.id === selectedCaseStudy);
+        return cs ? (
+          <CaseStudyBriefing caseStudy={cs} onReady={() => setShowBriefing(false)} />
+        ) : null;
+      })()}
     </main>
   );
 }

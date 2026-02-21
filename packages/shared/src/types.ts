@@ -46,6 +46,12 @@ export interface CaseStudy {
   brokenSections: SectionSlot[];
   idealCategories: Record<string, string[]>;
   scoringCriteria: string[];
+  difficulty: "beginner" | "intermediate" | "advanced";
+  learningObjectives: string[];
+  designTips: Record<string, string>;
+  whatsBroken: string[];
+  successHints: string[];
+  funFact: string;
 }
 
 export interface RoomConfig {
