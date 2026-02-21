@@ -9,7 +9,7 @@ import {
   SERVER_EVENTS,
   TEAM_COLORS,
 } from "@design-dash/shared";
-import type { Room, Team } from "@design-dash/shared";
+import type { Room, Team, DecisionPoint, PlayerDecision } from "@design-dash/shared";
 import JudgePanel from "@/components/voting/JudgePanel";
 
 export default function VotePage() {
@@ -75,13 +75,41 @@ export default function VotePage() {
   const votableTeams = activeTeams.filter((t) => t.id !== myTeamId);
   const allVoted = votableTeams.every((t) => votes[t.id] !== undefined);
 
-  // Get team decisions summary for display
+  // Resolve each team's decisions to display-friendly summaries
+  type DecisionSummary = { question: string; answer: string | null };
   const teamDecisionSummaries = useMemo(() => {
-    if (!gameState) return {};
-    const summaries: Record<string, number> = {};
+    if (!gameState?.caseStudy?.decisions) return {};
+    const decisions = gameState.caseStudy.decisions;
+    const summaries: Record<string, DecisionSummary[]> = {};
+
     for (const team of activeTeams) {
       const teamState = gameState.teamDecisions[team.id];
-      summaries[team.id] = teamState ? Object.keys(teamState.decisions).length : 0;
+      summaries[team.id] = decisions.map((dp: DecisionPoint) => {
+        const pd: PlayerDecision | undefined = teamState?.decisions[dp.id];
+        if (!pd) return { question: dp.scenarioText, answer: null };
+
+        let answer: string | null = null;
+        if (dp.type === "multiple_choice" && pd.choiceId && dp.choices) {
+          answer = dp.choices.find((c) => c.id === pd.choiceId)?.label ?? null;
+        } else if (dp.type === "tradeoff_slider" && pd.sliderValue != null && dp.tradeoff) {
+          const pct = pd.sliderValue;
+          answer = pct <= 33
+            ? dp.tradeoff.leftLabel
+            : pct >= 67
+              ? dp.tradeoff.rightLabel
+              : `${dp.tradeoff.leftLabel} / ${dp.tradeoff.rightLabel}`;
+        } else if (dp.type === "branching_path" && pd.branchId && dp.branches) {
+          const branch = dp.branches.find((b) => b.id === pd.branchId);
+          if (branch) {
+            answer = branch.label;
+            if (pd.followUpChoiceId && branch.followUp?.choices) {
+              const fu = branch.followUp.choices.find((c) => c.id === pd.followUpChoiceId);
+              if (fu) answer += ` → ${fu.label}`;
+            }
+          }
+        }
+        return { question: dp.scenarioText, answer };
+      });
     }
     return summaries;
   }, [gameState, activeTeams]);
@@ -90,13 +118,13 @@ export default function VotePage() {
     <main className="min-h-screen p-6 md:p-10">
       {/* Header */}
       <div className="text-center mb-10">
-        <h1 className="font-pixel text-xl md:text-3xl text-game-yellow mb-2">
+        <h1 className="font-pixel text-3xl md:text-5xl text-game-yellow mb-2">
           VOTE
         </h1>
-        <p className="font-pixel text-[10px] text-gray-400">
+        <p className="font-pixel text-sm text-gray-400">
           RATE EACH TEAM&apos;S DESIGN DECISIONS
         </p>
-        <p className="font-pixel text-[8px] text-gray-500 mt-2">ROOM: {roomCode}</p>
+        <p className="font-pixel text-xs text-gray-500 mt-2">ROOM: {roomCode}</p>
       </div>
 
       {/* Host Judge Panel */}
@@ -116,10 +144,10 @@ export default function VotePage() {
 
       {submitted ? (
         <div className="flex flex-col items-center justify-center py-20">
-          <div className="font-pixel text-lg text-game-green mb-4">
+          <div className="font-pixel text-2xl text-game-green mb-4">
             VOTES SUBMITTED!
           </div>
-          <p className="text-gray-400 text-sm">
+          <p className="text-gray-400 text-lg">
             Waiting for the host to finalize scores...
           </p>
           <div className="mt-6 flex gap-1">
@@ -139,8 +167,9 @@ export default function VotePage() {
             {activeTeams.map((team) => {
               const teamColor = TEAM_COLORS[parseInt(team.id.split("-")[1])] || "#ffffff";
               const isOwnTeam = team.id === myTeamId;
-              const decisionCount = teamDecisionSummaries[team.id] || 0;
-              const totalDecisions = gameState?.caseStudy?.decisions.length || 0;
+              const decisions = teamDecisionSummaries[team.id] || [];
+              const answeredCount = decisions.filter((d) => d.answer !== null).length;
+              const totalDecisions = decisions.length;
 
               return (
                 <div
@@ -153,7 +182,7 @@ export default function VotePage() {
                   style={{ borderTopColor: teamColor, borderTopWidth: "4px" }}
                 >
                   {isOwnTeam && (
-                    <div className="absolute top-3 right-3 z-10 rounded bg-white/10 px-2 py-1 font-pixel text-[8px] uppercase tracking-widest text-white/60 backdrop-blur-sm">
+                    <div className="absolute top-3 right-3 z-10 rounded bg-white/10 px-2 py-1 font-pixel text-xs uppercase tracking-widest text-white/60 backdrop-blur-sm">
                       Your Team
                     </div>
                   )}
@@ -161,42 +190,41 @@ export default function VotePage() {
                   {/* Team header */}
                   <div className="px-5 pt-4 pb-3">
                     <h3
-                      className="font-pixel text-xs tracking-wider uppercase"
+                      className="font-pixel text-base tracking-wider uppercase"
                       style={{ color: teamColor }}
                     >
                       {team.name}
                     </h3>
                   </div>
 
-                  {/* Decision summary */}
+                  {/* Decision list */}
                   <div className="px-5 pb-3">
-                    <p className="mb-2 font-pixel text-[8px] text-white/50 uppercase tracking-wide">
-                      Decisions Made
+                    <p className="mb-2 font-pixel text-xs text-white/50 uppercase tracking-wide">
+                      Decisions ({answeredCount}/{totalDecisions})
                     </p>
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-2 bg-gray-800 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-game-green rounded-full"
-                          style={{
-                            width: `${totalDecisions > 0 ? (decisionCount / totalDecisions) * 100 : 0}%`,
-                          }}
-                        />
-                      </div>
-                      <span className="font-pixel text-[9px] text-gray-400">
-                        {decisionCount}/{totalDecisions}
-                      </span>
+                    <div className="space-y-2 max-h-48 overflow-y-auto">
+                      {decisions.map((d, i) => (
+                        <div key={i} className="rounded bg-white/5 px-3 py-2">
+                          <p className="text-xs text-white/40 line-clamp-1">{d.question}</p>
+                          {d.answer ? (
+                            <p className="text-sm text-white/80 mt-0.5 line-clamp-1">{d.answer}</p>
+                          ) : (
+                            <p className="text-sm text-white/20 italic mt-0.5">NOT ANSWERED</p>
+                          )}
+                        </div>
+                      ))}
                     </div>
                   </div>
 
                   {/* Star rating */}
                   <div className="border-t border-white/5 px-5 py-4">
                     {isOwnTeam ? (
-                      <p className="text-center font-sans text-xs text-white/30 italic">
+                      <p className="text-center font-sans text-base text-white/30 italic">
                         You cannot vote for your own team
                       </p>
                     ) : (
                       <div className="flex flex-col items-center gap-2">
-                        <p className="font-pixel text-[8px] text-white/50 uppercase tracking-wide">
+                        <p className="font-pixel text-xs text-white/50 uppercase tracking-wide">
                           Your Rating
                         </p>
                         <div className="flex items-center gap-1">
@@ -250,7 +278,7 @@ export default function VotePage() {
                 SUBMIT VOTES
               </button>
               {!allVoted && (
-                <p className="font-pixel text-[8px] text-gray-500 mt-3">
+                <p className="font-pixel text-xs text-gray-500 mt-3">
                   RATE ALL TEAMS TO SUBMIT
                 </p>
               )}
