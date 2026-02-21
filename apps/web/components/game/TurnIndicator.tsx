@@ -33,6 +33,12 @@ export default function TurnIndicator() {
 
   const isMyTurn = playerId === activePlayerId;
 
+  // Check if my team already submitted this round
+  const hasSubmitted = useMemo(() => {
+    if (!turnState || !myTeamId) return false;
+    return turnState.submittedTeams?.includes(myTeamId) ?? false;
+  }, [turnState, myTeamId]);
+
   // Team color for the active player
   const teamColor = useMemo(() => {
     if (!room || !myTeamId) return "#7C8CF5";
@@ -94,13 +100,18 @@ export default function TurnIndicator() {
         </div>
 
         {/* Submit turn button */}
-        {isMyTurn && (
+        {isMyTurn && !hasSubmitted && (
           <button
             onClick={handleSubmitTurn}
             className="btn-green text-sm"
           >
             Submit Round
           </button>
+        )}
+        {hasSubmitted && (
+          <span className="text-sm font-medium text-accent-green">
+            Submitted — waiting for others
+          </span>
         )}
       </div>
 

@@ -250,6 +250,12 @@ export function handleTurnEvents(io: Server, socket: Socket): void {
     // Remove from active players
     delete room.gameState.currentTurn.activePlayerIds[player.teamId];
 
+    // Broadcast updated turn state so all clients see the submission
+    io.to(roomCode).emit(SERVER_EVENTS.TURN_SUBMITTED, {
+      submittedTeams: room.gameState.currentTurn.submittedTeams,
+      activePlayerIds: room.gameState.currentTurn.activePlayerIds,
+    });
+
     // If all teams have submitted, advance round
     if (Object.keys(room.gameState.currentTurn.activePlayerIds).length === 0) {
       const existingTimer = roomTimers.get(roomCode);

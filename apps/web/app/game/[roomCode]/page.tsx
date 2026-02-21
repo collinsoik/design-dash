@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useGameStore } from "@/lib/game-store";
 import { connectSocket } from "@/lib/socket";
-import { SERVER_EVENTS } from "@design-dash/shared";
+import { CLIENT_EVENTS, SERVER_EVENTS } from "@design-dash/shared";
 import TurnIndicator from "@/components/game/TurnIndicator";
 import ScenarioHeader from "@/components/game/ScenarioHeader";
 import ScenarioView from "@/components/game/ScenarioView";
@@ -49,6 +49,17 @@ export default function GamePage() {
       updateTimeRemaining(timeRemaining);
     });
 
+    socket.on(SERVER_EVENTS.TURN_SUBMITTED, ({ submittedTeams, activePlayerIds }: { submittedTeams: string[]; activePlayerIds: Record<string, string> }) => {
+      const gs = useGameStore.getState().gameState;
+      if (gs) {
+        useGameStore.getState().updateTurn({
+          ...gs.currentTurn,
+          submittedTeams,
+          activePlayerIds,
+        });
+      }
+    });
+
     socket.on(SERVER_EVENTS.DECISION_RECORDED, (payload) => {
       recordDecision(payload);
     });
@@ -68,11 +79,33 @@ export default function GamePage() {
       router.push(`/results/${roomCode}`);
     });
 
+    // Re-associate socket with room on reconnect
+    const onReconnect = () => {
+      const currentPlayerId = useGameStore.getState().playerId;
+      if (currentPlayerId) {
+        socket.emit(
+          CLIENT_EVENTS.ROOM_REJOIN,
+          { roomCode, playerId: currentPlayerId },
+          (response: { success: boolean; room?: any; playerId?: string }) => {
+            if (response.success && response.room) {
+              setRoom(response.room);
+              if (response.playerId) {
+                useGameStore.getState().setPlayerId(response.playerId);
+              }
+            }
+          }
+        );
+      }
+    };
+    socket.on("connect", onReconnect);
+
     return () => {
+      socket.off("connect", onReconnect);
       socket.off(SERVER_EVENTS.ROOM_STATE);
       socket.off(SERVER_EVENTS.GAME_STARTED);
       socket.off(SERVER_EVENTS.TURN_CHANGED);
       socket.off(SERVER_EVENTS.TURN_TICK);
+      socket.off(SERVER_EVENTS.TURN_SUBMITTED);
       socket.off(SERVER_EVENTS.DECISION_RECORDED);
       socket.off(SERVER_EVENTS.BRAINSTORM_NEW);
       socket.off(SERVER_EVENTS.VOTE_RESULTS);

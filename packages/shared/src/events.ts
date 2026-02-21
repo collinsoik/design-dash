@@ -24,6 +24,7 @@ export const SERVER_EVENTS = {
   GAME_STARTED: "game:started",
   TURN_CHANGED: "turn:changed",
   TURN_TICK: "turn:tick",
+  TURN_SUBMITTED: "turn:submitted",
   DECISION_RECORDED: "decision:recorded",
   BRAINSTORM_NEW: "brainstorm:new",
   VOTE_RESULTS: "vote:results",
