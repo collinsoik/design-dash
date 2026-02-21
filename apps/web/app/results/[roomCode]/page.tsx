@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useGameStore } from "@/lib/game-store";
 import { connectSocket } from "@/lib/socket";
-import { SERVER_EVENTS, TEAM_COLORS } from "@design-dash/shared";
+import { SERVER_EVENTS } from "@design-dash/shared";
 import type { Room, GameResults } from "@design-dash/shared";
 
 const TROPHY_ICONS = ["1ST", "2ND", "3RD"];
@@ -40,7 +40,7 @@ export default function ResultsPage() {
   }, [setRoom, setResults]);
 
   const teamResults = results?.teams || [];
-  const bestSections = results?.bestSections || [];
+  const bestDecisions = results?.bestDecisions || [];
 
   return (
     <main className="min-h-screen p-6 md:p-10">
@@ -139,20 +139,23 @@ export default function ResultsPage() {
             </div>
           </div>
 
-          {/* Best Section Awards */}
-          {bestSections.length > 0 && (
+          {/* Best Decision Awards */}
+          {bestDecisions.length > 0 && (
             <div className="max-w-3xl mx-auto mb-12">
               <h2 className="font-pixel text-xs text-game-purple mb-6 text-center">
-                BEST SECTION AWARDS
+                BEST DECISION AWARDS
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {bestSections.map((award, idx) => (
+                {bestDecisions.map((award, idx) => (
                   <div
                     key={idx}
                     className="border-3 border-game-purple bg-game-purple/10 p-4 text-center"
                   >
-                    <p className="font-pixel text-[9px] text-game-purple mb-1">
-                      Best {award.sectionLabel}
+                    <p className="font-pixel text-[8px] text-game-purple mb-2">
+                      Round {idx + 1}
+                    </p>
+                    <p className="text-[10px] text-gray-400 mb-2 line-clamp-2">
+                      {award.decisionLabel}
                     </p>
                     <p className="font-pixel text-[10px] text-white">
                       {award.teamName}

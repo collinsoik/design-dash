@@ -7,13 +7,13 @@ import { connectSocket } from "@/lib/socket";
 import { useGameStore } from "@/lib/game-store";
 import { CASE_STUDIES, CLIENT_EVENTS } from "@design-dash/shared";
 
-const TIMER_OPTIONS = [60, 90, 120, 150, 180];
+const TIMER_OPTIONS = [120, 150, 180, 210, 240];
 
 export default function HostPage() {
   const router = useRouter();
   const { setRoom, setPlayerId } = useGameStore();
   const [teamSize, setTeamSize] = useState(4);
-  const [turnTimer, setTurnTimer] = useState(90);
+  const [turnTimer, setTurnTimer] = useState(150);
   const [selectedCaseStudy, setSelectedCaseStudy] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -85,10 +85,10 @@ export default function HostPage() {
           </div>
         </section>
 
-        {/* Turn Timer */}
+        {/* Round Timer */}
         <section className="pixel-card">
-          <h2 className="font-pixel text-xs text-game-yellow mb-4">TURN TIMER</h2>
-          <p className="text-gray-400 text-sm mb-4">Seconds per turn for each player.</p>
+          <h2 className="font-pixel text-xs text-game-yellow mb-4">ROUND TIMER</h2>
+          <p className="text-gray-400 text-sm mb-4">Seconds per round for each decision.</p>
           <div className="flex flex-wrap gap-3">
             {TIMER_OPTIONS.map((seconds) => (
               <button
@@ -100,7 +100,7 @@ export default function HostPage() {
                     : "bg-transparent text-gray-400 border-game-blue hover:border-game-green hover:text-white"
                 }`}
               >
-                {seconds}s
+                {Math.floor(seconds / 60)}:{(seconds % 60).toString().padStart(2, "0")}
               </button>
             ))}
           </div>
@@ -108,9 +108,9 @@ export default function HostPage() {
 
         {/* Case Study Selection */}
         <section>
-          <h2 className="font-pixel text-xs text-game-yellow mb-4">SELECT CASE STUDY</h2>
+          <h2 className="font-pixel text-xs text-game-yellow mb-4">SELECT PRODUCT</h2>
           <p className="text-gray-400 text-sm mb-6">
-            Choose the broken website your teams will redesign.
+            Choose the product your teams will make design decisions for.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {CASE_STUDIES.map((cs) => (
@@ -128,13 +128,33 @@ export default function HostPage() {
                     selectedCaseStudy === cs.id ? "text-game-green" : "text-game-red"
                   }`}
                 >
-                  {cs.businessName}
+                  {cs.productName}
                 </h3>
-                <p className="font-pixel text-[8px] text-game-yellow mb-3">
-                  {cs.businessType}
+                <p className="font-pixel text-[8px] text-game-yellow mb-2">
+                  {cs.productType}
                 </p>
-                <p className="text-gray-400 text-xs leading-relaxed line-clamp-3">
+                <p className="text-gray-400 text-xs leading-relaxed line-clamp-3 mb-3">
                   {cs.story}
+                </p>
+                {/* Persona preview */}
+                <div className="flex items-center gap-2 mt-2 pt-2 border-t border-gray-700">
+                  <div className="w-5 h-5 rounded-full bg-game-purple/30 border border-game-purple/50 flex items-center justify-center">
+                    <span className="font-pixel text-[5px] text-game-purple">
+                      {cs.persona.name.split(" ").map(n => n[0]).join("")}
+                    </span>
+                  </div>
+                  <div>
+                    <p className="font-pixel text-[7px] text-gray-300">
+                      {cs.persona.name}
+                    </p>
+                    <p className="text-[9px] text-gray-500">
+                      {cs.persona.occupation}
+                    </p>
+                  </div>
+                </div>
+                {/* Decision count */}
+                <p className="font-pixel text-[7px] text-gray-500 mt-2">
+                  {cs.decisions.length} DECISIONS · {new Set(cs.decisions.map(d => d.round)).size} ROUNDS
                 </p>
               </button>
             ))}
@@ -152,7 +172,7 @@ export default function HostPage() {
           </button>
           {!selectedCaseStudy && (
             <p className="font-pixel text-[8px] text-gray-500 mt-4">
-              SELECT A CASE STUDY TO CONTINUE
+              SELECT A PRODUCT TO CONTINUE
             </p>
           )}
         </div>

@@ -10,8 +10,8 @@ export default function TurnIndicator() {
 
   const gameState = room?.gameState ?? null;
   const turnState = gameState?.currentTurn ?? null;
-  const totalTurns = gameState?.totalTurns ?? 0;
-  const turnNumber = turnState?.turnNumber ?? 0;
+  const totalRounds = gameState?.totalRounds ?? 0;
+  const currentRound = turnState?.round ?? 0;
   const timeRemaining = turnState?.timeRemaining ?? 0;
 
   // Determine the current player's team
@@ -62,14 +62,14 @@ export default function TurnIndicator() {
 
   return (
     <header className="flex items-center justify-between px-4 py-3 bg-game-blue/40 border-b-3 border-game-blue">
-      {/* Left: Room code + turn counter */}
+      {/* Left: Room code + round counter */}
       <div className="flex items-center gap-4">
         <span className="font-pixel text-[10px] text-gray-400">
           ROOM: {room?.code ?? "----"}
         </span>
         <div className="h-4 w-px bg-game-blue/60" />
         <span className="font-pixel text-[10px] text-game-yellow">
-          TURN {turnNumber}/{totalTurns}
+          ROUND {currentRound + 1}/{totalRounds}
         </span>
       </div>
 
@@ -102,7 +102,7 @@ export default function TurnIndicator() {
               hover:bg-game-green/30 hover:shadow-[0_0_10px_rgba(22,199,154,0.3)]
               active:bg-game-green/40 transition-all rounded"
           >
-            SUBMIT TURN
+            SUBMIT ROUND
           </button>
         )}
       </div>

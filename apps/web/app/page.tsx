@@ -44,7 +44,7 @@ export default function LandingPage() {
           DESIGNDASH
         </h1>
         <p className="font-pixel text-xs md:text-sm text-game-green neon-text-green">
-          Fix Broken Websites. Together.
+          Make Design Decisions. Together.
         </p>
       </div>
 
@@ -103,8 +103,8 @@ export default function LandingPage() {
             HOST GAME
           </h2>
           <p className="text-gray-400 text-sm text-center mb-8 leading-relaxed">
-            Create a new game room, choose a case study, and invite your students
-            to join.
+            Create a new game room, choose a product scenario, and invite your
+            players to join.
           </p>
           <Link href="/host" className="pixel-btn-green inline-block text-center">
             CREATE ROOM
@@ -115,7 +115,7 @@ export default function LandingPage() {
       {/* Footer */}
       <div className="mt-16 text-center relative z-10">
         <p className="font-pixel text-[8px] text-gray-600">
-          A MULTIPLAYER WEB DESIGN CHALLENGE
+          A MULTIPLAYER PRODUCT DESIGN GAME
         </p>
       </div>
     </main>

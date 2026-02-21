@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useGameStore } from "@/lib/game-store";
 import { getSocket } from "@/lib/socket";
-import type { BrainstormMessage } from "@/lib/types";
+import type { BrainstormMessage } from "@design-dash/shared";
 
 export default function BrainstormPanel() {
   const room = useGameStore((s) => s.room);
@@ -143,7 +143,7 @@ export default function BrainstormPanel() {
         <div className="flex items-center gap-3">
           <span className="font-pixel text-[7px] text-gray-500">
             {isMyTurn
-              ? "CHAT WHILE OTHERS BUILD"
+              ? "DISCUSS WHILE DECIDING"
               : "SUGGEST IDEAS FOR YOUR TEAM"}
           </span>
           <button

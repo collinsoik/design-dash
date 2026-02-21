@@ -2,14 +2,14 @@ import { Server, Socket } from "socket.io";
 import {
   CLIENT_EVENTS,
   SERVER_EVENTS,
-  TurnPlacePayload,
-  TurnRemovePayload,
+  DecisionSubmitPayload,
 } from "@design-dash/shared";
 import {
   GameState,
   TurnState,
-  WebsiteState,
-  SectionSlot,
+  TeamDecisionState,
+  PlayerDecision,
+  CaseStudy,
 } from "@design-dash/shared";
 import { CASE_STUDIES } from "@design-dash/shared";
 import { getRoom, rooms } from "./rooms";
@@ -18,74 +18,23 @@ import { saveGame } from "./db";
 // Active timers per room
 const roomTimers = new Map<string, NodeJS.Timeout>();
 
-function assignSectionsToPlayers(room: any): Record<string, string[]> {
-  const assignments: Record<string, string[]> = {};
-
-  // For each team, distribute sections among team members
-  for (const team of Object.values(room.teams) as any[]) {
-    if (team.members.length === 0) continue;
-
-    const caseStudy = CASE_STUDIES.find(
-      (cs) => cs.id === room.config.caseStudyId
-    );
-    if (!caseStudy) continue;
-
-    const sections = caseStudy.brokenSections;
-    const memberCount = team.members.length;
-
-    // Distribute sections round-robin among team members
-    sections.forEach((section: SectionSlot, index: number) => {
-      const memberIndex = index % memberCount;
-      const playerId = team.members[memberIndex];
-
-      if (!assignments[playerId]) {
-        assignments[playerId] = [];
-      }
-      assignments[playerId].push(section.id);
-    });
-  }
-
-  return assignments;
+function getTotalRounds(caseStudy: CaseStudy): number {
+  const rounds = new Set(caseStudy.decisions.map((d) => d.round));
+  return rounds.size;
 }
 
-function getMaxTurnOrder(room: any): number {
-  const caseStudy = CASE_STUDIES.find(
-    (cs) => cs.id === room.config.caseStudyId
-  );
-  if (!caseStudy) return 0;
-  return Math.max(...caseStudy.brokenSections.map((s) => s.turnOrder));
-}
-
-function getActivePlayersForTurn(
+function getActivePlayersForRound(
   room: any,
-  turnNumber: number
+  round: number
 ): Record<string, string> {
   const activePlayerIds: Record<string, string> = {};
-  const caseStudy = CASE_STUDIES.find(
-    (cs) => cs.id === room.config.caseStudyId
-  );
-  if (!caseStudy) return activePlayerIds;
-
-  // Get slots for this turn
-  const turnSlots = caseStudy.brokenSections.filter(
-    (s) => s.turnOrder === turnNumber
-  );
 
   for (const team of Object.values(room.teams) as any[]) {
     if (team.members.length === 0) continue;
 
-    // The active player is the one assigned to the first slot of this turn
-    for (const slotDef of turnSlots) {
-      const website = room.gameState?.teamWebsites[team.id];
-      if (website) {
-        const slot = website.sections.find(
-          (s: SectionSlot) => s.id === slotDef.id
-        );
-        if (slot?.assignedTo && !activePlayerIds[team.id]) {
-          activePlayerIds[team.id] = slot.assignedTo;
-        }
-      }
-    }
+    // Round-robin: each round, the next team member is the active player
+    const memberIndex = round % team.members.length;
+    activePlayerIds[team.id] = team.members[memberIndex];
   }
 
   return activePlayerIds;
@@ -114,59 +63,46 @@ function startTurnTimer(io: Server, roomCode: string): void {
       timeRemaining: r.gameState.currentTurn.timeRemaining,
     });
 
-    // Time's up - advance turn
+    // Time's up - advance round
     if (r.gameState.currentTurn.timeRemaining <= 0) {
       clearInterval(timer);
       roomTimers.delete(roomCode);
-      advanceTurn(io, roomCode);
+      advanceRound(io, roomCode);
     }
   }, 1000);
 
   roomTimers.set(roomCode, timer);
 }
 
-function advanceTurn(io: Server, roomCode: string): void {
+function advanceRound(io: Server, roomCode: string): void {
   const room = getRoom(roomCode);
   if (!room || !room.gameState) return;
 
-  // Lock current turn's slots
-  const currentTurnNumber = room.gameState.currentTurn.turnNumber;
-  for (const website of Object.values(room.gameState.teamWebsites)) {
-    for (const section of website.sections) {
-      if (
-        section.turnOrder === currentTurnNumber &&
-        section.status === "placed"
-      ) {
-        section.status = "locked";
-      }
-    }
-  }
+  const currentRound = room.gameState.currentTurn.round;
+  const nextRound = currentRound + 1;
 
-  const maxTurn = getMaxTurnOrder(room);
-  const nextTurnNumber = currentTurnNumber + 1;
-
-  if (nextTurnNumber > maxTurn) {
+  if (nextRound >= room.gameState.totalRounds) {
     // Game over - move to voting
     room.phase = "voting";
     io.to(roomCode).emit(SERVER_EVENTS.ROOM_STATE, room);
     return;
   }
 
-  // Set up next turn
-  const activePlayerIds = getActivePlayersForTurn(room, nextTurnNumber);
+  // Set up next round
+  const activePlayerIds = getActivePlayersForRound(room, nextRound);
 
   room.gameState.currentTurn = {
-    turnNumber: nextTurnNumber,
+    round: nextRound,
     activePlayerIds,
     timeRemaining: room.config.turnTimer,
-    assignedSlots: room.gameState.currentTurn.assignedSlots,
+    submittedTeams: [],
   };
 
   io.to(roomCode).emit(SERVER_EVENTS.TURN_CHANGED, {
-    turnNumber: nextTurnNumber,
+    round: nextRound,
     activePlayerIds,
     timeRemaining: room.config.turnTimer,
-    assignedSlots: room.gameState.currentTurn.assignedSlots,
+    submittedTeams: [],
   });
 
   startTurnTimer(io, roomCode);
@@ -196,62 +132,26 @@ export function handleTurnEvents(io: Server, socket: Socket): void {
       return;
     }
 
-    // Build team websites and assign sections
-    const teamWebsites: Record<string, WebsiteState> = {};
-    const assignments = assignSectionsToPlayers(room);
-
+    // Build team decision state
+    const teamDecisions: Record<string, TeamDecisionState> = {};
     for (const team of Object.values(room.teams)) {
       if (team.members.length === 0) continue;
-
-      const sections: SectionSlot[] = caseStudy.brokenSections.map((s) => {
-        // Find which player in this team is assigned this section
-        let assignedPlayer: string | null = null;
-        for (const memberId of team.members) {
-          if (assignments[memberId]?.includes(s.id)) {
-            assignedPlayer = memberId;
-            break;
-          }
-        }
-
-        return {
-          ...s,
-          assignedTo: assignedPlayer,
-          placedComponent: null,
-          status: "empty" as const,
-        };
-      });
-
-      teamWebsites[team.id] = { sections };
+      teamDecisions[team.id] = { decisions: {} };
     }
 
-    // Get active players for turn 0
-    const activePlayerIds: Record<string, string> = {};
-    for (const team of Object.values(room.teams)) {
-      if (team.members.length === 0) continue;
-      const turnSlots = caseStudy.brokenSections.filter(
-        (s) => s.turnOrder === 0
-      );
-      for (const slot of turnSlots) {
-        for (const memberId of team.members) {
-          if (
-            assignments[memberId]?.includes(slot.id) &&
-            !activePlayerIds[team.id]
-          ) {
-            activePlayerIds[team.id] = memberId;
-          }
-        }
-      }
-    }
+    // Get active players for round 0
+    const activePlayerIds = getActivePlayersForRound(room, 0);
+    const totalRounds = getTotalRounds(caseStudy);
 
     room.gameState = {
       caseStudy,
-      teamWebsites,
-      totalTurns: getMaxTurnOrder(room) + 1,
+      teamDecisions,
+      totalRounds,
       currentTurn: {
-        turnNumber: 0,
+        round: 0,
         activePlayerIds,
         timeRemaining: room.config.turnTimer,
-        assignedSlots: assignments,
+        submittedTeams: [],
       },
     };
 
@@ -270,8 +170,62 @@ export function handleTurnEvents(io: Server, socket: Socket): void {
     callback?.({ success: true });
   });
 
-  // turn:place - Player places a component in a slot
-  socket.on(CLIENT_EVENTS.TURN_PLACE, (payload: TurnPlacePayload) => {
+  // decision:submit - Player submits a decision for a decision point
+  socket.on(
+    CLIENT_EVENTS.DECISION_SUBMIT,
+    (payload: DecisionSubmitPayload) => {
+      const roomCode = (socket as any).roomCode;
+      const room = getRoom(roomCode);
+      if (!room || !room.gameState || room.phase !== "playing") return;
+
+      const player = room.players[socket.id];
+      if (!player || !player.teamId) return;
+
+      // Check if this player is the active player for their team
+      const activePlayerId =
+        room.gameState.currentTurn.activePlayerIds[player.teamId];
+      if (activePlayerId !== socket.id) return;
+
+      // Validate the decision point exists and is for the current round
+      const decisionPoint = room.gameState.caseStudy.decisions.find(
+        (d) => d.id === payload.decisionPointId
+      );
+      if (!decisionPoint) return;
+      if (decisionPoint.round !== room.gameState.currentTurn.round) return;
+
+      // Record the decision
+      const teamState = room.gameState.teamDecisions[player.teamId];
+      if (!teamState) return;
+
+      const decision: PlayerDecision = {
+        decisionPointId: payload.decisionPointId,
+        type: decisionPoint.type,
+        choiceId: payload.choiceId,
+        sliderValue: payload.sliderValue,
+        branchId: payload.branchId,
+        followUpChoiceId: payload.followUpChoiceId,
+        submittedAt: Date.now(),
+      };
+
+      teamState.decisions[payload.decisionPointId] = decision;
+
+      // Broadcast decision recorded to all players
+      io.to(roomCode).emit(SERVER_EVENTS.DECISION_RECORDED, {
+        teamId: player.teamId,
+        decisionPointId: payload.decisionPointId,
+        decision: {
+          type: decisionPoint.type,
+          choiceId: payload.choiceId,
+          sliderValue: payload.sliderValue,
+          branchId: payload.branchId,
+          followUpChoiceId: payload.followUpChoiceId,
+        },
+      });
+    }
+  );
+
+  // turn:submit - Player ends their round early
+  socket.on(CLIENT_EVENTS.TURN_SUBMIT, () => {
     const roomCode = (socket as any).roomCode;
     const room = getRoom(roomCode);
     if (!room || !room.gameState || room.phase !== "playing") return;
@@ -284,86 +238,20 @@ export function handleTurnEvents(io: Server, socket: Socket): void {
       room.gameState.currentTurn.activePlayerIds[player.teamId];
     if (activePlayerId !== socket.id) return;
 
-    // Check if this slot is assigned to this player
-    const assignedSlots =
-      room.gameState.currentTurn.assignedSlots[socket.id] || [];
-    if (!assignedSlots.includes(payload.slotId)) return;
+    // Mark this team as submitted for this round
+    if (!room.gameState.currentTurn.submittedTeams.includes(player.teamId)) {
+      room.gameState.currentTurn.submittedTeams.push(player.teamId);
+    }
 
-    // Place the component
-    const website = room.gameState.teamWebsites[player.teamId];
-    if (!website) return;
-
-    const slot = website.sections.find((s) => s.id === payload.slotId);
-    if (!slot || slot.status === "locked") return;
-
-    slot.placedComponent = { registryId: payload.componentId };
-    slot.status = "placed";
-
-    // Broadcast canvas update to the team
-    io.to(roomCode).emit(SERVER_EVENTS.CANVAS_UPDATED, {
-      teamId: player.teamId,
-      slotId: payload.slotId,
-      component: slot.placedComponent,
-    });
-  });
-
-  // turn:remove - Player removes a component from a slot
-  socket.on(CLIENT_EVENTS.TURN_REMOVE, (payload: TurnRemovePayload) => {
-    const roomCode = (socket as any).roomCode;
-    const room = getRoom(roomCode);
-    if (!room || !room.gameState || room.phase !== "playing") return;
-
-    const player = room.players[socket.id];
-    if (!player || !player.teamId) return;
-
-    const activePlayerId =
-      room.gameState.currentTurn.activePlayerIds[player.teamId];
-    if (activePlayerId !== socket.id) return;
-
-    const assignedSlots =
-      room.gameState.currentTurn.assignedSlots[socket.id] || [];
-    if (!assignedSlots.includes(payload.slotId)) return;
-
-    const website = room.gameState.teamWebsites[player.teamId];
-    if (!website) return;
-
-    const slot = website.sections.find((s) => s.id === payload.slotId);
-    if (!slot || slot.status === "locked") return;
-
-    slot.placedComponent = null;
-    slot.status = "empty";
-
-    io.to(roomCode).emit(SERVER_EVENTS.CANVAS_UPDATED, {
-      teamId: player.teamId,
-      slotId: payload.slotId,
-      component: null,
-    });
-  });
-
-  // turn:submit - Player ends their turn early
-  socket.on(CLIENT_EVENTS.TURN_SUBMIT, () => {
-    const roomCode = (socket as any).roomCode;
-    const room = getRoom(roomCode);
-    if (!room || !room.gameState || room.phase !== "playing") return;
-
-    const player = room.players[socket.id];
-    if (!player || !player.teamId) return;
-
-    // Check if ALL active players for this turn have submitted
-    // For now, just check if this player's team is done
-    const activePlayerId =
-      room.gameState.currentTurn.activePlayerIds[player.teamId];
-    if (activePlayerId !== socket.id) return;
-
-    // Mark this team as submitted for this turn
+    // Remove from active players
     delete room.gameState.currentTurn.activePlayerIds[player.teamId];
 
-    // If all teams have submitted, advance turn
+    // If all teams have submitted, advance round
     if (Object.keys(room.gameState.currentTurn.activePlayerIds).length === 0) {
       const existingTimer = roomTimers.get(roomCode);
       if (existingTimer) clearInterval(existingTimer);
       roomTimers.delete(roomCode);
-      advanceTurn(io, roomCode);
+      advanceRound(io, roomCode);
     }
   });
 

@@ -12,7 +12,6 @@ import {
   TEAM_NAMES,
 } from "@design-dash/shared";
 import type { Room, Player, Team } from "@design-dash/shared";
-import TeamDisplay from "@/components/lobby/TeamDisplay";
 
 export default function LobbyPage() {
   const params = useParams();

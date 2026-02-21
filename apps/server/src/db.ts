@@ -53,6 +53,20 @@ export async function initDb(): Promise<void> {
       display_name TEXT
     );
   `);
+  db.run(`
+    CREATE TABLE IF NOT EXISTS decisions (
+      id TEXT PRIMARY KEY,
+      game_id TEXT REFERENCES games(id),
+      team_id TEXT REFERENCES teams(id),
+      decision_point_id TEXT,
+      decision_type TEXT,
+      choice_id TEXT,
+      slider_value INTEGER,
+      branch_id TEXT,
+      follow_up_choice_id TEXT,
+      submitted_at DATETIME
+    );
+  `);
 
   persistDb();
 }
@@ -108,6 +122,31 @@ export function updateGameResults(room: Room, results: GameResults): void {
     "UPDATE games SET ended_at = ? WHERE room_code = ? AND ended_at IS NULL",
     [new Date().toISOString(), room.code]
   );
+
+  // Save decisions
+  if (room.gameState) {
+    const gameIdPrefix = `game-${room.code}-`;
+    for (const [teamId, teamState] of Object.entries(room.gameState.teamDecisions)) {
+      for (const [dpId, decision] of Object.entries(teamState.decisions)) {
+        const decisionId = `${gameIdPrefix}${teamId}-${dpId}`;
+        db.run(
+          `INSERT OR REPLACE INTO decisions (id, game_id, team_id, decision_point_id, decision_type, choice_id, slider_value, branch_id, follow_up_choice_id, submitted_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            decisionId,
+            gameIdPrefix,
+            `${gameIdPrefix}${teamId}`,
+            dpId,
+            decision.type,
+            decision.choiceId || null,
+            decision.sliderValue ?? null,
+            decision.branchId || null,
+            decision.followUpChoiceId || null,
+            new Date(decision.submittedAt).toISOString(),
+          ]
+        );
+      }
+    }
+  }
 
   persistDb();
 }

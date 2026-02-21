@@ -2,20 +2,19 @@
 // Socket.IO Event Constants
 // ==========================================
 
-// Client → Server Events
+// Client -> Server Events
 export const CLIENT_EVENTS = {
   ROOM_CREATE: "room:create",
   ROOM_JOIN: "room:join",
   GAME_START: "game:start",
-  TURN_PLACE: "turn:place",
-  TURN_REMOVE: "turn:remove",
+  DECISION_SUBMIT: "decision:submit",
   TURN_SUBMIT: "turn:submit",
   BRAINSTORM_MESSAGE: "brainstorm:message",
   VOTE_SUBMIT: "vote:submit",
   JUDGE_SCORE: "judge:score",
 } as const;
 
-// Server → Client Events
+// Server -> Client Events
 export const SERVER_EVENTS = {
   ROOM_STATE: "room:state",
   ROOM_PLAYER_JOINED: "room:player-joined",
@@ -24,7 +23,7 @@ export const SERVER_EVENTS = {
   GAME_STARTED: "game:started",
   TURN_CHANGED: "turn:changed",
   TURN_TICK: "turn:tick",
-  CANVAS_UPDATED: "canvas:updated",
+  DECISION_RECORDED: "decision:recorded",
   BRAINSTORM_NEW: "brainstorm:new",
   VOTE_RESULTS: "vote:results",
   GAME_ENDED: "game:ended",
@@ -42,13 +41,12 @@ export interface RoomJoinPayload {
   playerName: string;
 }
 
-export interface TurnPlacePayload {
-  slotId: string;
-  componentId: string;
-}
-
-export interface TurnRemovePayload {
-  slotId: string;
+export interface DecisionSubmitPayload {
+  decisionPointId: string;
+  choiceId?: string;        // for multiple_choice
+  sliderValue?: number;     // for tradeoff_slider (0-100)
+  branchId?: string;        // for branching_path
+  followUpChoiceId?: string; // for branching_path follow-up
 }
 
 export interface BrainstormMessagePayload {
@@ -76,19 +74,22 @@ export interface RoomPlayerJoinedPayload {
 }
 
 export interface TurnChangedPayload {
-  turnNumber: number;
+  round: number;
   activePlayerIds: Record<string, string>;
   timeRemaining: number;
-  assignedSlots: Record<string, string[]>;
+  submittedTeams: string[];
 }
 
-export interface CanvasUpdatedPayload {
+export interface DecisionRecordedPayload {
   teamId: string;
-  slotId: string;
-  component: {
-    registryId: string;
-    customizations?: Record<string, string>;
-  } | null;
+  decisionPointId: string;
+  decision: {
+    type: string;
+    choiceId?: string;
+    sliderValue?: number;
+    branchId?: string;
+    followUpChoiceId?: string;
+  };
 }
 
 export interface RoomErrorPayload {

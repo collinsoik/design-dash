@@ -6,6 +6,8 @@ import type {
   BrainstormMessage,
   GameResults,
   TurnState,
+  PlayerDecision,
+  DecisionRecordedPayload,
 } from "@design-dash/shared";
 
 interface GameStore {
@@ -25,7 +27,7 @@ interface GameStore {
   setGameState: (gameState: GameState) => void;
   updateTurn: (turn: TurnState) => void;
   updateTimeRemaining: (time: number) => void;
-  updateCanvas: (teamId: string, slotId: string, component: { registryId: string } | null) => void;
+  recordDecision: (payload: DecisionRecordedPayload) => void;
   addMessage: (message: BrainstormMessage) => void;
   setResults: (results: GameResults) => void;
   setError: (error: string | null) => void;
@@ -67,29 +69,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
   },
 
-  updateCanvas: (teamId, slotId, component) => {
+  recordDecision: (payload) => {
     const { gameState } = get();
     if (!gameState) return;
 
-    const website = gameState.teamWebsites[teamId];
-    if (!website) return;
+    const teamState = gameState.teamDecisions[payload.teamId];
+    if (!teamState) return;
 
-    const updatedSections = website.sections.map((s) =>
-      s.id === slotId
-        ? {
-            ...s,
-            placedComponent: component ? { registryId: component.registryId } : null,
-            status: (component ? "placed" : "empty") as "placed" | "empty",
-          }
-        : s
-    );
+    const decision: PlayerDecision = {
+      decisionPointId: payload.decisionPointId,
+      type: payload.decision.type as PlayerDecision["type"],
+      choiceId: payload.decision.choiceId,
+      sliderValue: payload.decision.sliderValue,
+      branchId: payload.decision.branchId,
+      followUpChoiceId: payload.decision.followUpChoiceId,
+      submittedAt: Date.now(),
+    };
 
     set({
       gameState: {
         ...gameState,
-        teamWebsites: {
-          ...gameState.teamWebsites,
-          [teamId]: { sections: updatedSections },
+        teamDecisions: {
+          ...gameState.teamDecisions,
+          [payload.teamId]: {
+            ...teamState,
+            decisions: {
+              ...teamState.decisions,
+              [payload.decisionPointId]: decision,
+            },
+          },
         },
       },
     });
