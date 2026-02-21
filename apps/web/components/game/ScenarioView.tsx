@@ -52,13 +52,6 @@ export default function ScenarioView() {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Story context */}
-      <div className="px-4 py-3 bg-game-blue/10 border border-game-blue/30 rounded">
-        <p className="text-sm text-gray-300 leading-relaxed">
-          {caseStudy.story}
-        </p>
-      </div>
-
       {/* Round decisions */}
       {roundDecisions.map((decision) => (
         <DecisionBlock

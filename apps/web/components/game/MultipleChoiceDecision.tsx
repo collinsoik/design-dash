@@ -44,7 +44,7 @@ export default function MultipleChoiceDecision({
               </div>
             )}
 
-            <h4 className="font-pixel text-xs text-white mb-1 pr-6">
+            <h4 className="font-pixel text-sm text-white mb-1 pr-6">
               {choice.label}
             </h4>
             <p className="text-xs text-gray-400 leading-relaxed">

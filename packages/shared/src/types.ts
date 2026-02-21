@@ -72,6 +72,7 @@ export interface CaseStudy {
   id: string;
   productName: string;
   productType: string;
+  shortDescription: string;
   story: string;
   persona: UserPersona;
   decisions: DecisionPoint[];

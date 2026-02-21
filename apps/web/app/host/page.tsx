@@ -164,7 +164,7 @@ export default function HostPage() {
                   {cs.productType}
                 </p>
                 <p className="text-gray-400 text-xs leading-relaxed line-clamp-3 mb-3">
-                  {cs.story}
+                  {cs.shortDescription}
                 </p>
                 {/* Persona preview */}
                 <div className="flex items-center gap-2 mt-2 pt-2 border-t border-gray-700">

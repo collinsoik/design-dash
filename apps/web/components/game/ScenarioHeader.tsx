@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useGameStore } from "@/lib/game-store";
 import DecisionSummary from "./DecisionSummary";
 
 export default function ScenarioHeader() {
   const room = useGameStore((s) => s.room);
   const playerId = useGameStore((s) => s.playerId);
+  const [showDetails, setShowDetails] = useState(false);
 
   const gameState = room?.gameState ?? null;
   const caseStudy = gameState?.caseStudy ?? null;
@@ -40,12 +41,10 @@ export default function ScenarioHeader() {
         </p>
       </div>
 
-      {/* Persona Card */}
+      {/* Persona: compact one-liner + goal pills */}
       {persona && (
         <div className="p-3 border-b border-game-blue/30">
-          <p className="font-pixel text-[8px] text-gray-500 mb-2">USER PERSONA</p>
           <div className="flex items-center gap-2 mb-2">
-            {/* Initials avatar */}
             <div className="w-8 h-8 rounded-full bg-game-blue/30 border border-game-blue flex items-center justify-center flex-shrink-0">
               <span className="font-pixel text-[10px] text-game-green">
                 {persona.name
@@ -61,25 +60,17 @@ export default function ScenarioHeader() {
               <p className="text-[10px] text-gray-500">{persona.occupation}</p>
             </div>
           </div>
-          <p className="text-[11px] text-gray-400 leading-relaxed mb-2">
-            {persona.bio}
-          </p>
-          {persona.goals.length > 0 && (
-            <div>
-              <p className="font-pixel text-[7px] text-gray-500 mb-1">GOALS</p>
-              <ul className="space-y-0.5">
-                {persona.goals.map((goal, i) => (
-                  <li
-                    key={i}
-                    className="flex items-start gap-1.5 text-[10px] text-gray-500"
-                  >
-                    <span className="text-game-green mt-0.5">*</span>
-                    <span>{goal}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+          {/* Goal pills */}
+          <div className="flex flex-wrap gap-1.5">
+            {persona.goals.map((goal, i) => (
+              <span
+                key={i}
+                className="inline-block font-pixel text-[7px] bg-game-green/15 text-game-green px-2 py-0.5 rounded-full"
+              >
+                {goal}
+              </span>
+            ))}
+          </div>
         </div>
       )}
 
@@ -91,24 +82,60 @@ export default function ScenarioHeader() {
         />
       </div>
 
-      {/* Scoring Criteria */}
-      {caseStudy && caseStudy.scoringCriteria.length > 0 && (
-        <div className="p-3">
-          <p className="font-pixel text-[8px] text-gray-500 mb-2">
-            SCORING CRITERIA
-          </p>
-          <ul className="space-y-1">
-            {caseStudy.scoringCriteria.map((criteria, i) => (
-              <li
-                key={i}
-                className="flex items-start gap-1.5 text-[10px] text-gray-500"
-              >
-                <span className="text-game-yellow mt-0.5">*</span>
-                <span>{criteria}</span>
-              </li>
-            ))}
-          </ul>
+      {/* MORE DETAILS toggle */}
+      {(persona || (caseStudy && caseStudy.scoringCriteria.length > 0)) && (
+        <div className="px-3 pt-2">
+          <button
+            onClick={() => setShowDetails((v) => !v)}
+            className="flex items-center gap-1.5 font-pixel text-[8px] text-gray-500 hover:text-gray-300 transition-colors w-full"
+          >
+            <svg
+              width="10"
+              height="10"
+              viewBox="0 0 10 10"
+              fill="none"
+              className={`transition-transform ${showDetails ? "rotate-90" : ""}`}
+            >
+              <path d="M3 1L7 5L3 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+            {showDetails ? "LESS DETAILS" : "MORE DETAILS"}
+          </button>
         </div>
+      )}
+
+      {/* Collapsible details */}
+      {showDetails && (
+        <>
+          {/* Persona bio */}
+          {persona && (
+            <div className="px-3 pt-2">
+              <p className="font-pixel text-[7px] text-gray-500 mb-1">BIO</p>
+              <p className="text-[11px] text-gray-400 leading-relaxed">
+                {persona.bio}
+              </p>
+            </div>
+          )}
+
+          {/* Scoring Criteria */}
+          {caseStudy && caseStudy.scoringCriteria.length > 0 && (
+            <div className="p-3">
+              <p className="font-pixel text-[8px] text-gray-500 mb-2">
+                SCORING CRITERIA
+              </p>
+              <ul className="space-y-1">
+                {caseStudy.scoringCriteria.map((criteria, i) => (
+                  <li
+                    key={i}
+                    className="flex items-start gap-1.5 text-[10px] text-gray-500"
+                  >
+                    <span className="text-game-yellow mt-0.5">*</span>
+                    <span>{criteria}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
