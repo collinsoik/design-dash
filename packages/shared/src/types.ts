@@ -182,23 +182,23 @@ export interface BestDecisionAward {
 // ── Constants ───────────────────────────────
 
 export const TEAM_COLORS = [
-  "#e94560", // Red
-  "#0f3460", // Blue
-  "#16c79a", // Green
-  "#f5c518", // Yellow
-  "#9b59b6", // Purple
-  "#e67e22", // Orange
-  "#1abc9c", // Teal
-  "#e74c3c", // Crimson
+  "#E5484D", // Red
+  "#3E63DD", // Blue
+  "#30A46C", // Green
+  "#F5D90A", // Yellow
+  "#8E4EC6", // Purple
+  "#F76808", // Orange
+  "#12A594", // Teal
+  "#E54666", // Rose
 ] as const;
 
 export const TEAM_NAMES = [
-  "Pixel Pirates",
-  "Code Wizards",
-  "Design Dragons",
-  "Layout Legends",
-  "CSS Samurai",
-  "HTML Heroes",
-  "UX Unicorns",
-  "Grid Guardians",
+  "Studio Red",
+  "Studio Blue",
+  "Studio Green",
+  "Studio Gold",
+  "Studio Violet",
+  "Studio Ember",
+  "Studio Teal",
+  "Studio Rose",
 ] as const;
