@@ -2,6 +2,7 @@ node_modules/
 dist/
 .next/
 *.db
+*.tsbuildinfo
 .env.local
 .env
 .vercel
