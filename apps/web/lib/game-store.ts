@@ -45,7 +45,13 @@ const initialState = {
 export const useGameStore = create<GameStore>((set, get) => ({
   ...initialState,
 
-  setRoom: (room) => set({ room, phase: room.phase }),
+  setRoom: (room) => {
+    const updates: Partial<GameStore> = { room, phase: room.phase };
+    if (room.gameState) {
+      updates.gameState = room.gameState;
+    }
+    set(updates);
+  },
   setPlayerId: (playerId) => set({ playerId }),
   setPhase: (phase) => set({ phase }),
   setGameState: (gameState) => {
