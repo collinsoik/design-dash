@@ -8,11 +8,11 @@ import { connectSocket } from "@/lib/socket";
 import { SERVER_EVENTS, TEAM_COLORS } from "@design-dash/shared";
 import type { Room, GameResults, DecisionPoint, PlayerDecision } from "@design-dash/shared";
 
-const TROPHY_ICONS = ["1ST", "2ND", "3RD"];
+const TROPHY_ICONS = ["1st", "2nd", "3rd"];
 const RANK_STYLES = [
-  { border: "border-game-yellow", bg: "bg-game-yellow/10", text: "text-game-yellow" },
-  { border: "border-gray-400", bg: "bg-gray-400/10", text: "text-gray-300" },
-  { border: "border-orange-600", bg: "bg-orange-600/10", text: "text-orange-400" },
+  { border: "border-accent-yellow", bg: "bg-accent-yellow-light", text: "text-accent-yellow" },
+  { border: "border-text-tertiary", bg: "bg-surface-tertiary", text: "text-text-secondary" },
+  { border: "border-accent-red", bg: "bg-accent-red-light", text: "text-accent-red" },
 ];
 
 export default function ResultsPage() {
@@ -82,26 +82,26 @@ export default function ResultsPage() {
   }, [gameState, teamResults]);
 
   return (
-    <main className="min-h-screen p-6 md:p-10">
+    <main className="min-h-screen p-6 md:p-10 bg-surface-primary">
       {/* Header */}
       <div className="text-center mb-12">
-        <h1 className="font-pixel text-4xl md:text-5xl text-game-yellow mb-3">
-          RESULTS
+        <h1 className="text-4xl font-bold text-text-primary mb-3">
+          Results
         </h1>
-        <p className="font-pixel text-lg text-gray-400">FINAL SCOREBOARD</p>
-        <p className="font-pixel text-base text-gray-500 mt-2">ROOM: {roomCode}</p>
+        <p className="text-lg text-text-secondary">Final Scoreboard</p>
+        <p className="text-sm text-text-tertiary mt-2">Room: {roomCode}</p>
       </div>
 
       {teamResults.length === 0 ? (
         <div className="text-center py-20">
-          <p className="font-pixel text-lg text-gray-400">
+          <p className="text-lg text-text-secondary">
             Waiting for results...
           </p>
           <div className="mt-6 flex gap-1 justify-center">
             {[0, 1, 2].map((i) => (
               <div
                 key={i}
-                className="w-3 h-3 bg-game-yellow animate-pulse"
+                className="w-3 h-3 rounded-full bg-accent-yellow animate-pulse"
                 style={{ animationDelay: `${i * 200}ms` }}
               />
             ))}
@@ -111,27 +111,27 @@ export default function ResultsPage() {
         <>
           {/* Leaderboard */}
           <div className="max-w-3xl mx-auto mb-12">
-            <h2 className="font-pixel text-base text-game-red mb-6 text-center">
-              LEADERBOARD
+            <h2 className="text-lg font-semibold text-text-primary mb-6 text-center">
+              Leaderboard
             </h2>
             <div className="space-y-4">
               {teamResults.map((team, idx) => (
                 <div
                   key={team.teamId}
-                  className={`flex items-center gap-4 p-4 border-3 ${
+                  className={`flex items-center gap-4 p-4 border rounded-xl shadow-soft ${
                     idx < 3
                       ? `${RANK_STYLES[idx].border} ${RANK_STYLES[idx].bg}`
-                      : "border-game-blue bg-game-blue/10"
+                      : "border-border-primary bg-white"
                   }`}
                 >
                   {/* Rank */}
                   <div className="w-16 text-center">
                     {idx < 3 ? (
-                      <span className={`font-pixel text-2xl ${RANK_STYLES[idx].text}`}>
+                      <span className={`text-2xl font-bold ${RANK_STYLES[idx].text}`}>
                         {TROPHY_ICONS[idx]}
                       </span>
                     ) : (
-                      <span className="font-pixel text-2xl text-gray-500">
+                      <span className="text-2xl font-bold text-text-tertiary">
                         #{idx + 1}
                       </span>
                     )}
@@ -140,8 +140,8 @@ export default function ResultsPage() {
                   {/* Team Info */}
                   <div className="flex-1">
                     <h3
-                      className={`font-pixel text-lg ${
-                        idx < 3 ? RANK_STYLES[idx].text : "text-gray-400"
+                      className={`text-lg font-semibold ${
+                        idx < 3 ? RANK_STYLES[idx].text : "text-text-secondary"
                       }`}
                     >
                       {team.teamName}
@@ -151,22 +151,22 @@ export default function ResultsPage() {
                   {/* Score Breakdown */}
                   <div className="flex items-center gap-6 text-right">
                     <div>
-                      <p className="font-pixel text-base text-gray-500">PEER</p>
-                      <p className="font-pixel text-base text-game-green">
+                      <p className="text-xs text-text-tertiary">Peer</p>
+                      <p className="text-sm font-bold text-accent-green">
                         {team.peerScore.toFixed(1)}
                       </p>
                     </div>
                     <div>
-                      <p className="font-pixel text-base text-gray-500">JUDGE</p>
-                      <p className="font-pixel text-base text-blue-400">
+                      <p className="text-xs text-text-tertiary">Judge</p>
+                      <p className="text-sm font-bold text-accent-blue">
                         {team.judgeScore.toFixed(1)}
                       </p>
                     </div>
                     <div className="min-w-[60px]">
-                      <p className="font-pixel text-base text-gray-500">TOTAL</p>
+                      <p className="text-xs text-text-tertiary">Total</p>
                       <p
-                        className={`font-pixel text-2xl ${
-                          idx === 0 ? "text-game-yellow" : "text-white"
+                        className={`text-2xl font-bold ${
+                          idx === 0 ? "text-accent-yellow" : "text-text-primary"
                         }`}
                       >
                         {team.finalScore.toFixed(1)}
@@ -181,22 +181,22 @@ export default function ResultsPage() {
           {/* Best Decision Awards */}
           {bestDecisions.length > 0 && (
             <div className="max-w-3xl mx-auto mb-12">
-              <h2 className="font-pixel text-base text-game-purple mb-6 text-center">
-                BEST DECISION AWARDS
+              <h2 className="text-lg font-semibold text-accent-purple mb-6 text-center">
+                Best Decision Awards
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {bestDecisions.map((award, idx) => (
                   <div
                     key={idx}
-                    className="border-3 border-game-purple bg-game-purple/10 p-4 text-center"
+                    className="border border-accent-purple/30 bg-accent-purple-light rounded-xl p-4 text-center"
                   >
-                    <p className="font-pixel text-base text-game-purple mb-2">
+                    <p className="text-sm font-medium text-accent-purple mb-2">
                       Round {idx + 1}
                     </p>
-                    <p className="text-lg text-gray-400 mb-2 line-clamp-2">
+                    <p className="text-sm text-text-secondary mb-2 line-clamp-2">
                       {award.decisionLabel}
                     </p>
-                    <p className="font-pixel text-lg text-white">
+                    <p className="text-lg font-semibold text-text-primary">
                       {award.teamName}
                     </p>
                   </div>
@@ -208,44 +208,44 @@ export default function ResultsPage() {
           {/* Team Decisions */}
           {teamResults.length > 0 && Object.keys(teamDecisionSummaries).length > 0 && (
             <div className="max-w-5xl mx-auto mb-12">
-              <h2 className="font-pixel text-base text-game-green mb-6 text-center">
-                TEAM DECISIONS
+              <h2 className="text-lg font-semibold text-accent-green mb-6 text-center">
+                Team Decisions
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {teamResults.map((tr) => {
-                  const teamColor = TEAM_COLORS[parseInt(tr.teamId.split("-")[1])] || "#ffffff";
+                  const teamColor = TEAM_COLORS[parseInt(tr.teamId.split("-")[1])] || "#7C8CF5";
                   const decisions = teamDecisionSummaries[tr.teamId] || [];
                   const answeredCount = decisions.filter((d) => d.answer !== null).length;
 
                   return (
                     <div
                       key={tr.teamId}
-                      className="rounded-lg border-2 border-white/10 bg-game-dark/90"
+                      className="rounded-xl border border-border-primary bg-white shadow-card"
                       style={{ borderTopColor: teamColor, borderTopWidth: "4px" }}
                     >
                       <div className="px-5 pt-4 pb-3">
                         <h3
-                          className="font-pixel text-base tracking-wider uppercase"
+                          className="text-sm font-semibold uppercase tracking-wide"
                           style={{ color: teamColor }}
                         >
                           {tr.teamName}
                         </h3>
-                        <p className="font-pixel text-xs text-white/40 mt-1">
+                        <p className="text-xs text-text-tertiary mt-1">
                           #{tr.rank} — {tr.finalScore.toFixed(1)} pts
                         </p>
                       </div>
                       <div className="px-5 pb-4">
-                        <p className="mb-2 font-pixel text-xs text-white/50 uppercase tracking-wide">
+                        <p className="mb-2 text-xs font-medium text-text-tertiary uppercase tracking-wide">
                           Decisions ({answeredCount}/{decisions.length})
                         </p>
                         <div className="space-y-2 max-h-48 overflow-y-auto">
                           {decisions.map((d, i) => (
-                            <div key={i} className="rounded bg-white/5 px-3 py-2">
-                              <p className="text-xs text-white/40 line-clamp-1">{d.question}</p>
+                            <div key={i} className="rounded-lg bg-surface-tertiary px-3 py-2">
+                              <p className="text-xs text-text-tertiary line-clamp-1">{d.question}</p>
                               {d.answer ? (
-                                <p className="text-sm text-white/80 mt-0.5 line-clamp-1">{d.answer}</p>
+                                <p className="text-sm text-text-primary mt-0.5 line-clamp-1">{d.answer}</p>
                               ) : (
-                                <p className="text-sm text-white/20 italic mt-0.5">NOT ANSWERED</p>
+                                <p className="text-sm text-text-disabled italic mt-0.5">Not answered</p>
                               )}
                             </div>
                           ))}
@@ -259,20 +259,20 @@ export default function ResultsPage() {
           )}
 
           {/* Score Legend */}
-          <div className="max-w-md mx-auto mb-12 pixel-card">
-            <h3 className="font-pixel text-sm text-gray-400 mb-3 text-center">
-              SCORING BREAKDOWN
+          <div className="max-w-md mx-auto mb-12 card">
+            <h3 className="text-sm font-medium text-text-tertiary mb-3 text-center uppercase tracking-wide">
+              Scoring Breakdown
             </h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-400">Peer Votes (40%)</span>
-                <span className="text-game-green font-pixel text-sm">
+                <span className="text-text-secondary">Peer Votes (40%)</span>
+                <span className="text-accent-green font-semibold">
                   {room?.config.peerVoteWeight || 40}%
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-400">Judge Score (60%)</span>
-                <span className="text-blue-400 font-pixel text-sm">
+                <span className="text-text-secondary">Judge Score (60%)</span>
+                <span className="text-accent-blue font-semibold">
                   {room?.config.judgeWeight || 60}%
                 </span>
               </div>
@@ -283,11 +283,11 @@ export default function ResultsPage() {
 
       {/* Play Again */}
       <div className="text-center pb-10">
-        <Link href="/" className="pixel-btn-green inline-block text-sm px-10 py-4">
-          PLAY AGAIN
+        <Link href="/" className="btn-green inline-block px-10 py-4">
+          Play Again
         </Link>
-        <p className="font-pixel text-xs text-gray-600 mt-4">
-          THANKS FOR PLAYING DESIGNDASH!
+        <p className="text-xs text-text-disabled mt-4">
+          Thanks for playing DesignDash!
         </p>
       </div>
     </main>

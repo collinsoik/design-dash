@@ -88,14 +88,14 @@ export default function GamePage() {
   }, [room?.phase, roomCode, router]);
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
+    <div className="h-screen flex flex-col overflow-hidden bg-surface-primary">
       {/* Top Bar */}
       <TurnIndicator />
 
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Sidebar - Scenario Header + Progress */}
-        <aside className="w-64 border-r-3 border-game-blue bg-game-dark/80 overflow-hidden flex flex-col">
+        <aside className="w-64 border-r border-border-primary bg-surface-secondary overflow-hidden flex flex-col">
           <ScenarioHeader />
         </aside>
 
@@ -108,7 +108,7 @@ export default function GamePage() {
         </main>
 
         {/* Right Sidebar - Team Info */}
-        <aside className="w-60 border-l-3 border-game-blue bg-game-dark/80 overflow-auto">
+        <aside className="w-60 border-l border-border-primary bg-surface-secondary overflow-auto">
           <TeamSidebar />
         </aside>
       </div>

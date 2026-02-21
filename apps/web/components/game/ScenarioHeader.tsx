@@ -31,22 +31,22 @@ export default function ScenarioHeader() {
   return (
     <div className="flex flex-col h-full overflow-y-auto">
       {/* Product Info */}
-      <div className="p-3 border-b border-game-blue/30">
-        <p className="font-pixel text-[8px] text-gray-500 mb-1">PRODUCT</p>
-        <h2 className="font-pixel text-sm text-game-yellow">
+      <div className="p-3 border-b border-border-primary">
+        <p className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-1">Product</p>
+        <h2 className="text-lg font-semibold text-text-primary">
           {caseStudy?.productName ?? "Loading..."}
         </h2>
-        <p className="text-xs text-gray-400 mt-1">
+        <p className="text-sm text-text-secondary mt-1">
           {caseStudy?.productType ?? ""}
         </p>
       </div>
 
       {/* Persona: compact one-liner + goal pills */}
       {persona && (
-        <div className="p-3 border-b border-game-blue/30">
+        <div className="p-3 border-b border-border-primary">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-full bg-game-blue/30 border border-game-blue flex items-center justify-center flex-shrink-0">
-              <span className="font-pixel text-[10px] text-game-green">
+            <div className="w-8 h-8 rounded-full bg-accent-purple-light border border-accent-purple/30 flex items-center justify-center flex-shrink-0">
+              <span className="text-xs font-semibold text-accent-purple">
                 {persona.name
                   .split(" ")
                   .map((n) => n[0])
@@ -54,10 +54,10 @@ export default function ScenarioHeader() {
               </span>
             </div>
             <div>
-              <p className="text-xs text-white font-medium">
+              <p className="text-sm font-medium text-text-primary">
                 {persona.name}, {persona.age}
               </p>
-              <p className="text-[10px] text-gray-500">{persona.occupation}</p>
+              <p className="text-xs text-text-tertiary">{persona.occupation}</p>
             </div>
           </div>
           {/* Goal pills */}
@@ -65,7 +65,7 @@ export default function ScenarioHeader() {
             {persona.goals.map((goal, i) => (
               <span
                 key={i}
-                className="inline-block font-pixel text-[7px] bg-game-green/15 text-game-green px-2 py-0.5 rounded-full"
+                className="badge-green"
               >
                 {goal}
               </span>
@@ -75,7 +75,7 @@ export default function ScenarioHeader() {
       )}
 
       {/* Decision Progress */}
-      <div className="p-3 border-b border-game-blue/30">
+      <div className="p-3 border-b border-border-primary">
         <DecisionSummary
           made={decisionProgress.made}
           total={decisionProgress.total}
@@ -87,7 +87,7 @@ export default function ScenarioHeader() {
         <div className="px-3 pt-2">
           <button
             onClick={() => setShowDetails((v) => !v)}
-            className="flex items-center gap-1.5 font-pixel text-[8px] text-gray-500 hover:text-gray-300 transition-colors w-full"
+            className="flex items-center gap-1.5 text-xs font-medium text-text-tertiary hover:text-text-secondary transition-colors w-full"
           >
             <svg
               width="10"
@@ -98,7 +98,7 @@ export default function ScenarioHeader() {
             >
               <path d="M3 1L7 5L3 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
-            {showDetails ? "LESS DETAILS" : "MORE DETAILS"}
+            {showDetails ? "Less Details" : "More Details"}
           </button>
         </div>
       )}
@@ -109,8 +109,8 @@ export default function ScenarioHeader() {
           {/* Persona bio */}
           {persona && (
             <div className="px-3 pt-2">
-              <p className="font-pixel text-[7px] text-gray-500 mb-1">BIO</p>
-              <p className="text-[11px] text-gray-400 leading-relaxed">
+              <p className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-1">Bio</p>
+              <p className="text-sm text-text-secondary leading-relaxed">
                 {persona.bio}
               </p>
             </div>
@@ -119,16 +119,16 @@ export default function ScenarioHeader() {
           {/* Scoring Criteria */}
           {caseStudy && caseStudy.scoringCriteria.length > 0 && (
             <div className="p-3">
-              <p className="font-pixel text-[8px] text-gray-500 mb-2">
-                SCORING CRITERIA
+              <p className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-2">
+                Scoring Criteria
               </p>
               <ul className="space-y-1">
                 {caseStudy.scoringCriteria.map((criteria, i) => (
                   <li
                     key={i}
-                    className="flex items-start gap-1.5 text-[10px] text-gray-500"
+                    className="flex items-start gap-1.5 text-sm text-text-tertiary"
                   >
-                    <span className="text-game-yellow mt-0.5">*</span>
+                    <span className="text-accent-yellow mt-0.5">*</span>
                     <span>{criteria}</span>
                   </li>
                 ))}

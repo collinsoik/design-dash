@@ -115,16 +115,16 @@ export default function VotePage() {
   }, [gameState, activeTeams]);
 
   return (
-    <main className="min-h-screen p-6 md:p-10">
+    <main className="min-h-screen p-6 md:p-10 bg-surface-primary">
       {/* Header */}
       <div className="text-center mb-10">
-        <h1 className="font-pixel text-3xl md:text-5xl text-game-yellow mb-2">
-          VOTE
+        <h1 className="text-4xl font-bold text-text-primary mb-2">
+          Vote
         </h1>
-        <p className="font-pixel text-sm text-gray-400">
-          RATE EACH TEAM&apos;S DESIGN DECISIONS
+        <p className="text-sm text-text-secondary">
+          Rate each team&apos;s design decisions
         </p>
-        <p className="font-pixel text-xs text-gray-500 mt-2">ROOM: {roomCode}</p>
+        <p className="text-xs text-text-tertiary mt-2">Room: {roomCode}</p>
       </div>
 
       {/* Host Judge Panel */}
@@ -134,7 +134,7 @@ export default function VotePage() {
             teams={activeTeams.map((t) => ({
               id: t.id,
               name: t.name,
-              color: TEAM_COLORS[parseInt(t.id.split("-")[1])] || "#ffffff",
+              color: TEAM_COLORS[parseInt(t.id.split("-")[1])] || "#7C8CF5",
             }))}
             onScore={handleJudgeScore}
             onFinalize={() => {}}
@@ -144,17 +144,17 @@ export default function VotePage() {
 
       {submitted ? (
         <div className="flex flex-col items-center justify-center py-20">
-          <div className="font-pixel text-2xl text-game-green mb-4">
-            VOTES SUBMITTED!
+          <div className="text-2xl font-bold text-accent-green mb-4">
+            Votes Submitted!
           </div>
-          <p className="text-gray-400 text-lg">
+          <p className="text-text-secondary text-sm">
             Waiting for the host to finalize scores...
           </p>
           <div className="mt-6 flex gap-1">
             {[0, 1, 2].map((i) => (
               <div
                 key={i}
-                className="w-3 h-3 bg-game-green animate-pulse"
+                className="w-3 h-3 rounded-full bg-accent-green animate-pulse"
                 style={{ animationDelay: `${i * 200}ms` }}
               />
             ))}
@@ -165,7 +165,7 @@ export default function VotePage() {
           {/* Team Decision Review Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto mb-10">
             {activeTeams.map((team) => {
-              const teamColor = TEAM_COLORS[parseInt(team.id.split("-")[1])] || "#ffffff";
+              const teamColor = TEAM_COLORS[parseInt(team.id.split("-")[1])] || "#7C8CF5";
               const isOwnTeam = team.id === myTeamId;
               const decisions = teamDecisionSummaries[team.id] || [];
               const answeredCount = decisions.filter((d) => d.answer !== null).length;
@@ -174,15 +174,15 @@ export default function VotePage() {
               return (
                 <div
                   key={team.id}
-                  className={`relative overflow-hidden rounded-lg border-2 bg-game-dark/90 transition-shadow ${
+                  className={`relative overflow-hidden rounded-xl border bg-white shadow-card transition-shadow ${
                     isOwnTeam
-                      ? "border-white/10 opacity-60"
-                      : "border-white/10 hover:shadow-lg hover:shadow-game-purple/20"
+                      ? "border-border-primary opacity-60"
+                      : "border-border-primary hover:shadow-elevated"
                   }`}
                   style={{ borderTopColor: teamColor, borderTopWidth: "4px" }}
                 >
                   {isOwnTeam && (
-                    <div className="absolute top-3 right-3 z-10 rounded bg-white/10 px-2 py-1 font-pixel text-xs uppercase tracking-widest text-white/60 backdrop-blur-sm">
+                    <div className="absolute top-3 right-3 z-10 badge-gray">
                       Your Team
                     </div>
                   )}
@@ -190,7 +190,7 @@ export default function VotePage() {
                   {/* Team header */}
                   <div className="px-5 pt-4 pb-3">
                     <h3
-                      className="font-pixel text-base tracking-wider uppercase"
+                      className="text-sm font-semibold uppercase tracking-wide"
                       style={{ color: teamColor }}
                     >
                       {team.name}
@@ -199,17 +199,17 @@ export default function VotePage() {
 
                   {/* Decision list */}
                   <div className="px-5 pb-3">
-                    <p className="mb-2 font-pixel text-xs text-white/50 uppercase tracking-wide">
+                    <p className="mb-2 text-xs font-medium text-text-tertiary uppercase tracking-wide">
                       Decisions ({answeredCount}/{totalDecisions})
                     </p>
                     <div className="space-y-2 max-h-48 overflow-y-auto">
                       {decisions.map((d, i) => (
-                        <div key={i} className="rounded bg-white/5 px-3 py-2">
-                          <p className="text-xs text-white/40 line-clamp-1">{d.question}</p>
+                        <div key={i} className="rounded-lg bg-surface-tertiary px-3 py-2">
+                          <p className="text-xs text-text-tertiary line-clamp-1">{d.question}</p>
                           {d.answer ? (
-                            <p className="text-sm text-white/80 mt-0.5 line-clamp-1">{d.answer}</p>
+                            <p className="text-sm text-text-primary mt-0.5 line-clamp-1">{d.answer}</p>
                           ) : (
-                            <p className="text-sm text-white/20 italic mt-0.5">NOT ANSWERED</p>
+                            <p className="text-sm text-text-disabled italic mt-0.5">Not answered</p>
                           )}
                         </div>
                       ))}
@@ -217,14 +217,14 @@ export default function VotePage() {
                   </div>
 
                   {/* Star rating */}
-                  <div className="border-t border-white/5 px-5 py-4">
+                  <div className="border-t border-border-primary px-5 py-4">
                     {isOwnTeam ? (
-                      <p className="text-center font-sans text-base text-white/30 italic">
+                      <p className="text-center text-sm text-text-disabled italic">
                         You cannot vote for your own team
                       </p>
                     ) : (
                       <div className="flex flex-col items-center gap-2">
-                        <p className="font-pixel text-xs text-white/50 uppercase tracking-wide">
+                        <p className="text-xs font-medium text-text-tertiary uppercase tracking-wide">
                           Your Rating
                         </p>
                         <div className="flex items-center gap-1">
@@ -240,8 +240,8 @@ export default function VotePage() {
                                   xmlns="http://www.w3.org/2000/svg"
                                   viewBox="0 0 24 24"
                                   className="h-7 w-7"
-                                  fill={isActive ? "#f5c518" : "none"}
-                                  stroke={isActive ? "#f5c518" : "#555"}
+                                  fill={isActive ? "#F0C94B" : "none"}
+                                  stroke={isActive ? "#F0C94B" : "#D0D4DA"}
                                   strokeWidth={2}
                                 >
                                   <path
@@ -255,7 +255,7 @@ export default function VotePage() {
                           })}
                         </div>
                         {votes[team.id] && (
-                          <p className="font-sans text-xs text-game-yellow">
+                          <p className="text-xs text-accent-yellow font-medium">
                             {votes[team.id]} / 5 stars
                           </p>
                         )}
@@ -273,13 +273,13 @@ export default function VotePage() {
               <button
                 onClick={handleSubmitVotes}
                 disabled={!allVoted}
-                className="pixel-btn-yellow text-sm px-10 py-4 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="btn-primary px-10 py-4 disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                SUBMIT VOTES
+                Submit Votes
               </button>
               {!allVoted && (
-                <p className="font-pixel text-xs text-gray-500 mt-3">
-                  RATE ALL TEAMS TO SUBMIT
+                <p className="text-xs text-text-disabled mt-3">
+                  Rate all teams to submit
                 </p>
               )}
             </div>

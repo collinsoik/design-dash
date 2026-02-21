@@ -43,8 +43,8 @@ export default function ScenarioView() {
   if (!caseStudy) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <p className="font-pixel text-xs text-gray-500 animate-pulse">
-          LOADING SCENARIO...
+        <p className="text-sm text-text-tertiary animate-pulse">
+          Loading scenario...
         </p>
       </div>
     );
@@ -64,10 +64,10 @@ export default function ScenarioView() {
 
       {!isMyTurn && (
         <div className="text-center py-4">
-          <p className="font-pixel text-xs text-gray-500">
-            WAITING FOR YOUR TEAMMATE TO DECIDE...
+          <p className="text-sm font-medium text-text-tertiary">
+            Waiting for your teammate to decide...
           </p>
-          <p className="text-[11px] text-gray-600 mt-1">
+          <p className="text-sm text-text-disabled mt-1">
             Use the team chat to suggest ideas!
           </p>
         </div>
@@ -127,27 +127,27 @@ function DecisionBlock({ decision, isMyTurn, existingDecision }: DecisionBlockPr
   return (
     <div
       className={`
-        p-4 rounded border-2 transition-all
-        ${submitted ? "border-game-green/30 bg-game-green/5" : "border-game-blue/30 bg-game-dark/50"}
+        p-4 rounded-lg border transition-all
+        ${submitted ? "border-accent-green/30 bg-accent-green-light" : "border-border-primary bg-white shadow-soft"}
       `}
     >
       {/* Scenario text */}
       <div className="mb-4">
         <div className="flex items-center gap-2 mb-2">
-          <span className="font-pixel text-[8px] text-gray-500 uppercase">
+          <span className="text-xs font-medium text-text-tertiary uppercase tracking-wide">
             {decision.type.replace("_", " ")}
           </span>
           {submitted && (
-            <span className="font-pixel text-[8px] text-game-green">
-              SUBMITTED
+            <span className="badge-green">
+              Submitted
             </span>
           )}
         </div>
-        <p className="text-sm text-gray-200 leading-relaxed">
+        <p className="text-base text-text-primary leading-relaxed">
           {decision.scenarioText}
         </p>
         {decision.context && (
-          <p className="text-xs text-gray-500 mt-1 italic">
+          <p className="text-sm text-text-tertiary mt-1 italic">
             {decision.context}
           </p>
         )}
@@ -188,12 +188,9 @@ function DecisionBlock({ decision, isMyTurn, existingDecision }: DecisionBlockPr
         <div className="mt-4 flex justify-end">
           <button
             onClick={handleSubmit}
-            className="font-pixel text-[10px] px-6 py-2 rounded border-2
-              bg-game-green/20 border-game-green text-game-green
-              hover:bg-game-green/30 hover:shadow-[0_0_10px_rgba(22,199,154,0.3)]
-              active:bg-game-green/40 transition-all"
+            className="btn-green"
           >
-            LOCK IN
+            Lock In
           </button>
         </div>
       )}

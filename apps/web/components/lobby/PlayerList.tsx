@@ -9,7 +9,7 @@ interface PlayerListProps {
 export default function PlayerList({ players }: PlayerListProps) {
   return (
     <div className="space-y-3">
-      <h2 className="font-pixel text-sm text-game-yellow tracking-wide uppercase">
+      <h2 className="text-xl font-semibold text-text-primary">
         Players ({players.length})
       </h2>
 
@@ -17,14 +17,14 @@ export default function PlayerList({ players }: PlayerListProps) {
         {players.map((player, index) => (
           <li
             key={player.id}
-            className="player-card-enter group flex items-center gap-3 rounded-md border-2 border-game-blue bg-game-dark/80 px-4 py-3 transition-colors hover:border-game-purple"
+            className="player-card-enter group flex items-center gap-3 rounded-lg border border-border-primary bg-white px-4 py-3 transition-colors hover:border-border-secondary hover:shadow-card"
             style={{ animationDelay: `${index * 80}ms` }}
           >
             {/* Team color dot */}
             <span
-              className="inline-block h-3 w-3 shrink-0 rounded-full ring-2 ring-white/20"
+              className="inline-block h-3 w-3 shrink-0 rounded-full ring-2 ring-border-primary"
               style={{
-                backgroundColor: player.teamId ? undefined : "#555",
+                backgroundColor: player.teamId ? undefined : "#C9CDD3",
               }}
               aria-label={
                 player.teamId
@@ -34,28 +34,28 @@ export default function PlayerList({ players }: PlayerListProps) {
             />
 
             {/* Player name */}
-            <span className="font-pixel text-xs text-white truncate">
+            <span className="text-sm font-medium text-text-primary truncate">
               {player.displayName}
             </span>
 
             {/* Host badge */}
             {player.isHost && (
-              <span className="ml-auto shrink-0 rounded bg-game-yellow/20 px-2 py-0.5 font-pixel text-[8px] uppercase text-game-yellow">
+              <span className="ml-auto badge-yellow">
                 Host
               </span>
             )}
 
             {/* Connection status */}
             <span
-              className={`ml-auto shrink-0 flex items-center gap-1.5 text-[10px] font-sans ${
-                player.connected ? "text-game-green" : "text-red-400"
+              className={`ml-auto shrink-0 flex items-center gap-1.5 text-sm ${
+                player.connected ? "text-accent-green" : "text-accent-red"
               }`}
             >
               <span
                 className={`inline-block h-2 w-2 rounded-full ${
                   player.connected
-                    ? "bg-game-green animate-pulse"
-                    : "bg-red-400"
+                    ? "bg-accent-green animate-pulse"
+                    : "bg-accent-red"
                 }`}
               />
               {player.connected ? "Online" : "Offline"}
@@ -65,7 +65,7 @@ export default function PlayerList({ players }: PlayerListProps) {
       </ul>
 
       {players.length === 0 && (
-        <p className="text-center font-pixel text-[10px] text-white/40 py-6">
+        <p className="text-center text-sm text-text-disabled py-6">
           Waiting for players to join...
         </p>
       )}

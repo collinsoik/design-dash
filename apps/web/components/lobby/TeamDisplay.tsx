@@ -32,7 +32,7 @@ export default function TeamDisplay({ teams, players }: TeamDisplayProps) {
 
   return (
     <div className="space-y-4">
-      <h2 className="font-pixel text-sm text-game-yellow tracking-wide uppercase">
+      <h2 className="text-xl font-semibold text-text-primary">
         Teams
       </h2>
 
@@ -40,38 +40,35 @@ export default function TeamDisplay({ teams, players }: TeamDisplayProps) {
         {teams.map((team) => {
           const color = resolveColor(team.color);
           const memberNames = getMemberNames(team.members);
-          // Determine how many empty slots remain.  Fall back to 4 if no
-          // explicit size is configured (the RoomConfig.teamSize lives
-          // outside the component, but we can infer a reasonable max).
           const maxSlots = Math.max(team.members.length, 4);
           const emptySlots = maxSlots - team.members.length;
 
           return (
             <div
               key={team.id}
-              className="relative overflow-hidden rounded-lg border-2 border-white/10 bg-game-dark/90"
-              style={{ borderLeftColor: color, borderLeftWidth: "4px" }}
+              className="relative overflow-hidden rounded-xl border border-border-primary bg-white shadow-card"
+              style={{ borderTopColor: color, borderTopWidth: "4px" }}
             >
               {/* Team header */}
               <div
                 className="px-4 py-3"
-                style={{ backgroundColor: `${color}22` }}
+                style={{ backgroundColor: `${color}12` }}
               >
                 <div className="flex items-center justify-between">
                   <h3
-                    className="font-pixel text-xs tracking-wider uppercase truncate"
+                    className="text-sm font-semibold uppercase tracking-wide truncate"
                     style={{ color }}
                   >
                     {team.name}
                   </h3>
-                  <span className="shrink-0 font-sans text-xs text-white/60">
+                  <span className="shrink-0 text-sm text-text-tertiary">
                     {team.members.length}/{maxSlots} players
                   </span>
                 </div>
               </div>
 
               {/* Member list */}
-              <ul className="divide-y divide-white/5 px-4">
+              <ul className="divide-y divide-border-primary px-4">
                 {memberNames.map((name, idx) => (
                   <li
                     key={team.members[idx]}
@@ -81,7 +78,7 @@ export default function TeamDisplay({ teams, players }: TeamDisplayProps) {
                       className="inline-block h-2 w-2 rounded-full"
                       style={{ backgroundColor: color }}
                     />
-                    <span className="font-sans text-sm text-white/90 truncate">
+                    <span className="text-sm text-text-primary truncate">
                       {name}
                     </span>
                   </li>
@@ -93,8 +90,8 @@ export default function TeamDisplay({ teams, players }: TeamDisplayProps) {
                     key={`empty-${idx}`}
                     className="flex items-center gap-2 py-2"
                   >
-                    <span className="inline-block h-2 w-2 rounded-full bg-white/20" />
-                    <span className="waiting-blink font-sans text-sm text-white/30 italic">
+                    <span className="inline-block h-2 w-2 rounded-full bg-text-disabled" />
+                    <span className="waiting-blink text-sm text-text-disabled italic">
                       Waiting...
                     </span>
                   </li>
@@ -104,7 +101,7 @@ export default function TeamDisplay({ teams, players }: TeamDisplayProps) {
               {/* Bottom padding when the list is empty */}
               {team.members.length === 0 && emptySlots === 0 && (
                 <div className="px-4 py-3">
-                  <p className="font-pixel text-[8px] text-white/30">
+                  <p className="text-xs text-text-disabled">
                     No members yet
                   </p>
                 </div>
@@ -115,7 +112,7 @@ export default function TeamDisplay({ teams, players }: TeamDisplayProps) {
       </div>
 
       {teams.length === 0 && (
-        <p className="text-center font-pixel text-[10px] text-white/40 py-8">
+        <p className="text-center text-sm text-text-disabled py-8">
           No teams created yet
         </p>
       )}

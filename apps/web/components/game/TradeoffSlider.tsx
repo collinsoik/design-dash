@@ -29,18 +29,18 @@ export default function TradeoffSlider({
       {/* Labels */}
       <div className="flex justify-between items-start gap-4">
         <div className="flex-1 text-left">
-          <p className="font-pixel text-xs text-game-red mb-1">
+          <p className="text-sm font-semibold text-accent-red mb-1">
             {tradeoff.leftLabel}
           </p>
-          <p className="text-[11px] text-gray-500 leading-relaxed">
+          <p className="text-xs text-text-tertiary leading-relaxed">
             {tradeoff.leftDescription}
           </p>
         </div>
         <div className="flex-1 text-right">
-          <p className="font-pixel text-xs text-game-green mb-1">
+          <p className="text-sm font-semibold text-accent-green mb-1">
             {tradeoff.rightLabel}
           </p>
-          <p className="text-[11px] text-gray-500 leading-relaxed">
+          <p className="text-xs text-text-tertiary leading-relaxed">
             {tradeoff.rightDescription}
           </p>
         </div>
@@ -57,22 +57,23 @@ export default function TradeoffSlider({
           disabled={disabled}
           className={`
             w-full h-2 rounded-full appearance-none cursor-pointer
-            bg-gradient-to-r from-game-red via-game-yellow to-game-green
+            bg-gradient-to-r from-accent-red via-accent-yellow to-accent-green
             [&::-webkit-slider-thumb]:appearance-none
             [&::-webkit-slider-thumb]:w-5
             [&::-webkit-slider-thumb]:h-5
             [&::-webkit-slider-thumb]:rounded-full
             [&::-webkit-slider-thumb]:bg-white
             [&::-webkit-slider-thumb]:border-2
-            [&::-webkit-slider-thumb]:border-game-blue
-            [&::-webkit-slider-thumb]:shadow-[0_0_8px_rgba(255,255,255,0.3)]
+            [&::-webkit-slider-thumb]:border-border-secondary
+            [&::-webkit-slider-thumb]:shadow-card
             [&::-webkit-slider-thumb]:cursor-pointer
             [&::-moz-range-thumb]:w-5
             [&::-moz-range-thumb]:h-5
             [&::-moz-range-thumb]:rounded-full
             [&::-moz-range-thumb]:bg-white
             [&::-moz-range-thumb]:border-2
-            [&::-moz-range-thumb]:border-game-blue
+            [&::-moz-range-thumb]:border-border-secondary
+            [&::-moz-range-thumb]:shadow-card
             [&::-moz-range-thumb]:cursor-pointer
             ${disabled ? "opacity-50 cursor-not-allowed" : ""}
           `}
@@ -81,10 +82,10 @@ export default function TradeoffSlider({
 
       {/* Value indicator */}
       <div className="text-center">
-        <span className="font-pixel text-sm text-game-yellow">
+        <span className="text-lg font-bold text-accent-primary">
           {localValue}%
         </span>
-        <span className="text-xs text-gray-500 ml-2">
+        <span className="text-sm text-text-tertiary ml-2">
           {localValue < 30
             ? `Leaning ${tradeoff.leftLabel}`
             : localValue > 70

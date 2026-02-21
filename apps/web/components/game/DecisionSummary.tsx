@@ -11,14 +11,14 @@ export default function DecisionSummary({ made, total }: DecisionSummaryProps) {
   return (
     <div>
       <div className="flex items-center justify-between mb-1.5">
-        <p className="font-pixel text-[8px] text-gray-500">PROGRESS</p>
-        <p className="font-pixel text-[9px] text-game-green">
+        <p className="text-xs font-medium text-text-tertiary uppercase tracking-wide">Progress</p>
+        <p className="text-sm font-semibold text-accent-green">
           {made}/{total}
         </p>
       </div>
-      <div className="w-full h-2 bg-game-dark border border-game-blue/40 rounded-full overflow-hidden">
+      <div className="w-full h-2 bg-surface-tertiary border border-border-primary rounded-full overflow-hidden">
         <div
-          className="h-full bg-game-green transition-all duration-500 rounded-full"
+          className="h-full bg-accent-green transition-all duration-500 rounded-full"
           style={{ width: `${percent}%` }}
         />
       </div>

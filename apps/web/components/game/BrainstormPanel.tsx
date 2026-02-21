@@ -22,8 +22,8 @@ export default function BrainstormPanel() {
   }, [room, playerId]);
 
   const teamColor = useMemo(() => {
-    if (!room || !myTeamId) return "#16c79a";
-    return room.teams[myTeamId]?.color ?? "#16c79a";
+    if (!room || !myTeamId) return "#4ACA9A";
+    return room.teams[myTeamId]?.color ?? "#4ACA9A";
   }, [room, myTeamId]);
 
   // Check if it's the current player's turn
@@ -79,7 +79,7 @@ export default function BrainstormPanel() {
   if (isCollapsed) {
     return (
       <div
-        className="border-t-3 border-game-blue bg-game-dark/80 px-4 py-2 cursor-pointer hover:bg-game-blue/10 transition-colors"
+        className="border-t border-border-primary bg-surface-secondary px-4 py-2 cursor-pointer hover:bg-surface-tertiary transition-colors"
         onClick={() => setIsCollapsed(false)}
       >
         <div className="flex items-center justify-between">
@@ -88,17 +88,17 @@ export default function BrainstormPanel() {
               className="w-2 h-2 rounded-full"
               style={{ backgroundColor: teamColor }}
             />
-            <h3 className="font-pixel text-xs text-game-green">
-              TEAM CHAT
+            <h3 className="text-sm font-semibold text-accent-green">
+              Team Chat
             </h3>
             {messages.length > 0 && (
-              <span className="font-pixel text-[8px] text-gray-500">
+              <span className="text-xs text-text-tertiary">
                 ({messages.length})
               </span>
             )}
           </div>
           <svg
-            className="w-4 h-4 text-gray-500"
+            className="w-4 h-4 text-text-tertiary"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -117,33 +117,32 @@ export default function BrainstormPanel() {
 
   return (
     <div
-      className="h-36 border-t-3 bg-game-dark/80 flex flex-col"
-      style={{ borderColor: teamColor + "40" }}
+      className="h-36 border-t border-border-primary bg-surface-secondary flex flex-col"
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2 border-b border-game-blue/30">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-border-primary">
         <div className="flex items-center gap-2">
           <div
             className="w-2 h-2 rounded-full"
             style={{ backgroundColor: teamColor }}
           />
-          <h3 className="font-pixel text-xs text-game-green">
-            TEAM CHAT
+          <h3 className="text-sm font-semibold text-accent-green">
+            Team Chat
           </h3>
         </div>
         <div className="flex items-center gap-3">
-          <span className="font-pixel text-[7px] text-gray-500">
+          <span className="text-xs text-text-tertiary">
             {isMyTurn
-              ? "DISCUSS WHILE DECIDING"
-              : "SUGGEST IDEAS FOR YOUR TEAM"}
+              ? "Discuss while deciding"
+              : "Suggest ideas for your team"}
           </span>
           <button
             onClick={() => setIsCollapsed(true)}
-            className="p-0.5 hover:bg-game-blue/20 rounded transition-colors"
+            className="p-0.5 hover:bg-surface-tertiary rounded transition-colors"
             title="Collapse chat"
           >
             <svg
-              className="w-3.5 h-3.5 text-gray-500"
+              className="w-3.5 h-3.5 text-text-tertiary"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -162,9 +161,9 @@ export default function BrainstormPanel() {
       {/* Messages + Input */}
       <div className="flex-1 flex gap-2 px-3 py-2 overflow-hidden">
         {/* Message list */}
-        <div className="flex-1 bg-game-dark border-2 border-game-blue/40 rounded p-2 overflow-y-auto">
+        <div className="flex-1 bg-white border border-border-primary rounded-lg p-2 overflow-y-auto">
           {messages.length === 0 ? (
-            <p className="text-gray-600 text-xs italic">
+            <p className="text-text-disabled text-xs italic">
               Chat with your team here!
             </p>
           ) : (
@@ -172,15 +171,15 @@ export default function BrainstormPanel() {
               {messages.map((msg) => (
                 <div key={msg.id} className="flex items-start gap-1.5">
                   <span
-                    className="font-pixel text-[8px] flex-shrink-0"
+                    className="text-xs font-semibold flex-shrink-0"
                     style={{
                       color:
-                        msg.playerId === playerId ? teamColor : "#9ca3af",
+                        msg.playerId === playerId ? teamColor : "#9CA3AF",
                     }}
                   >
                     {msg.playerName}:
                   </span>
-                  <span className="text-xs text-gray-300 break-words">
+                  <span className="text-xs text-text-secondary break-words">
                     {msg.text}
                   </span>
                 </div>
@@ -199,24 +198,22 @@ export default function BrainstormPanel() {
             onChange={(e) => setInputText(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type a message..."
-            className="flex-1 bg-game-dark border-2 border-game-blue/40 rounded px-3 py-1
-              text-sm text-white placeholder-gray-600
-              focus:border-game-green focus:outline-none transition-colors"
+            className="input flex-1 text-sm"
             maxLength={200}
           />
           <button
             onClick={handleSend}
             disabled={!inputText.trim()}
             className={`
-              font-pixel text-[10px] py-2 px-3 rounded border-2 transition-all
+              text-sm font-semibold py-2 px-3 rounded-lg border transition-all
               ${
                 inputText.trim()
-                  ? "bg-game-green/20 border-game-green text-game-green hover:bg-game-green/30 hover:shadow-[0_0_8px_rgba(22,199,154,0.2)]"
-                  : "bg-gray-800/50 border-gray-700 text-gray-600 cursor-not-allowed"
+                  ? "btn-green"
+                  : "bg-surface-tertiary border-border-primary text-text-disabled cursor-not-allowed"
               }
             `}
           >
-            SEND
+            Send
           </button>
         </div>
       </div>

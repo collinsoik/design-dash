@@ -133,29 +133,29 @@ export default function LobbyPage() {
   const canStart = totalPlayers >= 2;
 
   return (
-    <main className="min-h-screen p-6 md:p-10 flex flex-col">
+    <main className="min-h-screen p-6 md:p-10 flex flex-col bg-surface-primary">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <Link
           href="/"
-          className="font-pixel text-xs text-gray-400 hover:text-game-red transition-colors"
+          className="text-sm text-text-tertiary hover:text-accent-primary transition-colors"
         >
-          &lt; LEAVE
+          &larr; Leave
         </Link>
-        <h1 className="font-pixel text-sm md:text-lg text-game-red">LOBBY</h1>
+        <h1 className="text-2xl font-bold text-text-primary">Lobby</h1>
         <div className="w-16" />
       </div>
 
       {/* Room Code Display */}
       <div className="text-center mb-10">
-        <p className="font-pixel text-[10px] text-gray-400 mb-3">ROOM CODE</p>
-        <div className="inline-block pixel-border px-10 py-5 bg-game-dark">
-          <span className="font-pixel text-3xl md:text-5xl text-game-yellow tracking-[0.3em]">
+        <p className="text-sm text-text-tertiary mb-3">Room Code</p>
+        <div className="inline-block border border-border-primary rounded-xl px-10 py-5 bg-white shadow-card">
+          <span className="font-mono text-4xl font-bold text-accent-primary tracking-[0.3em]">
             {roomCode}
           </span>
         </div>
-        <p className="font-pixel text-[8px] text-gray-500 mt-3">
-          SHARE THIS CODE WITH YOUR PLAYERS
+        <p className="text-xs text-text-disabled mt-3">
+          Share this code with your players
         </p>
       </div>
 
@@ -164,12 +164,12 @@ export default function LobbyPage() {
         {teams.slice(0, 4).map((team, idx) => (
           <div
             key={team.id}
-            className="border-3 bg-game-blue/20 p-4 flex flex-col"
-            style={{ borderColor: TEAM_COLORS[idx] || "#0f3460" }}
+            className="border rounded-xl bg-white p-4 flex flex-col shadow-soft"
+            style={{ borderColor: TEAM_COLORS[idx] || "#E2E5EA", borderTopWidth: "4px", borderTopColor: TEAM_COLORS[idx] || "#E2E5EA" }}
           >
             <h3
-              className="font-pixel text-[10px] mb-4 text-center"
-              style={{ color: TEAM_COLORS[idx] || "#ffffff" }}
+              className="text-sm font-semibold mb-4 text-center"
+              style={{ color: TEAM_COLORS[idx] || "#1A1A2E" }}
             >
               {team.name}
             </h3>
@@ -180,19 +180,19 @@ export default function LobbyPage() {
                   return (
                     <div
                       key={memberId}
-                      className="flex items-center gap-2 bg-game-dark/50 px-3 py-2 border border-gray-700"
+                      className="flex items-center gap-2 bg-surface-tertiary px-3 py-2 rounded-lg border border-border-primary"
                     >
                       <div
                         className={`w-2 h-2 rounded-full ${
-                          player?.connected ? "bg-game-green animate-pulse" : "bg-gray-600"
+                          player?.connected ? "bg-accent-green animate-pulse" : "bg-text-disabled"
                         }`}
                       />
-                      <span className="text-sm text-white">
+                      <span className="text-sm text-text-primary">
                         {player?.displayName || "Unknown"}
                       </span>
                       {memberId === playerId && (
-                        <span className="font-pixel text-[6px] text-game-green ml-auto">
-                          YOU
+                        <span className="text-xs font-medium text-accent-green ml-auto">
+                          You
                         </span>
                       )}
                     </div>
@@ -200,13 +200,13 @@ export default function LobbyPage() {
                 })
               ) : (
                 <div className="flex items-center justify-center h-full min-h-[60px]">
-                  <p className="font-pixel text-[8px] text-gray-600">WAITING{dots}</p>
+                  <p className="text-xs text-text-disabled">Waiting{dots}</p>
                 </div>
               )}
             </div>
             <div className="mt-3 text-center">
-              <span className="font-pixel text-[8px] text-gray-500">
-                {team.members.length}/{room?.config.teamSize || 4} PLAYERS
+              <span className="text-xs text-text-tertiary">
+                {team.members.length}/{room?.config.teamSize || 4} players
               </span>
             </div>
           </div>
@@ -218,43 +218,43 @@ export default function LobbyPage() {
         <div className="text-center mb-4">
           <button
             onClick={() => setShowBriefing(true)}
-            className="pixel-btn-yellow text-[10px]"
+            className="btn-ghost"
           >
-            VIEW MISSION BRIEFING
+            View Mission Briefing
           </button>
         </div>
       )}
 
       {/* Status Bar */}
       <div className="text-center space-y-4">
-        <p className="font-pixel text-xs text-gray-400">
-          {totalPlayers} PLAYER{totalPlayers !== 1 ? "S" : ""} CONNECTED
+        <p className="text-xs text-text-tertiary">
+          {totalPlayers} player{totalPlayers !== 1 ? "s" : ""} connected
         </p>
 
         {isHost ? (
           <div>
             {startError && (
-              <p className="font-pixel text-[10px] text-game-red mb-3">
+              <p className="text-sm text-accent-red mb-3">
                 {startError}
               </p>
             )}
             <button
               onClick={handleStart}
               disabled={!canStart || isStarting}
-              className="pixel-btn-green text-sm px-10 py-4 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="btn-green px-10 py-4 disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              {isStarting ? "STARTING..." : "START GAME"}
+              {isStarting ? "Starting..." : "Start Game"}
             </button>
             {!canStart && (
-              <p className="font-pixel text-[8px] text-gray-500 mt-3">
-                NEED AT LEAST 2 PLAYERS TO START
+              <p className="text-xs text-text-disabled mt-3">
+                Need at least 2 players to start
               </p>
             )}
           </div>
         ) : (
           <div className="flex items-center justify-center gap-1">
-            <p className="font-pixel text-xs text-game-green">
-              WAITING FOR HOST TO START{dots}
+            <p className="text-xs text-accent-green font-medium">
+              Waiting for host to start{dots}
             </p>
           </div>
         )}

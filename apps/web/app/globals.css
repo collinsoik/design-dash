@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -6,125 +6,94 @@
 
 @layer base {
   body {
-    @apply bg-game-dark text-white font-sans;
+    @apply bg-surface-primary text-text-primary font-sans;
   }
 }
 
 @layer components {
-  .pixel-border {
-    border: 3px solid #e94560;
-    box-shadow:
-      3px 3px 0px #0f3460,
-      -1px -1px 0px #0f3460,
-      1px -1px 0px #0f3460,
-      -1px 1px 0px #0f3460;
+  /* ── Cards ── */
+  .card {
+    @apply bg-white border border-border-primary rounded-lg p-4 shadow-soft;
   }
 
-  .pixel-border-green {
-    border: 3px solid #16c79a;
-    box-shadow:
-      3px 3px 0px #0f3460,
-      -1px -1px 0px #0f3460,
-      1px -1px 0px #0f3460,
-      -1px 1px 0px #0f3460;
+  .card-elevated {
+    @apply bg-white border border-border-primary rounded-xl p-6 shadow-elevated;
   }
 
-  .pixel-border-yellow {
-    border: 3px solid #f5c518;
-    box-shadow:
-      3px 3px 0px #0f3460,
-      -1px -1px 0px #0f3460,
-      1px -1px 0px #0f3460,
-      -1px 1px 0px #0f3460;
+  /* ── Buttons ── */
+  .btn {
+    @apply inline-flex items-center justify-center font-semibold text-sm px-6 py-2.5 rounded-lg transition-all duration-150;
   }
 
-  .pixel-border-purple {
-    border: 3px solid #9b59b6;
-    box-shadow:
-      3px 3px 0px #0f3460,
-      -1px -1px 0px #0f3460,
-      1px -1px 0px #0f3460,
-      -1px 1px 0px #0f3460;
+  .btn:active {
+    transform: scale(0.98);
   }
 
-  .pixel-btn {
-    @apply font-pixel text-xs px-6 py-3 uppercase tracking-wider transition-all duration-150;
-    border: 3px solid currentColor;
-    box-shadow:
-      4px 4px 0px #0f3460;
-    position: relative;
+  .btn-primary {
+    @apply btn bg-accent-primary text-white hover:opacity-90;
   }
 
-  .pixel-btn:hover {
-    transform: translate(2px, 2px);
-    box-shadow:
-      2px 2px 0px #0f3460;
+  .btn-primary:disabled {
+    @apply opacity-40 cursor-not-allowed;
   }
 
-  .pixel-btn:active {
-    transform: translate(4px, 4px);
-    box-shadow: none;
+  .btn-red {
+    @apply btn bg-accent-red text-white hover:opacity-90;
   }
 
-  .pixel-btn-red {
-    @apply pixel-btn bg-game-red text-white border-game-red;
+  .btn-green {
+    @apply btn bg-accent-green text-white hover:opacity-90;
   }
 
-  .pixel-btn-green {
-    @apply pixel-btn bg-game-green text-game-dark border-game-green;
+  .btn-yellow {
+    @apply btn bg-accent-yellow text-text-primary hover:opacity-90;
   }
 
-  .pixel-btn-yellow {
-    @apply pixel-btn bg-game-yellow text-game-dark border-game-yellow;
+  .btn-blue {
+    @apply btn bg-accent-blue text-white hover:opacity-90;
   }
 
-  .pixel-btn-blue {
-    @apply pixel-btn bg-game-blue text-white border-game-blue;
+  .btn-ghost {
+    @apply btn bg-transparent text-text-secondary border border-border-primary hover:bg-surface-tertiary;
   }
 
-  .pixel-shadow {
-    box-shadow:
-      4px 4px 0px #0f3460,
-      -1px -1px 0px #0f3460;
+  /* ── Inputs ── */
+  .input {
+    @apply w-full bg-surface-tertiary border border-border-primary rounded-lg px-4 py-2.5 text-base text-text-primary placeholder-text-disabled focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus/20 transition-colors;
   }
 
-  .pixel-card {
-    @apply bg-game-blue/30 p-4 pixel-border;
+  /* ── Badges ── */
+  .badge {
+    @apply inline-flex items-center font-medium text-xs px-2 py-0.5 rounded-full;
   }
 
-  .neon-text-red {
-    text-shadow:
-      0 0 7px #e94560,
-      0 0 10px #e94560,
-      0 0 21px #e94560;
+  .badge-green {
+    @apply badge bg-accent-green-light text-accent-green;
   }
 
-  .neon-text-green {
-    text-shadow:
-      0 0 7px #16c79a,
-      0 0 10px #16c79a,
-      0 0 21px #16c79a;
+  .badge-red {
+    @apply badge bg-accent-red-light text-accent-red;
   }
 
-  .neon-text-yellow {
-    text-shadow:
-      0 0 7px #f5c518,
-      0 0 10px #f5c518,
-      0 0 21px #f5c518;
+  .badge-yellow {
+    @apply badge bg-accent-yellow-light text-accent-yellow;
+  }
+
+  .badge-blue {
+    @apply badge bg-accent-blue-light text-accent-blue;
+  }
+
+  .badge-purple {
+    @apply badge bg-accent-purple-light text-accent-purple;
+  }
+
+  .badge-gray {
+    @apply badge bg-surface-tertiary text-text-secondary;
   }
 }
 
 @layer utilities {
   .animate-pulse-slow {
     animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-
-  .animate-blink {
-    animation: blink 1s step-end infinite;
-  }
-
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
   }
 }

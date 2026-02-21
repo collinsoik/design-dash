@@ -11,9 +11,9 @@ import CaseStudyBriefing from "@/components/tutorial/CaseStudyBriefing";
 const TIMER_OPTIONS = [120, 150, 180, 210, 240];
 
 const DIFFICULTY_COLORS = {
-  beginner: "bg-game-green text-game-dark",
-  intermediate: "bg-game-yellow text-game-dark",
-  advanced: "bg-game-red text-white",
+  beginner: "badge-green",
+  intermediate: "badge-yellow",
+  advanced: "badge-red",
 } as const;
 
 export default function HostPage() {
@@ -67,41 +67,41 @@ export default function HostPage() {
   }
 
   return (
-    <main className="min-h-screen p-6 md:p-10">
+    <main className="min-h-screen p-6 md:p-10 bg-surface-primary">
       {/* Header */}
       <div className="flex items-center justify-between mb-10">
         <Link
           href="/"
-          className="font-pixel text-xs text-gray-400 hover:text-game-red transition-colors"
+          className="text-sm text-text-tertiary hover:text-accent-primary transition-colors"
         >
-          &lt; BACK
+          &larr; Back
         </Link>
-        <h1 className="font-pixel text-lg md:text-2xl text-game-red neon-text-red">
-          HOST GAME
+        <h1 className="text-2xl font-bold text-text-primary">
+          Host Game
         </h1>
         <div className="w-16" />
       </div>
 
       <div className="max-w-4xl mx-auto space-y-10">
         {error && (
-          <div className="pixel-card border-game-red bg-game-red/10 text-center">
-            <p className="font-pixel text-[10px] text-game-red">{error}</p>
+          <div className="card border-accent-red bg-accent-red-light text-center">
+            <p className="text-sm text-accent-red">{error}</p>
           </div>
         )}
 
         {/* Team Size */}
-        <section className="pixel-card">
-          <h2 className="font-pixel text-xs text-game-yellow mb-4">TEAM SIZE</h2>
-          <p className="text-gray-400 text-sm mb-4">How many players per team?</p>
+        <section className="card">
+          <h2 className="text-lg font-semibold text-text-primary mb-4">Team Size</h2>
+          <p className="text-text-secondary text-sm mb-4">How many players per team?</p>
           <div className="flex gap-3">
             {[2, 3, 4, 5, 6].map((size) => (
               <button
                 key={size}
                 onClick={() => setTeamSize(size)}
-                className={`w-14 h-14 font-pixel text-sm border-3 transition-all ${
+                className={`w-14 h-14 text-sm font-semibold border rounded-lg transition-all ${
                   teamSize === size
-                    ? "bg-game-green text-game-dark border-game-green"
-                    : "bg-transparent text-gray-400 border-game-blue hover:border-game-green hover:text-white"
+                    ? "bg-accent-green text-white border-accent-green"
+                    : "bg-white text-text-secondary border-border-primary hover:border-accent-green hover:text-text-primary"
                 }`}
               >
                 {size}
@@ -111,18 +111,18 @@ export default function HostPage() {
         </section>
 
         {/* Round Timer */}
-        <section className="pixel-card">
-          <h2 className="font-pixel text-xs text-game-yellow mb-4">ROUND TIMER</h2>
-          <p className="text-gray-400 text-sm mb-4">Seconds per round for each decision.</p>
+        <section className="card">
+          <h2 className="text-lg font-semibold text-text-primary mb-4">Round Timer</h2>
+          <p className="text-text-secondary text-sm mb-4">Seconds per round for each decision.</p>
           <div className="flex flex-wrap gap-3">
             {TIMER_OPTIONS.map((seconds) => (
               <button
                 key={seconds}
                 onClick={() => setTurnTimer(seconds)}
-                className={`px-5 py-3 font-pixel text-xs border-3 transition-all ${
+                className={`px-5 py-3 text-sm font-semibold border rounded-lg transition-all ${
                   turnTimer === seconds
-                    ? "bg-game-green text-game-dark border-game-green"
-                    : "bg-transparent text-gray-400 border-game-blue hover:border-game-green hover:text-white"
+                    ? "bg-accent-green text-white border-accent-green"
+                    : "bg-white text-text-secondary border-border-primary hover:border-accent-green hover:text-text-primary"
                 }`}
               >
                 {Math.floor(seconds / 60)}:{(seconds % 60).toString().padStart(2, "0")}
@@ -133,8 +133,8 @@ export default function HostPage() {
 
         {/* Case Study Selection */}
         <section>
-          <h2 className="font-pixel text-xs text-game-yellow mb-4">SELECT PRODUCT</h2>
-          <p className="text-gray-400 text-sm mb-6">
+          <h2 className="text-lg font-semibold text-text-primary mb-4">Select Product</h2>
+          <p className="text-text-secondary text-sm mb-6">
             Choose the product your teams will make design decisions for.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -142,49 +142,49 @@ export default function HostPage() {
               <button
                 key={cs.id}
                 onClick={() => setSelectedCaseStudy(cs.id)}
-                className={`text-left p-5 border-3 transition-all ${
+                className={`text-left p-5 border rounded-xl transition-all ${
                   selectedCaseStudy === cs.id
-                    ? "border-game-green bg-game-green/10"
-                    : "border-game-blue bg-game-blue/20 hover:border-game-purple"
+                    ? "border-accent-green bg-accent-green-light shadow-card"
+                    : "border-border-primary bg-white hover:border-accent-purple hover:shadow-card"
                 }`}
               >
                 <div className="flex items-center justify-between mb-1">
                   <h3
-                    className={`font-pixel text-[10px] ${
-                      selectedCaseStudy === cs.id ? "text-game-green" : "text-game-red"
+                    className={`text-sm font-semibold ${
+                      selectedCaseStudy === cs.id ? "text-accent-green" : "text-text-primary"
                     }`}
                   >
                     {cs.productName}
                   </h3>
-                  <span className={`font-pixel text-[6px] px-1.5 py-0.5 rounded ${DIFFICULTY_COLORS[cs.difficulty]}`}>
-                    {cs.difficulty.toUpperCase()}
+                  <span className={DIFFICULTY_COLORS[cs.difficulty]}>
+                    {cs.difficulty.charAt(0).toUpperCase() + cs.difficulty.slice(1)}
                   </span>
                 </div>
-                <p className="font-pixel text-[8px] text-game-yellow mb-2">
+                <p className="text-sm font-medium text-accent-primary mb-2">
                   {cs.productType}
                 </p>
-                <p className="text-gray-400 text-xs leading-relaxed line-clamp-3 mb-3">
+                <p className="text-text-secondary text-sm leading-relaxed line-clamp-3 mb-3">
                   {cs.shortDescription}
                 </p>
                 {/* Persona preview */}
-                <div className="flex items-center gap-2 mt-2 pt-2 border-t border-gray-700">
-                  <div className="w-5 h-5 rounded-full bg-game-purple/30 border border-game-purple/50 flex items-center justify-center">
-                    <span className="font-pixel text-[5px] text-game-purple">
+                <div className="flex items-center gap-2 mt-2 pt-2 border-t border-border-primary">
+                  <div className="w-5 h-5 rounded-full bg-accent-purple-light border border-accent-purple/30 flex items-center justify-center">
+                    <span className="text-xs font-semibold text-accent-purple">
                       {cs.persona.name.split(" ").map(n => n[0]).join("")}
                     </span>
                   </div>
                   <div>
-                    <p className="font-pixel text-[7px] text-gray-300">
+                    <p className="text-sm text-text-primary">
                       {cs.persona.name}
                     </p>
-                    <p className="text-[9px] text-gray-500">
+                    <p className="text-xs text-text-tertiary">
                       {cs.persona.occupation}
                     </p>
                   </div>
                 </div>
                 {/* Decision count */}
-                <p className="font-pixel text-[7px] text-gray-500 mt-2">
-                  {cs.decisions.length} DECISIONS · {new Set(cs.decisions.map(d => d.round)).size} ROUNDS
+                <p className="text-xs text-text-tertiary mt-2">
+                  {cs.decisions.length} decisions &middot; {new Set(cs.decisions.map(d => d.round)).size} rounds
                 </p>
               </button>
             ))}
@@ -195,9 +195,9 @@ export default function HostPage() {
             <div className="text-center mt-4">
               <button
                 onClick={() => setShowBriefing(true)}
-                className="pixel-btn-yellow text-[10px]"
+                className="btn-ghost"
               >
-                VIEW MISSION BRIEFING
+                View Mission Briefing
               </button>
             </div>
           )}
@@ -208,13 +208,13 @@ export default function HostPage() {
           <button
             onClick={handleCreate}
             disabled={!selectedCaseStudy || isCreating}
-            className="pixel-btn-red text-sm px-10 py-4 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="btn-primary px-10 py-4 disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {isCreating ? "CREATING..." : "CREATE ROOM"}
+            {isCreating ? "Creating..." : "Create Room"}
           </button>
           {!selectedCaseStudy && (
-            <p className="font-pixel text-[8px] text-gray-500 mt-4">
-              SELECT A PRODUCT TO CONTINUE
+            <p className="text-sm text-text-disabled mt-4">
+              Select a product to continue
             </p>
           )}
         </div>

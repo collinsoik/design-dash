@@ -35,8 +35,8 @@ export default function TurnIndicator() {
 
   // Team color for the active player
   const teamColor = useMemo(() => {
-    if (!room || !myTeamId) return "#ffffff";
-    return room.teams[myTeamId]?.color ?? "#ffffff";
+    if (!room || !myTeamId) return "#7C8CF5";
+    return room.teams[myTeamId]?.color ?? "#7C8CF5";
   }, [room, myTeamId]);
 
   // Format time as M:SS
@@ -48,9 +48,9 @@ export default function TurnIndicator() {
 
   // Timer color class based on time remaining
   const timerColorClass = useMemo(() => {
-    if (timeRemaining <= 10) return "border-game-red text-game-red animate-pulse";
-    if (timeRemaining <= 30) return "border-game-yellow text-game-yellow";
-    return "border-game-green text-game-green";
+    if (timeRemaining <= 10) return "border-accent-red text-accent-red animate-pulse";
+    if (timeRemaining <= 30) return "border-accent-yellow text-accent-yellow";
+    return "border-accent-green text-accent-green";
   }, [timeRemaining]);
 
   // Submit turn early
@@ -61,15 +61,15 @@ export default function TurnIndicator() {
   }, [isMyTurn]);
 
   return (
-    <header className="flex items-center justify-between px-4 py-3 bg-game-blue/40 border-b-3 border-game-blue">
+    <header className="flex items-center justify-between px-4 py-3 bg-surface-secondary border-b border-border-primary shadow-soft">
       {/* Left: Room code + round counter */}
       <div className="flex items-center gap-4">
-        <span className="font-pixel text-[10px] text-gray-400">
-          ROOM: {room?.code ?? "----"}
+        <span className="text-sm text-text-tertiary">
+          Room: {room?.code ?? "----"}
         </span>
-        <div className="h-4 w-px bg-game-blue/60" />
-        <span className="font-pixel text-[10px] text-game-yellow">
-          ROUND {currentRound + 1}/{totalRounds}
+        <div className="h-4 w-px bg-border-primary" />
+        <span className="text-sm font-semibold text-accent-primary">
+          Round {currentRound + 1}/{totalRounds}
         </span>
       </div>
 
@@ -81,14 +81,14 @@ export default function TurnIndicator() {
             className="w-3 h-3 rounded-full animate-pulse"
             style={{ backgroundColor: teamColor }}
           />
-          <span className={`font-pixel text-sm ${isMyTurn ? "text-game-green" : "text-white"}`}>
-            {isMyTurn ? "YOUR TURN!" : `${activePlayerName}'s turn`}
+          <span className={`text-sm font-semibold ${isMyTurn ? "text-accent-green" : "text-text-primary"}`}>
+            {isMyTurn ? "Your Turn!" : `${activePlayerName}'s turn`}
           </span>
         </div>
 
         {/* Timer display */}
         <div
-          className={`font-pixel text-xl px-4 py-1 border-3 rounded ${timerColorClass}`}
+          className={`font-mono text-xl font-bold px-4 py-1 border rounded-lg ${timerColorClass}`}
         >
           {formatTime(timeRemaining)}
         </div>
@@ -97,19 +97,16 @@ export default function TurnIndicator() {
         {isMyTurn && (
           <button
             onClick={handleSubmitTurn}
-            className="font-pixel text-[10px] px-4 py-2
-              bg-game-green/20 border-2 border-game-green text-game-green
-              hover:bg-game-green/30 hover:shadow-[0_0_10px_rgba(22,199,154,0.3)]
-              active:bg-game-green/40 transition-all rounded"
+            className="btn-green text-sm"
           >
-            SUBMIT ROUND
+            Submit Round
           </button>
         )}
       </div>
 
       {/* Right: connection indicator */}
       <div className="flex items-center gap-2">
-        <div className="w-2 h-2 bg-game-green rounded-full animate-pulse" />
+        <div className="w-2 h-2 bg-accent-green rounded-full animate-pulse" />
       </div>
     </header>
   );

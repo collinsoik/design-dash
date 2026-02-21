@@ -64,11 +64,11 @@ export default function JudgePanel({
   );
 
   return (
-    <div className="rounded-xl border-2 border-game-purple/40 bg-game-dark p-6 space-y-6">
+    <div className="card-elevated space-y-6">
       {/* Panel header */}
       <div className="flex items-center gap-3">
-        <div className="h-3 w-3 rounded-sm bg-game-red animate-pulse" />
-        <h2 className="font-pixel text-sm text-game-yellow tracking-wide uppercase">
+        <div className="h-3 w-3 rounded-full bg-accent-red animate-pulse" />
+        <h2 className="text-xl font-semibold text-text-primary">
           Judge Scoring Panel
         </h2>
       </div>
@@ -81,30 +81,30 @@ export default function JudgePanel({
           return (
             <div
               key={team.id}
-              className="rounded-lg border border-white/10 bg-white/[0.02] p-4 space-y-3"
+              className="rounded-lg border border-border-primary bg-surface-secondary p-4 space-y-3"
               style={{ borderLeftColor: team.color, borderLeftWidth: "4px" }}
             >
               {/* Team name */}
               <div className="flex items-center justify-between">
                 <h3
-                  className="font-pixel text-xs tracking-wider uppercase"
+                  className="text-sm font-semibold uppercase tracking-wide"
                   style={{ color: team.color }}
                 >
                   {team.name}
                 </h3>
-                <span className="font-pixel text-lg text-game-yellow">
+                <span className="text-2xl font-bold text-accent-primary">
                   {state.score}
-                  <span className="text-[10px] text-white/40">/10</span>
+                  <span className="text-sm text-text-disabled">/10</span>
                 </span>
               </div>
 
               {/* Score slider */}
               <div className="space-y-1">
-                <label className="font-pixel text-[8px] text-white/50 uppercase tracking-wide">
+                <label className="text-xs font-medium text-text-tertiary uppercase tracking-wide">
                   Score
                 </label>
                 <div className="flex items-center gap-3">
-                  <span className="font-sans text-xs text-white/40 w-4 text-center">
+                  <span className="text-sm text-text-disabled w-4 text-center">
                     1
                   </span>
                   <input
@@ -116,14 +116,14 @@ export default function JudgePanel({
                     onChange={(e) =>
                       handleScoreChange(team.id, parseInt(e.target.value, 10))
                     }
-                    className="judge-slider flex-1 h-2 appearance-none rounded-full bg-white/10 outline-none"
+                    className="judge-slider flex-1 h-2 appearance-none rounded-full bg-surface-tertiary outline-none"
                     style={
                       {
                         "--slider-color": team.color,
                       } as React.CSSProperties
                     }
                   />
-                  <span className="font-sans text-xs text-white/40 w-5 text-center">
+                  <span className="text-sm text-text-disabled w-5 text-center">
                     10
                   </span>
                 </div>
@@ -138,14 +138,14 @@ export default function JudgePanel({
                     onChange={(e) =>
                       handleScoreChange(team.id, parseInt(e.target.value, 10) || 1)
                     }
-                    className="w-16 rounded border border-white/10 bg-game-dark px-2 py-1 text-center font-sans text-sm text-white outline-none focus:border-game-yellow"
+                    className="w-16 rounded-lg border border-border-primary bg-white px-2 py-1 text-center text-lg text-text-primary outline-none focus:border-border-focus focus:ring-2 focus:ring-border-focus/20"
                   />
                 </div>
               </div>
 
               {/* Notes */}
               <div className="space-y-1">
-                <label className="font-pixel text-[8px] text-white/50 uppercase tracking-wide">
+                <label className="text-xs font-medium text-text-tertiary uppercase tracking-wide">
                   Notes (optional)
                 </label>
                 <textarea
@@ -153,7 +153,7 @@ export default function JudgePanel({
                   onChange={(e) => handleNotesChange(team.id, e.target.value)}
                   placeholder="Feedback for the team..."
                   rows={2}
-                  className="w-full resize-none rounded border border-white/10 bg-game-dark/60 px-3 py-2 font-sans text-sm text-white/80 placeholder-white/20 outline-none focus:border-game-purple"
+                  className="w-full resize-none rounded-lg border border-border-primary bg-white px-3 py-2 text-sm text-text-primary placeholder-text-disabled outline-none focus:border-border-focus focus:ring-2 focus:ring-border-focus/20"
                 />
               </div>
             </div>
@@ -163,8 +163,8 @@ export default function JudgePanel({
 
       {/* Score summary */}
       {showConfirm && (
-        <div className="rounded-lg border border-game-yellow/30 bg-game-yellow/5 p-4 space-y-3">
-          <p className="font-pixel text-[10px] text-game-yellow uppercase tracking-wide">
+        <div className="rounded-lg border border-accent-yellow/30 bg-accent-yellow-light p-4 space-y-3">
+          <p className="text-sm font-semibold text-accent-yellow uppercase tracking-wide">
             Confirm Scores
           </p>
           <ul className="space-y-1">
@@ -173,18 +173,18 @@ export default function JudgePanel({
               return (
                 <li
                   key={team.id}
-                  className="flex items-center justify-between font-sans text-sm"
+                  className="flex items-center justify-between text-sm"
                 >
                   <span style={{ color: team.color }}>{team.name}</span>
-                  <span className="text-game-yellow font-pixel text-xs">
+                  <span className="font-bold text-accent-primary">
                     {state.score}/10
                   </span>
                 </li>
               );
             })}
           </ul>
-          <p className="font-sans text-xs text-white/40">
-            Click &quot;FINALIZE SCORES&quot; again to submit.
+          <p className="text-sm text-text-tertiary">
+            Click &quot;Finalize Scores&quot; again to submit.
           </p>
         </div>
       )}
@@ -194,12 +194,12 @@ export default function JudgePanel({
         type="button"
         onClick={handleFinalize}
         disabled={!allScored}
-        className={`w-full rounded-lg border-2 px-6 py-3 font-pixel text-xs uppercase tracking-widest transition-all ${
+        className={`w-full rounded-lg border px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-all ${
           allScored
             ? showConfirm
-              ? "border-game-red bg-game-red/20 text-game-red hover:bg-game-red/30 animate-pulse"
-              : "border-game-green bg-game-green/20 text-game-green hover:bg-game-green/30"
-            : "cursor-not-allowed border-white/10 bg-white/5 text-white/30"
+              ? "btn-red animate-pulse"
+              : "btn-green"
+            : "cursor-not-allowed bg-surface-tertiary border-border-primary text-text-disabled"
         }`}
       >
         {showConfirm ? "Confirm & Finalize Scores" : "Finalize Scores"}
@@ -212,23 +212,23 @@ export default function JudgePanel({
           appearance: none;
           width: 18px;
           height: 18px;
-          border-radius: 4px;
-          background: var(--slider-color, #f5c518);
+          border-radius: 50%;
+          background: var(--slider-color, #7C8CF5);
           cursor: pointer;
-          border: 2px solid rgba(255, 255, 255, 0.2);
-          box-shadow: 0 0 8px var(--slider-color, #f5c518);
+          border: 2px solid rgba(255, 255, 255, 0.8);
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
         }
         .judge-slider::-moz-range-thumb {
           width: 18px;
           height: 18px;
-          border-radius: 4px;
-          background: var(--slider-color, #f5c518);
+          border-radius: 50%;
+          background: var(--slider-color, #7C8CF5);
           cursor: pointer;
-          border: 2px solid rgba(255, 255, 255, 0.2);
-          box-shadow: 0 0 8px var(--slider-color, #f5c518);
+          border: 2px solid rgba(255, 255, 255, 0.8);
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
         }
         .judge-slider:focus::-webkit-slider-thumb {
-          box-shadow: 0 0 12px var(--slider-color, #f5c518);
+          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.16);
         }
       `}</style>
     </div>

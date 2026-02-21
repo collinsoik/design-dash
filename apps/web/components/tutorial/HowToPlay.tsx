@@ -14,7 +14,7 @@ const RULES = [
         <path d="M16 3.13a4 4 0 0 1 0 7.75" />
       </svg>
     ),
-    label: "TEAMS",
+    label: "Teams",
     text: "Compete in teams. Take turns making decisions.",
   },
   {
@@ -25,7 +25,7 @@ const RULES = [
         <line x1="9" y1="15" x2="15" y2="15" />
       </svg>
     ),
-    label: "DECIDE",
+    label: "Decide",
     text: "Pick options, drag sliders, choose paths.",
   },
   {
@@ -34,40 +34,40 @@ const RULES = [
         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
       </svg>
     ),
-    label: "SCORE",
+    label: "Score",
     text: "Teams vote + teacher scores. Highest wins!",
   },
 ];
 
 export default function HowToPlay({ onClose }: HowToPlayProps) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
-      <div className="pixel-card relative w-full max-w-md bg-game-dark">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <div className="card-elevated relative w-full max-w-md">
         {/* Close button */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center font-pixel text-sm text-white/60 transition-colors hover:text-game-red"
+          className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center text-lg text-text-tertiary transition-colors hover:text-accent-red"
           aria-label="Close tutorial"
         >
           X
         </button>
 
-        <h2 className="neon-text-green pt-6 text-center font-pixel text-sm tracking-wider text-game-green md:text-base">
-          HOW TO PLAY
+        <h2 className="pt-6 text-center text-xl font-semibold text-text-primary">
+          How to Play
         </h2>
 
         <div className="space-y-4 px-6 py-6 md:px-8">
           {RULES.map((rule) => (
             <div key={rule.label} className="flex items-center gap-4">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-game-blue/20 text-game-blue">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent-blue-light text-accent-blue">
                 {rule.icon}
               </div>
               <div>
-                <span className="font-pixel text-[10px] text-game-yellow">
+                <span className="text-sm font-semibold text-accent-primary">
                   {rule.label}
                 </span>
-                <p className="text-sm text-white/80">{rule.text}</p>
+                <p className="text-sm text-text-secondary">{rule.text}</p>
               </div>
             </div>
           ))}
@@ -77,9 +77,9 @@ export default function HowToPlay({ onClose }: HowToPlayProps) {
           <button
             type="button"
             onClick={onClose}
-            className="pixel-btn-green text-sm px-8 py-3"
+            className="btn-green px-8 py-3"
           >
-            GOT IT!
+            Got It!
           </button>
         </div>
       </div>
