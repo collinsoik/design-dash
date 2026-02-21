@@ -91,7 +91,7 @@ export default function SectionSlot({
         <div className="flex flex-col items-center justify-center h-full min-h-[80px] px-4 py-3">
           <div className="flex items-center gap-2">
             <svg
-              className="w-4 h-4 text-gray-600"
+              className="w-5 h-5 text-gray-600"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -103,12 +103,12 @@ export default function SectionSlot({
                 d="M12 4v16m8-8H4"
               />
             </svg>
-            <span className="font-pixel text-[8px] text-gray-500">
+            <span className="font-pixel text-[10px] text-gray-400">
               Drop {slot.label} here
             </span>
           </div>
           {assignedPlayerName && (
-            <span className="font-pixel text-[6px] text-gray-600 mt-1">
+            <span className="font-pixel text-[8px] text-gray-600 mt-1">
               Assigned to {assignedPlayerName}
             </span>
           )}
@@ -133,10 +133,10 @@ export default function SectionSlot({
           {/* Component info bar */}
           <div className="flex items-center justify-between px-3 py-2 bg-game-dark/60">
             <div className="flex-1 min-w-0">
-              <p className="font-pixel text-[7px] text-game-green truncate">
+              <p className="font-pixel text-[9px] text-game-green truncate">
                 {component.name}
               </p>
-              <p className="font-pixel text-[6px] text-gray-500 truncate">
+              <p className="font-pixel text-[8px] text-gray-500 truncate">
                 {slot.label}
               </p>
             </div>
@@ -145,13 +145,13 @@ export default function SectionSlot({
             {canInteract && (
               <button
                 onClick={handleRemove}
-                className="ml-2 p-1 rounded border border-game-red/40 bg-game-red/10
+                className="ml-2 p-1.5 rounded border border-game-red/40 bg-game-red/10
                   hover:bg-game-red/30 hover:border-game-red transition-colors
                   flex-shrink-0"
                 title="Remove component"
               >
                 <svg
-                  className="w-3 h-3 text-game-red"
+                  className="w-3.5 h-3.5 text-game-red"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -166,23 +166,14 @@ export default function SectionSlot({
               </button>
             )}
           </div>
-
-          {/* Assigned player */}
-          {assignedPlayerName && (
-            <div className="px-3 pb-1.5">
-              <span className="font-pixel text-[6px] text-gray-600">
-                By {assignedPlayerName}
-              </span>
-            </div>
-          )}
         </div>
       ) : (
         /* ── Fallback placed but no component found ── */
         <div className="flex flex-col items-center justify-center h-full min-h-[80px] px-4 py-3">
-          <span className="font-pixel text-[8px] text-game-red">
+          <span className="font-pixel text-[10px] text-game-red">
             Unknown Component
           </span>
-          <span className="font-pixel text-[6px] text-gray-500 mt-1">
+          <span className="font-pixel text-[8px] text-gray-500 mt-1">
             {slot.label}
           </span>
         </div>
@@ -191,8 +182,8 @@ export default function SectionSlot({
       {/* Drop hover indicator */}
       {isOver && !isLocked && (
         <div className="absolute inset-0 flex items-center justify-center bg-game-green/5 rounded pointer-events-none">
-          <div className="px-3 py-1 bg-game-green/20 border border-game-green rounded">
-            <span className="font-pixel text-[8px] text-game-green">
+          <div className="px-4 py-2 bg-game-green/20 border border-game-green rounded">
+            <span className="font-pixel text-[10px] text-game-green">
               DROP HERE
             </span>
           </div>

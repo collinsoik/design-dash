@@ -48,27 +48,42 @@ export const useGameStore = create<GameStore>((set, get) => ({
   setRoom: (room) => set({ room, phase: room.phase }),
   setPlayerId: (playerId) => set({ playerId }),
   setPhase: (phase) => set({ phase }),
-  setGameState: (gameState) => set({ gameState }),
+  setGameState: (gameState) => {
+    const { room } = get();
+    if (room) {
+      set({ gameState, room: { ...room, gameState } });
+    } else {
+      set({ gameState });
+    }
+  },
 
   updateTurn: (turn) => {
-    const { gameState } = get();
+    const { gameState, room } = get();
     if (!gameState) return;
-    set({ gameState: { ...gameState, currentTurn: turn } });
+    const updatedGameState = { ...gameState, currentTurn: turn };
+    const updates: Partial<GameStore> = { gameState: updatedGameState };
+    if (room) {
+      updates.room = { ...room, gameState: updatedGameState };
+    }
+    set(updates);
   },
 
   updateTimeRemaining: (time) => {
-    const { gameState } = get();
+    const { gameState, room } = get();
     if (!gameState) return;
-    set({
-      gameState: {
-        ...gameState,
-        currentTurn: { ...gameState.currentTurn, timeRemaining: time },
-      },
-    });
+    const updatedGameState = {
+      ...gameState,
+      currentTurn: { ...gameState.currentTurn, timeRemaining: time },
+    };
+    const updates: Partial<GameStore> = { gameState: updatedGameState };
+    if (room) {
+      updates.room = { ...room, gameState: updatedGameState };
+    }
+    set(updates);
   },
 
   updateCanvas: (teamId, slotId, component) => {
-    const { gameState } = get();
+    const { gameState, room } = get();
     if (!gameState) return;
 
     const website = gameState.teamWebsites[teamId];
@@ -84,15 +99,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
         : s
     );
 
-    set({
-      gameState: {
-        ...gameState,
-        teamWebsites: {
-          ...gameState.teamWebsites,
-          [teamId]: { sections: updatedSections },
-        },
+    const updatedGameState = {
+      ...gameState,
+      teamWebsites: {
+        ...gameState.teamWebsites,
+        [teamId]: { sections: updatedSections },
       },
-    });
+    };
+    const updates: Partial<GameStore> = { gameState: updatedGameState };
+    if (room) {
+      updates.room = { ...room, gameState: updatedGameState };
+    }
+    set(updates);
   },
 
   addMessage: (message) => {

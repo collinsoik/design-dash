@@ -62,14 +62,10 @@ export default function TurnIndicator() {
 
   return (
     <header className="flex items-center justify-between px-4 py-3 bg-game-blue/40 border-b-3 border-game-blue">
-      {/* Left: Room code + turn counter */}
-      <div className="flex items-center gap-4">
-        <span className="font-pixel text-[10px] text-gray-400">
-          ROOM: {room?.code ?? "----"}
-        </span>
-        <div className="h-4 w-px bg-game-blue/60" />
-        <span className="font-pixel text-[10px] text-game-yellow">
-          TURN {turnNumber}/{totalTurns}
+      {/* Left: Turn counter */}
+      <div className="flex items-center gap-3">
+        <span className="font-pixel text-xs text-game-yellow">
+          Turn {turnNumber}/{totalTurns}
         </span>
       </div>
 
@@ -81,36 +77,38 @@ export default function TurnIndicator() {
             className="w-3 h-3 rounded-full animate-pulse"
             style={{ backgroundColor: teamColor }}
           />
-          <span className="font-pixel text-[10px] text-white">
+          <span className={`font-pixel text-sm ${isMyTurn ? "text-game-green" : "text-white"}`}>
             {isMyTurn ? "YOUR TURN!" : `${activePlayerName}'s turn`}
           </span>
         </div>
 
         {/* Timer display */}
         <div
-          className={`font-pixel text-lg px-4 py-1 border-3 rounded ${timerColorClass}`}
+          className={`font-pixel text-xl px-4 py-1 border-3 rounded ${timerColorClass}`}
         >
           {formatTime(timeRemaining)}
         </div>
 
-        {/* Submit turn button (only visible for active player) */}
+        {/* Submit turn button */}
         {isMyTurn && (
           <button
             onClick={handleSubmitTurn}
-            className="font-pixel text-[8px] px-3 py-2
+            className="font-pixel text-[10px] px-4 py-2
               bg-game-green/20 border-2 border-game-green text-game-green
               hover:bg-game-green/30 hover:shadow-[0_0_10px_rgba(22,199,154,0.3)]
               active:bg-game-green/40 transition-all rounded"
           >
-            SUBMIT TURN
+            DONE
           </button>
         )}
       </div>
 
-      {/* Right: Live indicator */}
+      {/* Right: Room code */}
       <div className="flex items-center gap-2">
-        <div className="w-3 h-3 bg-game-green rounded-full animate-pulse" />
-        <span className="font-pixel text-[8px] text-gray-400">LIVE</span>
+        <span className="font-pixel text-[10px] text-gray-400">
+          {room?.code ?? "----"}
+        </span>
+        <div className="w-2 h-2 bg-game-green rounded-full animate-pulse" />
       </div>
     </header>
   );

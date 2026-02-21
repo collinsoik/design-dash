@@ -24,9 +24,6 @@ export default function TeamSidebar() {
     return room.gameState.currentTurn.activePlayerIds[myTeamId] ?? null;
   }, [room, myTeamId]);
 
-  // Assigned slots map: playerId -> slotIds
-  const assignedSlots = room?.gameState?.currentTurn?.assignedSlots ?? {};
-
   // Team members with details
   const members = useMemo(() => {
     if (!room || !team) return [];
@@ -34,7 +31,6 @@ export default function TeamSidebar() {
       const player = room.players[memberId];
       const isActive = memberId === activePlayerId;
       const isConnected = player?.connected ?? false;
-      const slots = assignedSlots[memberId] ?? [];
 
       return {
         id: memberId,
@@ -42,21 +38,12 @@ export default function TeamSidebar() {
         isActive,
         isConnected,
         isCurrentPlayer: memberId === playerId,
-        assignedSlots: slots,
       };
     });
-  }, [room, team, activePlayerId, assignedSlots, playerId]);
+  }, [room, team, activePlayerId, playerId]);
 
   // Case study info
   const caseStudy = room?.gameState?.caseStudy ?? null;
-
-  // Get section labels for assigned slot IDs
-  const getSectionLabel = (slotId: string): string => {
-    if (!room?.gameState || !myTeamId) return slotId;
-    const website = room.gameState.teamWebsites[myTeamId];
-    const section = website?.sections.find((s) => s.id === slotId);
-    return section?.label ?? slotId;
-  };
 
   return (
     <aside className="w-56 border-l-3 border-game-blue bg-game-dark/80 flex flex-col h-full">
@@ -69,7 +56,7 @@ export default function TeamSidebar() {
               style={{ backgroundColor: team.color }}
             />
           )}
-          <h2 className="font-pixel text-[10px] text-game-yellow text-center">
+          <h2 className="font-pixel text-xs text-game-yellow text-center">
             {team?.name ?? "YOUR TEAM"}
           </h2>
         </div>
@@ -78,7 +65,7 @@ export default function TeamSidebar() {
       <div className="flex-1 overflow-y-auto p-3 space-y-4">
         {/* ── Team Members ───────────────────────── */}
         <div>
-          <h4 className="font-pixel text-[8px] text-gray-400 mb-2">
+          <h4 className="font-pixel text-[9px] text-gray-400 mb-2">
             MEMBERS
           </h4>
           <div className="space-y-1.5">
@@ -117,7 +104,7 @@ export default function TeamSidebar() {
                   </span>
 
                   {/* Status badge */}
-                  <span className="font-pixel text-[6px] flex-shrink-0">
+                  <span className="font-pixel text-[7px] flex-shrink-0">
                     {member.isActive
                       ? "ACTIVE"
                       : !member.isConnected
@@ -127,7 +114,6 @@ export default function TeamSidebar() {
                 </div>
               ))
             ) : (
-              /* Placeholder members */
               <>
                 {["Player 1", "Player 2", "Player 3", "Player 4"].map(
                   (name, i) => (
@@ -148,7 +134,7 @@ export default function TeamSidebar() {
                       />
                       {name}
                       {i === 0 && (
-                        <span className="font-pixel text-[6px] ml-auto">
+                        <span className="font-pixel text-[7px] ml-auto">
                           ACTIVE
                         </span>
                       )}
@@ -160,76 +146,34 @@ export default function TeamSidebar() {
           </div>
         </div>
 
-        {/* ── Assigned Sections ──────────────────── */}
-        {members.some((m) => m.assignedSlots.length > 0) && (
-          <div>
-            <h4 className="font-pixel text-[8px] text-gray-400 mb-2">
-              ASSIGNMENTS
-            </h4>
-            <div className="space-y-2">
-              {members
-                .filter((m) => m.assignedSlots.length > 0)
-                .map((member) => (
-                  <div key={member.id}>
-                    <p className="font-pixel text-[7px] text-gray-300 mb-1">
-                      {member.name}:
-                    </p>
-                    <div className="pl-2 space-y-0.5">
-                      {member.assignedSlots.map((slotId) => (
-                        <div
-                          key={slotId}
-                          className="flex items-center gap-1.5 text-[10px] text-gray-500"
-                        >
-                          <div className="w-1 h-1 bg-game-blue rounded-full" />
-                          <span>{getSectionLabel(slotId)}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </div>
-        )}
-
-        {/* ── Case Study Info ────────────────────── */}
+        {/* ── Case Study ────────────────────── */}
         <div className="pt-3 border-t border-gray-700">
-          <h4 className="font-pixel text-[8px] text-gray-400 mb-2">
-            CASE STUDY
+          <h4 className="font-pixel text-[9px] text-gray-400 mb-2">
+            MISSION
           </h4>
           {caseStudy ? (
             <div className="space-y-2">
-              <div className="px-2 py-1.5 bg-game-blue/10 border border-game-blue/30 rounded">
-                <p className="font-pixel text-[7px] text-game-yellow mb-0.5">
+              <div className="px-2 py-2 bg-game-blue/10 border border-game-blue/30 rounded">
+                <p className="font-pixel text-[9px] text-game-yellow mb-1">
                   {caseStudy.businessName}
                 </p>
-                <p className="text-[10px] text-gray-400">
+                <p className="text-xs text-gray-400">
                   {caseStudy.businessType}
                 </p>
               </div>
 
-              {/* Scoring criteria */}
-              {caseStudy.scoringCriteria.length > 0 && (
-                <div>
-                  <p className="font-pixel text-[6px] text-gray-500 mb-1">
-                    SCORING CRITERIA:
+              {/* Fun fact - keeps it light */}
+              {caseStudy.funFact && (
+                <div className="px-2 py-2 bg-game-yellow/5 border border-game-yellow/20 rounded">
+                  <p className="text-xs text-gray-300 leading-relaxed">
+                    {caseStudy.funFact}
                   </p>
-                  <ul className="space-y-0.5">
-                    {caseStudy.scoringCriteria.map((criteria, i) => (
-                      <li
-                        key={i}
-                        className="flex items-start gap-1.5 text-[10px] text-gray-500"
-                      >
-                        <span className="text-game-green mt-0.5">*</span>
-                        <span>{criteria}</span>
-                      </li>
-                    ))}
-                  </ul>
                 </div>
               )}
             </div>
           ) : (
             <p className="text-xs text-gray-600 italic">
-              Case study details will appear here during gameplay.
+              Details will appear when the game starts.
             </p>
           )}
         </div>
@@ -237,18 +181,18 @@ export default function TeamSidebar() {
         {/* ── Team Score ─────────────────────────── */}
         {team && (team.peerScore > 0 || team.judgeScore > 0) && (
           <div className="pt-3 border-t border-gray-700">
-            <h4 className="font-pixel text-[8px] text-gray-400 mb-2">
+            <h4 className="font-pixel text-[9px] text-gray-400 mb-2">
               SCORES
             </h4>
             <div className="grid grid-cols-2 gap-2">
               <div className="text-center px-2 py-1.5 bg-game-blue/10 border border-game-blue/30 rounded">
-                <p className="font-pixel text-[6px] text-gray-500">PEER</p>
+                <p className="font-pixel text-[7px] text-gray-500">PEER</p>
                 <p className="font-pixel text-sm text-game-green">
                   {team.peerScore}
                 </p>
               </div>
               <div className="text-center px-2 py-1.5 bg-game-blue/10 border border-game-blue/30 rounded">
-                <p className="font-pixel text-[6px] text-gray-500">JUDGE</p>
+                <p className="font-pixel text-[7px] text-gray-500">JUDGE</p>
                 <p className="font-pixel text-sm text-game-yellow">
                   {team.judgeScore}
                 </p>
