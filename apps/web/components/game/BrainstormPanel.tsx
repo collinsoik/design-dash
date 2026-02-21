@@ -26,13 +26,6 @@ export default function BrainstormPanel() {
     return room.teams[myTeamId]?.color ?? "#16c79a";
   }, [room, myTeamId]);
 
-  // Determine if it's the current player's turn
-  const isMyTurn = useMemo(() => {
-    if (!room?.gameState?.currentTurn || !playerId || !myTeamId) return false;
-    const activeId = room.gameState.currentTurn.activePlayerIds[myTeamId];
-    return activeId === playerId;
-  }, [room, playerId, myTeamId]);
-
   // Listen for brainstorm messages from socket
   useEffect(() => {
     const socket = getSocket();
@@ -77,14 +70,6 @@ export default function BrainstormPanel() {
     [handleSend]
   );
 
-  // Format timestamp
-  function formatTimestamp(ts: number): string {
-    const date = new Date(ts);
-    const h = date.getHours().toString().padStart(2, "0");
-    const m = date.getMinutes().toString().padStart(2, "0");
-    return `${h}:${m}`;
-  }
-
   if (isCollapsed) {
     return (
       <div
@@ -97,11 +82,11 @@ export default function BrainstormPanel() {
               className="w-2 h-2 rounded-full"
               style={{ backgroundColor: teamColor }}
             />
-            <h3 className="font-pixel text-[10px] text-game-green">
+            <h3 className="font-pixel text-xs text-game-green">
               TEAM CHAT
             </h3>
             {messages.length > 0 && (
-              <span className="font-pixel text-[7px] text-gray-500">
+              <span className="font-pixel text-[8px] text-gray-500">
                 ({messages.length})
               </span>
             )}
@@ -136,36 +121,29 @@ export default function BrainstormPanel() {
             className="w-2 h-2 rounded-full"
             style={{ backgroundColor: teamColor }}
           />
-          <h3 className="font-pixel text-[10px] text-game-green">
+          <h3 className="font-pixel text-xs text-game-green">
             TEAM CHAT
           </h3>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="font-pixel text-[7px] text-gray-500">
-            {isMyTurn
-              ? "CHAT WHILE OTHERS BUILD"
-              : "SUGGEST IDEAS FOR YOUR TEAM"}
-          </span>
-          <button
-            onClick={() => setIsCollapsed(true)}
-            className="p-0.5 hover:bg-game-blue/20 rounded transition-colors"
-            title="Collapse chat"
+        <button
+          onClick={() => setIsCollapsed(true)}
+          className="p-0.5 hover:bg-game-blue/20 rounded transition-colors"
+          title="Collapse chat"
+        >
+          <svg
+            className="w-3.5 h-3.5 text-gray-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
           >
-            <svg
-              className="w-3.5 h-3.5 text-gray-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-          </button>
-        </div>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </button>
       </div>
 
       {/* Messages + Input */}
@@ -174,17 +152,14 @@ export default function BrainstormPanel() {
         <div className="flex-1 bg-game-dark border-2 border-game-blue/40 rounded p-2 overflow-y-auto">
           {messages.length === 0 ? (
             <p className="text-gray-600 text-xs italic">
-              No messages yet. Start brainstorming with your team!
+              Chat with your team here!
             </p>
           ) : (
             <div className="space-y-1.5">
               {messages.map((msg) => (
                 <div key={msg.id} className="flex items-start gap-1.5">
-                  <span className="font-pixel text-[6px] text-gray-600 mt-0.5 flex-shrink-0">
-                    {formatTimestamp(msg.timestamp)}
-                  </span>
                   <span
-                    className="font-pixel text-[7px] flex-shrink-0"
+                    className="font-pixel text-[8px] flex-shrink-0"
                     style={{
                       color:
                         msg.playerId === playerId ? teamColor : "#9ca3af",
@@ -220,7 +195,7 @@ export default function BrainstormPanel() {
             onClick={handleSend}
             disabled={!inputText.trim()}
             className={`
-              font-pixel text-[8px] py-2 px-3 rounded border-2 transition-all
+              font-pixel text-[10px] py-2 px-3 rounded border-2 transition-all
               ${
                 inputText.trim()
                   ? "bg-game-green/20 border-game-green text-game-green hover:bg-game-green/30 hover:shadow-[0_0_8px_rgba(22,199,154,0.2)]"

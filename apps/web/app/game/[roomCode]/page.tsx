@@ -166,9 +166,7 @@ export default function GamePage() {
         {/* Main Content */}
         <div className="flex-1 flex overflow-hidden">
           {/* Left Sidebar - Component Palette */}
-          <aside className="w-72 border-r-3 border-game-blue bg-game-dark/80 overflow-hidden">
-            <ComponentPalette />
-          </aside>
+          <ComponentPalette />
 
           {/* Center - Canvas + Brainstorm */}
           <main className="flex-1 flex flex-col overflow-hidden">
@@ -179,9 +177,7 @@ export default function GamePage() {
           </main>
 
           {/* Right Sidebar - Team Info */}
-          <aside className="w-60 border-l-3 border-game-blue bg-game-dark/80 overflow-auto">
-            <TeamSidebar />
-          </aside>
+          <TeamSidebar />
         </div>
       </div>
 
