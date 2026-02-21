@@ -157,8 +157,12 @@ export function handleTurnEvents(io: Server, socket: Socket): void {
 
     room.phase = "playing";
 
-    // Save game to DB
-    saveGame(room);
+    // Save game to DB (non-blocking - don't let DB errors prevent game from starting)
+    try {
+      saveGame(room);
+    } catch (err) {
+      console.error("Failed to save game to DB (game will continue):", err);
+    }
 
     // Broadcast game started
     io.to(roomCode).emit(SERVER_EVENTS.GAME_STARTED, room.gameState);

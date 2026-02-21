@@ -168,6 +168,72 @@ export function handleRoomEvents(io: Server, socket: Socket): void {
     io.to(payload.roomCode).emit(SERVER_EVENTS.ROOM_STATE, room);
   });
 
+  // room:rejoin - Reconnecting client re-associates with their room
+  socket.on(
+    CLIENT_EVENTS.ROOM_REJOIN,
+    (payload: { roomCode: string; playerId: string }, callback) => {
+      const room = rooms.get(payload.roomCode);
+      if (!room) {
+        callback?.({ success: false, error: "Room not found" });
+        return;
+      }
+
+      const oldPlayerId = payload.playerId;
+      const newSocketId = socket.id;
+
+      // Find the player by their old ID
+      const player = room.players[oldPlayerId];
+      if (!player) {
+        callback?.({ success: false, error: "Player not found in room" });
+        return;
+      }
+
+      // Update player entry with new socket ID
+      if (oldPlayerId !== newSocketId) {
+        player.id = newSocketId;
+        player.connected = true;
+        delete room.players[oldPlayerId];
+        room.players[newSocketId] = player;
+
+        // Update host ID if this was the host
+        if (room.hostId === oldPlayerId) {
+          room.hostId = newSocketId;
+        }
+
+        // Update team member references
+        if (player.teamId && room.teams[player.teamId]) {
+          const team = room.teams[player.teamId];
+          const memberIdx = team.members.indexOf(oldPlayerId);
+          if (memberIdx !== -1) {
+            team.members[memberIdx] = newSocketId;
+          }
+        }
+
+        // Update active player IDs in game state if game is in progress
+        if (room.gameState?.currentTurn?.activePlayerIds) {
+          for (const [teamId, activeId] of Object.entries(room.gameState.currentTurn.activePlayerIds)) {
+            if (activeId === oldPlayerId) {
+              room.gameState.currentTurn.activePlayerIds[teamId] = newSocketId;
+            }
+          }
+        }
+      } else {
+        player.connected = true;
+      }
+
+      // Re-join the socket.io room and store room code
+      socket.join(payload.roomCode);
+      (socket as any).roomCode = payload.roomCode;
+      (socket as any).playerId = newSocketId;
+
+      // Send current room state back
+      callback?.({ success: true, room, playerId: newSocketId });
+
+      // Broadcast updated room state to all
+      io.to(payload.roomCode).emit(SERVER_EVENTS.ROOM_STATE, room);
+    }
+  );
+
   // Handle disconnection
   socket.on("disconnect", () => {
     const roomCode = (socket as any).roomCode;

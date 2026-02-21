@@ -6,6 +6,7 @@
 export const CLIENT_EVENTS = {
   ROOM_CREATE: "room:create",
   ROOM_JOIN: "room:join",
+  ROOM_REJOIN: "room:rejoin",
   GAME_START: "game:start",
   DECISION_SUBMIT: "decision:submit",
   TURN_SUBMIT: "turn:submit",

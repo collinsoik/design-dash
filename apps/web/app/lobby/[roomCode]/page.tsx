@@ -25,6 +25,8 @@ export default function LobbyPage() {
   const { room, playerId, setRoom, setPlayerId } = useGameStore();
   const [dots, setDots] = useState("");
   const [showBriefing, setShowBriefing] = useState(true);
+  const [startError, setStartError] = useState<string | null>(null);
+  const [isStarting, setIsStarting] = useState(false);
 
   const isHost = room?.hostId === playerId;
 
@@ -52,7 +54,37 @@ export default function LobbyPage() {
           }
         }
       );
+    } else if (playerId) {
+      // Already have a playerId - rejoin to re-associate socket with room
+      socket.emit(
+        CLIENT_EVENTS.ROOM_REJOIN,
+        { roomCode, playerId },
+        (response: { success: boolean; room?: Room; playerId?: string; error?: string }) => {
+          if (response.success && response.room) {
+            setRoom(response.room);
+            if (response.playerId) setPlayerId(response.playerId);
+          }
+        }
+      );
     }
+
+    // Handle reconnection - re-associate with room using stored playerId
+    const onReconnect = () => {
+      const currentPlayerId = useGameStore.getState().playerId;
+      if (currentPlayerId) {
+        socket.emit(
+          CLIENT_EVENTS.ROOM_REJOIN,
+          { roomCode, playerId: currentPlayerId },
+          (response: { success: boolean; room?: Room; playerId?: string }) => {
+            if (response.success && response.room) {
+              setRoom(response.room);
+              if (response.playerId) setPlayerId(response.playerId);
+            }
+          }
+        );
+      }
+    };
+    socket.on("connect", onReconnect);
 
     // Listen for room updates
     socket.on(SERVER_EVENTS.ROOM_STATE, (roomData: Room) => {
@@ -65,6 +97,7 @@ export default function LobbyPage() {
     });
 
     return () => {
+      socket.off("connect", onReconnect);
       socket.off(SERVER_EVENTS.ROOM_STATE);
       socket.off(SERVER_EVENTS.GAME_STARTED);
     };
@@ -75,10 +108,24 @@ export default function LobbyPage() {
   const totalPlayers = Object.values(players).filter((p) => !p.isHost).length;
 
   function handleStart() {
+    setStartError(null);
+    setIsStarting(true);
+
     const socket = getSocket();
+
+    // Timeout if server doesn't respond within 8 seconds
+    const timeout = setTimeout(() => {
+      setStartError("Server did not respond. Please try again.");
+      setIsStarting(false);
+    }, 8000);
+
     socket.emit(CLIENT_EVENTS.GAME_START, null, (response: { success: boolean; error?: string }) => {
+      clearTimeout(timeout);
       if (response.success) {
         router.push(`/game/${roomCode}`);
+      } else {
+        setStartError(response.error || "Failed to start game");
+        setIsStarting(false);
       }
     });
   }
@@ -186,12 +233,17 @@ export default function LobbyPage() {
 
         {isHost ? (
           <div>
+            {startError && (
+              <p className="font-pixel text-[10px] text-game-red mb-3">
+                {startError}
+              </p>
+            )}
             <button
               onClick={handleStart}
-              disabled={!canStart}
+              disabled={!canStart || isStarting}
               className="pixel-btn-green text-sm px-10 py-4 disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              START GAME
+              {isStarting ? "STARTING..." : "START GAME"}
             </button>
             {!canStart && (
               <p className="font-pixel text-[8px] text-gray-500 mt-3">
