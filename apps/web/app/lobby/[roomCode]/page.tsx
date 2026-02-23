@@ -63,9 +63,17 @@ export default function LobbyPage() {
           if (response.success && response.room) {
             setRoom(response.room);
             if (response.playerId) setPlayerId(response.playerId);
+          } else {
+            // Stale playerId from previous game — clear state and redirect
+            useGameStore.getState().reset();
+            router.push("/");
           }
         }
       );
+    } else if (!playerName) {
+      // No identity at all — redirect to landing
+      router.push("/");
+      return;
     }
 
     // Handle reconnection - re-associate with room using stored playerId

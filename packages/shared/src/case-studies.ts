@@ -182,7 +182,7 @@ export const CASE_STUDIES: CaseStudy[] = [
         scenarioText:
           "Alex just downloaded Melodify. What should the onboarding flow look like?",
         context:
-          "Current onboarding asks users to pick 5 artists from 50. Only 40% finish. Users who skip have 3x higher churn.",
+          "Current onboarding asks users to pick 5 artists from 50. Only 40% finish. Users who skip have 3x higher churn (users who stop using the app).",
         choices: [
           {
             id: "quick-listen",

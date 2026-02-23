@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { connectSocket } from "@/lib/socket";
+import { connectSocket, disconnectSocket } from "@/lib/socket";
 import { useGameStore } from "@/lib/game-store";
 import { CASE_STUDIES, CLIENT_EVENTS } from "@design-dash/shared";
 import CaseStudyBriefing from "@/components/tutorial/CaseStudyBriefing";
@@ -25,6 +25,12 @@ export default function HostPage() {
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showBriefing, setShowBriefing] = useState(false);
+
+  // Reset previous game state on mount (defense-in-depth for direct /host navigation)
+  useEffect(() => {
+    useGameStore.getState().reset();
+    disconnectSocket();
+  }, []);
 
   function handleCreate() {
     if (!selectedCaseStudy) return;

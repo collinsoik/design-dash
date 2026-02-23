@@ -19,7 +19,7 @@ const rooms = new Map<string, Room>();
 
 function generateRoomCode(): string {
   const num = Math.floor(1000 + Math.random() * 9000);
-  return `DASH-${num}`;
+  return `${num}`;
 }
 
 // Ensure unique code
@@ -84,6 +84,13 @@ export function handleRoomEvents(io: Server, socket: Socket): void {
       };
 
       rooms.set(code, room);
+
+      // Leave any previous rooms (defense-in-depth for Play Again)
+      for (const existingRoom of socket.rooms) {
+        if (existingRoom !== socket.id) {
+          socket.leave(existingRoom);
+        }
+      }
       socket.join(code);
 
       // Store room code on socket for later reference
@@ -148,6 +155,12 @@ export function handleRoomEvents(io: Server, socket: Socket): void {
     room.players[socket.id] = player;
     targetTeam.members.push(socket.id);
 
+    // Leave any previous rooms (defense-in-depth for Play Again)
+    for (const existingRoom of socket.rooms) {
+      if (existingRoom !== socket.id) {
+        socket.leave(existingRoom);
+      }
+    }
     socket.join(payload.roomCode);
     (socket as any).roomCode = payload.roomCode;
     (socket as any).playerId = socket.id;
@@ -221,6 +234,12 @@ export function handleRoomEvents(io: Server, socket: Socket): void {
         player.connected = true;
       }
 
+      // Leave any previous rooms (defense-in-depth for Play Again)
+      for (const existingRoom of socket.rooms) {
+        if (existingRoom !== socket.id) {
+          socket.leave(existingRoom);
+        }
+      }
       // Re-join the socket.io room and store room code
       socket.join(payload.roomCode);
       (socket as any).roomCode = payload.roomCode;

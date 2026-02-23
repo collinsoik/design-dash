@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import HowToPlay from "@/components/tutorial/HowToPlay";
+import { useGameStore } from "@/lib/game-store";
+import { disconnectSocket } from "@/lib/socket";
 
 export default function LandingPage() {
   const router = useRouter();
@@ -12,17 +14,23 @@ export default function LandingPage() {
   const [isJoining, setIsJoining] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
 
+  // Reset previous game state when landing page mounts (e.g. after "Play Again")
+  useEffect(() => {
+    useGameStore.getState().reset();
+    disconnectSocket();
+  }, []);
+
   function handleRoomCodeChange(value: string) {
-    // Auto-format: uppercase, max 8 chars, insert dash after DASH
-    const cleaned = value.toUpperCase().replace(/[^A-Z0-9-]/g, "");
-    if (cleaned.length <= 9) {
+    // Only allow digits, max 4 chars
+    const cleaned = value.replace(/[^0-9]/g, "");
+    if (cleaned.length <= 4) {
       setRoomCode(cleaned);
     }
   }
 
   function handleJoin(e: FormEvent) {
     e.preventDefault();
-    if (!roomCode.trim() || !playerName.trim()) return;
+    if (roomCode.trim().length !== 4 || !playerName.trim()) return;
 
     setIsJoining(true);
     const encodedName = encodeURIComponent(playerName.trim());
@@ -57,9 +65,9 @@ export default function LandingPage() {
                 type="text"
                 value={roomCode}
                 onChange={(e) => handleRoomCodeChange(e.target.value)}
-                placeholder="DASH-XXXX"
-                maxLength={9}
-                className="input font-mono uppercase tracking-widest"
+                placeholder="1234"
+                maxLength={4}
+                className="input font-mono tracking-widest"
               />
             </div>
             <div>
@@ -77,7 +85,7 @@ export default function LandingPage() {
             </div>
             <button
               type="submit"
-              disabled={!roomCode.trim() || !playerName.trim() || isJoining}
+              disabled={roomCode.trim().length !== 4 || !playerName.trim() || isJoining}
               className="w-full btn-primary disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {isJoining ? "Joining..." : "Join"}
