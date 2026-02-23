@@ -26,7 +26,7 @@ DesignDash is a multiplayer design challenge game with a **Vercel frontend** and
 
 The backend runs in **Docker** with `restart: unless-stopped`, meaning it auto-restarts on crash and survives reboots (Docker daemon starts on boot).
 
-**Docker Compose:** `/home/collin/design-dash/server/docker-compose.yml`
+**Docker Compose:** `/home/collin/design-dash/apps/server/docker-compose.yml`
 
 **Common commands:**
 
@@ -35,9 +35,9 @@ The backend runs in **Docker** with `restart: unless-stopped`, meaning it auto-r
 | View status | `docker ps` (look for `server-game-server-1`) |
 | View logs | `docker logs server-game-server-1` |
 | Tail logs | `docker logs -f server-game-server-1` |
-| Restart | `cd /home/collin/design-dash/server && docker compose restart` |
-| Rebuild + restart | `cd /home/collin/design-dash/server && docker compose up -d --build` |
-| Stop | `cd /home/collin/design-dash/server && docker compose down` |
+| Restart | `cd /home/collin/design-dash/apps/server && docker compose restart` |
+| Rebuild + restart | `cd /home/collin/design-dash/apps/server && docker compose up -d --build` |
+| Stop | `cd /home/collin/design-dash/apps/server && docker compose down` |
 
 ## Environment
 
@@ -95,7 +95,7 @@ No PM2 involvement — this project uses Docker exclusively.
 4. `curl http://localhost:3002/health` — can the server respond locally?
 
 **Container not starting:**
-- `docker compose logs` from the `server/` directory
+- `docker compose logs` from the `apps/server/` directory
 - Check if port 3002 is already in use: `lsof -i :3002`
 - Rebuild: `docker compose up -d --build`
 
