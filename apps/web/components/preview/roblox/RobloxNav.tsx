@@ -44,7 +44,7 @@ const tabs = [
 
 export default function RobloxNav() {
   return (
-    <div className="flex items-center justify-around bg-[#1a1c1e] py-1 mt-auto shrink-0 -mx-1.5 px-1.5">
+    <div className="flex items-center justify-around bg-[#1a1c1e] py-1 mt-auto shrink-0 -mx-1.5 px-1.5 -mb-1">
       {tabs.map((tab) => (
         <div key={tab.type} className="flex flex-col items-center gap-px">
           <NavIcon type={tab.type} />

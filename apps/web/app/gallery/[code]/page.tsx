@@ -353,6 +353,7 @@ export default function GalleryPage() {
               <PhoneFrame
                 teamColor={teamColor}
                 productName={caseStudy.productName}
+                dark={caseStudy.id === "roblox"}
               >
                 <ProductPreview
                   caseStudyId={caseStudy.id}

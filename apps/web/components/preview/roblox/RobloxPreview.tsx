@@ -18,7 +18,7 @@ export default function RobloxPreview({ decisions }: RobloxPreviewProps) {
   const creatorVariant = (creatorDecision?.branchId as "creator-spotlight" | "boost-system" | "creator-mentorship") ?? null;
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 bg-[#232527] -mx-1.5 px-1.5">
+    <div className="flex flex-col flex-1 min-h-0">
       {/* Roblox header */}
       <div className="flex items-center justify-between py-1 shrink-0">
         <p className="text-[6px] font-extrabold tracking-wider text-white">ROBLOX</p>
