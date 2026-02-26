@@ -1,414 +1,517 @@
 import { CaseStudy } from "./types";
 
+export const DESIGN_PHASES = [
+  { name: "Empathize", description: "Understand the user and their problems", color: "rose" },
+  { name: "Define", description: "Define the specific problem to solve", color: "amber" },
+  { name: "Ideate", description: "Brainstorm creative solutions", color: "emerald" },
+  { name: "Prototype", description: "Design your solution", color: "blue" },
+  { name: "Test", description: "Plan how to test your design", color: "violet" },
+] as const;
+
 export const CASE_STUDIES: CaseStudy[] = [
   {
     id: "spotify",
     productName: "Spotify",
     productType: "Music Streaming App",
     shortDescription:
-      "Redesign Spotify's mobile experience to reduce churn and boost engagement.",
+      "Redesign Spotify so people love using it even more.",
     story:
-      "Spotify's mobile app has 600 million users, but engagement is plateauing and younger users are drifting to TikTok for music discovery. Your team will make the key UX decisions for a major app redesign.",
+      "Spotify is a music app with millions of users, but some people are getting bored and switching to other apps like TikTok to find new songs. Your team gets to decide how to redesign the app so people have more fun using it!",
     persona: {
       name: "Alex Chen",
-      age: 28,
-      occupation: "Marketing Coordinator",
-      bio: "Casual listener who uses music during commutes and workouts. Wants music that fits the moment, not endless browsing.",
+      age: 22,
+      occupation: "College Student",
+      bio: "Alex listens to music while walking to class and working out. They want to find the right song fast without scrolling forever.",
       goals: [
-        "Find music matching their activity",
-        "Discover new songs effortlessly",
-        "Simple, clean interface",
+        "Find music that matches what they're doing",
+        "Discover cool new songs easily",
+        "Keep the app simple and not confusing",
       ],
     },
     decisions: [
+      // ── EMPATHIZE ──────────────────────────────
       {
         id: "spotify-home-layout",
         order: 0,
         round: 0,
         type: "branching_path",
         scenarioText:
-          "Alex opens Spotify after updating. What should the redesigned home screen prioritize?",
+          "Alex opens Spotify. What should they see first on the home screen?",
         context:
-          "60% of users replay the same 20 songs. 25% explore weekly. The current home is a mix of recently played and generic playlists.",
+          "Most people listen to the same songs over and over. Only about 1 out of 4 people look for new music each week. The home screen right now is kind of boring and the same for everyone.",
         branches: [
           {
             id: "activity-based",
-            label: "Activity-Based Home",
+            label: "What Are You Doing?",
             description:
-              "Contextual suggestions by time of day and activity. Minimal browsing needed.",
+              "Show music based on what Alex is doing right now — walking, studying, exercising, or relaxing.",
             followUp: {
               scenarioText:
-                "How should Spotify detect Alex's current activity?",
+                "How should Spotify figure out what Alex is doing?",
               choices: [
                 {
                   id: "time-based",
-                  label: "Time of Day",
+                  label: "Check the Time",
                   description:
-                    "Use time patterns — morning commute, afternoon focus, evening wind-down.",
+                    "Use the time of day — morning means commute music, evening means chill music.",
                 },
                 {
                   id: "motion-sensors",
-                  label: "Phone Sensors",
+                  label: "Use the Phone's Sensors",
                   description:
-                    "Detect walking, driving, or sitting still using phone motion sensors.",
+                    "The phone can tell if Alex is walking, in a car, or sitting still.",
                 },
                 {
                   id: "manual-modes",
-                  label: "Manual Activity Modes",
+                  label: "Let Alex Pick",
                   description:
-                    "Let Alex tap their current activity: Commute, Work, Gym, Chill.",
+                    "Show buttons like \"Studying\", \"Workout\", \"Hanging Out\" that Alex can tap.",
                 },
               ],
             },
           },
           {
             id: "social-feed",
-            label: "Social Feed Home",
+            label: "What Friends Are Listening To",
             description:
-              "Friends' listening, trending tracks, and collaborative playlists up front.",
+              "Show what Alex's friends are playing right now, plus popular songs everyone likes.",
             followUp: {
               scenarioText:
-                "How should Spotify handle privacy in the social feed?",
+                "Should Alex's friends be able to see what Alex is listening to?",
               choices: [
                 {
                   id: "opt-in",
-                  label: "Opt-In Sharing",
+                  label: "Only If Alex Says OK",
                   description:
-                    "Nothing shared by default. Users choose what friends can see.",
+                    "Alex has to turn on sharing first. Nothing is shared until they choose to.",
                 },
                 {
                   id: "public-default",
-                  label: "Public by Default",
+                  label: "Shared Automatically",
                   description:
-                    "Listening activity visible to friends unless turned off.",
+                    "Friends can see what Alex listens to unless Alex turns it off.",
                 },
                 {
                   id: "anonymous-trends",
-                  label: "Anonymous Trends",
+                  label: "Keep It Secret",
                   description:
-                    "Show what's trending among friends without revealing who listened to what.",
+                    "Show what songs are popular with friends, but don't say who listened to what.",
                 },
               ],
             },
           },
           {
             id: "discovery-engine",
-            label: "Discovery Engine Home",
+            label: "Songs Picked Just For You",
             description:
-              "AI-curated daily mixes and personalized new releases dominate the screen.",
+              "The app uses a smart computer to pick songs it thinks Alex will love based on what they've listened to before.",
             followUp: {
               scenarioText:
-                "How aggressive should the AI be in pushing new music?",
+                "How many new songs should the app suggest vs. songs Alex already knows?",
               choices: [
                 {
                   id: "gentle-mix",
-                  label: "80/20 Familiar/New",
+                  label: "Mostly Favorites",
                   description:
-                    "Mostly familiar favorites with 20% new discoveries mixed in.",
+                    "80% songs Alex already likes, 20% new songs to try.",
                 },
                 {
                   id: "bold-discovery",
-                  label: "50/50 Split",
+                  label: "Half and Half",
                   description:
-                    "Half familiar, half new. Push users out of their comfort zone.",
+                    "50% familiar songs, 50% brand new ones. More surprises!",
                 },
                 {
                   id: "user-control",
-                  label: "Discovery Dial",
+                  label: "Alex Decides",
                   description:
-                    "Let Alex set their own familiar-vs-new ratio with a slider.",
+                    "A slider lets Alex choose how many new songs vs. favorites they want.",
                 },
               ],
             },
           },
         ],
       },
+      // ── DEFINE ──────────────────────────────
       {
         id: "spotify-nav-complexity",
         order: 1,
-        round: 0,
+        round: 1,
         type: "branching_path",
         scenarioText:
-          "How should Spotify's navigation be redesigned?",
+          "How should the buttons at the bottom of the app be set up?",
         context:
-          "Power users want more features accessible. Casual users say the app feels cluttered. The current 3-tab layout hides popular features.",
+          "Right now the app has 3 buttons at the bottom: Home, Search, and Library. Some people want more buttons so they can find things faster. Other people think more buttons make it confusing.",
         branches: [
           {
             id: "minimal-nav",
-            label: "Minimal (3 Tabs)",
+            label: "Keep It Simple (3 Buttons)",
             description:
-              "Home, Search, Library. Clean and simple. Everything else in menus.",
+              "Just Home, Search, and Library. Clean and easy. Other features are hidden in menus.",
             followUp: {
               scenarioText:
-                "Where should hidden features like Radio and Podcasts live?",
+                "Where should the hidden features go, like Radio and Podcasts?",
               choices: [
                 {
                   id: "search-subtabs",
-                  label: "Under Search",
+                  label: "Inside Search",
                   description:
-                    "Search tab expands into Browse, Radio, Podcasts sub-sections.",
+                    "When you tap Search, you can also find Radio and Podcasts there.",
                 },
                 {
                   id: "home-cards",
-                  label: "Home Screen Cards",
+                  label: "On the Home Screen",
                   description:
-                    "Promoted as cards on the home screen based on usage.",
+                    "Show them as cards on the home page that you can scroll to.",
                 },
                 {
                   id: "long-press",
-                  label: "Long-Press Menu",
+                  label: "Hold Down a Button",
                   description:
-                    "Long-press the search icon for a quick-access menu of all features.",
+                    "Press and hold the Search button to see a menu with all the extra features.",
                 },
               ],
             },
           },
           {
             id: "balanced-nav",
-            label: "Balanced (5 Tabs)",
+            label: "More Buttons (5 Buttons)",
             description:
-              "Home, Search, Radio, Library, Profile. Everything one tap away.",
+              "Home, Search, Radio, Library, and Profile. Everything is one tap away.",
             followUp: {
-              scenarioText: "5 tabs is a lot for small screens. How do you keep it clean?",
+              scenarioText: "5 buttons takes up a lot of space on the screen. How do you keep it looking clean?",
               choices: [
                 {
                   id: "icon-only",
-                  label: "Icons Only",
+                  label: "Pictures Only",
                   description:
-                    "No text labels — just recognizable icons to save space.",
+                    "Just show the little pictures (icons), no words underneath. Saves space.",
                 },
                 {
                   id: "active-label",
-                  label: "Active Tab Label",
+                  label: "Only Label the One You're On",
                   description:
-                    "Only the selected tab shows its text label. Others are icons only.",
+                    "The button you tapped shows its name. The others just show pictures.",
                 },
                 {
                   id: "scrollable",
-                  label: "Scrollable Tab Bar",
+                  label: "Scroll Sideways",
                   description:
-                    "Horizontally scrollable bar showing 4 tabs at a time.",
+                    "You can swipe the bottom bar left and right to see more buttons.",
                 },
               ],
             },
           },
           {
             id: "adaptive-nav",
-            label: "Adaptive Navigation",
+            label: "Smart Buttons (Changes for You)",
             description:
-              "Nav changes based on usage patterns — shows Alex's most-used features.",
+              "The buttons change based on what Alex uses most. If Alex never uses Radio, it disappears and something else takes its place.",
             followUp: {
               scenarioText:
-                "What if the adaptive nav confuses Alex when tabs change?",
+                "What if the buttons keep changing and Alex gets confused?",
               choices: [
                 {
                   id: "pin-favorites",
-                  label: "Pin Favorites",
+                  label: "Pin Your Favorites",
                   description:
-                    "Alex pins their top 3 tabs. 4th slot rotates based on context.",
+                    "Alex picks their top 3 buttons. Only the 4th one changes based on what they do.",
                 },
                 {
                   id: "animation-hint",
-                  label: "Animated Transitions",
+                  label: "Show the Change",
                   description:
-                    "When tabs change, animate them so Alex sees what moved.",
+                    "When a button changes, it slides over with an animation so Alex notices.",
                 },
                 {
                   id: "learn-slowly",
-                  label: "Slow Learning",
+                  label: "Change Slowly",
                   description:
-                    "Only change after 2 weeks of consistent behavior. Very stable.",
+                    "Only change after 2 weeks of Alex using the app the same way. Very stable.",
                 },
               ],
             },
           },
         ],
       },
+      // ── IDEATE ──────────────────────────────
       {
         id: "spotify-social",
         order: 2,
-        round: 1,
+        round: 2,
         type: "branching_path",
         scenarioText:
-          "Spotify wants to add deeper social features to compete with TikTok. What direction?",
+          "Spotify wants to add ways for friends to share music together. What should they do?",
         context:
-          "Users 18-24 discover music on TikTok more than Spotify. Spotify Wrapped goes viral annually — social clearly resonates, but daily social features haven't stuck.",
+          "A lot of young people find new music on TikTok instead of Spotify. Spotify Wrapped (the year-end music summary) goes viral every year, so people clearly like sharing music. But adding social features to a music app is tricky.",
         branches: [
           {
             id: "passive-social",
-            label: "Passive Social",
+            label: "Quiet Sharing",
             description:
-              "Show friends' listening activity and shared taste scores. No messaging.",
+              "Just show what friends are listening to. No messages or comments — keep it simple.",
             followUp: {
-              scenarioText: "Where should passive social data appear?",
+              scenarioText: "Where should you see what friends are listening to?",
               choices: [
                 {
                   id: "home-widget",
-                  label: "Home Screen Widget",
+                  label: "Small Box on Home Screen",
                   description:
-                    'A small "Friends Listening" card on the home screen.',
+                    "A little card on the home page that says \"Friends are listening to...\"",
                 },
                 {
                   id: "dedicated-tab",
-                  label: "Dedicated Activity Tab",
+                  label: "Its Own Page",
                   description:
-                    "Separate tab showing all friend activity in a feed.",
+                    "A separate page just for seeing all your friends' music activity.",
                 },
                 {
                   id: "inline-tracks",
-                  label: "Inline on Tracks",
+                  label: "Friend Faces on Songs",
                   description:
-                    "Friend avatars on tracks they've listened to.",
+                    "When you see a song, tiny friend profile pictures show up if they listened to it.",
                 },
               ],
             },
           },
           {
             id: "active-social",
-            label: "Active Social",
+            label: "Full Social Features",
             description:
-              "Full social: collaborative playlists, song comments, sharing, and listening parties.",
+              "Let friends make playlists together, comment on songs, share music, and even listen together at the same time.",
             followUp: {
               scenarioText:
-                "How do you roll out active social without overwhelming existing users?",
+                "Some people might not want all these social features. How do you handle that?",
               choices: [
                 {
                   id: "opt-in-gradual",
-                  label: "Gradual Opt-In",
+                  label: "Start with It Hidden",
                   description:
-                    "Social hidden by default. Prompt to enable after 2 weeks.",
+                    "Social features are off at first. After 2 weeks, ask if Alex wants to turn them on.",
                 },
                 {
                   id: "onboarding-choice",
-                  label: "Onboarding Choice",
+                  label: "Ask at the Start",
                   description:
-                    'Ask users to pick "Social" or "Solo" mode during setup.',
+                    "When Alex first opens the app, ask: \"Do you want Social mode or Solo mode?\"",
                 },
                 {
                   id: "always-on",
-                  label: "Always On",
+                  label: "Turn It On for Everyone",
                   description:
-                    "Social enabled for everyone. Users can mute if they want.",
+                    "Everyone gets social features. If you don't like it, you can turn it off yourself.",
                 },
               ],
             },
           },
           {
             id: "no-social",
-            label: "Skip Social Entirely",
+            label: "Skip Social Stuff",
             description:
-              "Focus on audio quality, better recommendations, and offline features instead.",
+              "Don't add social features. Instead, make the music sound better and the recommendations smarter.",
             followUp: {
               scenarioText:
-                "What should Spotify invest in to differentiate instead?",
+                "If no social features, what should Spotify spend time building instead?",
               choices: [
                 {
                   id: "ai-dj",
-                  label: "AI DJ Mode",
+                  label: "AI DJ",
                   description:
-                    "AI creates seamless transitions between songs like a real DJ.",
+                    "A smart DJ that blends songs together smoothly, like a real DJ at a party.",
                 },
                 {
                   id: "lossless-audio",
-                  label: "Lossless Audio Focus",
+                  label: "Amazing Sound Quality",
                   description:
-                    "Market-leading audio quality with device-specific tuning.",
+                    "Make the music sound way better than any other app. Super clear and crisp.",
                 },
                 {
                   id: "mood-engine",
-                  label: "Mood Engine",
+                  label: "Mood Music",
                   description:
-                    "Detect mood from phone sensors, play matching music automatically.",
+                    "The app figures out your mood and plays music that matches how you're feeling.",
                 },
               ],
             },
           },
         ],
       },
+      // ── PROTOTYPE ──────────────────────────────
       {
         id: "spotify-onboarding",
         order: 3,
-        round: 2,
+        round: 3,
         type: "branching_path",
         scenarioText:
-          "Alex just re-downloaded Spotify after a break. What should the re-onboarding flow look like?",
+          "Alex just downloaded Spotify for the first time. What should happen when they open it?",
         context:
-          "30% of churned users re-download within 6 months. Current re-onboarding treats them like new users. Re-downloaded users who see irrelevant recommendations churn again 2x faster.",
+          "Right now, new users are asked to pick 5 artists from a huge list of 50. Only 4 out of 10 people finish doing it. People who skip this step are 3 times more likely to delete the app later because the song suggestions aren't good.",
         branches: [
           {
             id: "quick-listen",
-            label: "Quick Listen Test",
+            label: "Quick Music Quiz",
             description:
-              "Play 10-second clips, user taps thumbs up/down. 60 seconds, feels fun.",
+              "Play short clips of songs and Alex taps thumbs up or thumbs down. Takes about 60 seconds and feels like a game!",
             followUp: {
-              scenarioText: "How many clips should Alex hear before getting recommendations?",
+              scenarioText: "How many song clips should Alex hear before getting recommendations?",
               choices: [
                 {
                   id: "five-clips",
-                  label: "5 Clips (30 sec)",
-                  description: "Quick and painless. Enough for a rough profile.",
+                  label: "5 Songs (30 seconds)",
+                  description: "Quick and easy. Good enough to get started.",
                 },
                 {
                   id: "ten-clips",
-                  label: "10 Clips (60 sec)",
-                  description: "Better accuracy. Still fast enough to feel fun.",
+                  label: "10 Songs (1 minute)",
+                  description: "A little longer but the recommendations will be much better.",
                 },
                 {
                   id: "adaptive-count",
-                  label: "Adaptive",
-                  description: "Keep going until the AI is confident. Could be 5 or 20.",
+                  label: "Keep Going Until It's Good",
+                  description: "The app keeps playing clips until it's confident it knows what Alex likes.",
                 },
               ],
             },
           },
           {
             id: "welcome-back",
-            label: "Welcome Back Flow",
+            label: "Tell Us About You",
             description:
-              "Restore old library and ask what changed. \"Still into jazz? Discovered any new genres?\"",
+              "Ask Alex a few quick questions: \"What kind of music do you like? What changed recently?\"",
             followUp: {
-              scenarioText: "How should Spotify handle Alex's old playlists?",
+              scenarioText: "What if Alex already has playlists from another music app?",
               choices: [
                 {
                   id: "restore-all",
-                  label: "Restore Everything",
-                  description: "Bring back all old playlists and follows immediately.",
+                  label: "Bring Everything Over",
+                  description: "Copy all their old playlists and favorites from the other app.",
                 },
                 {
                   id: "selective-restore",
-                  label: "Pick What to Keep",
-                  description: "Show old playlists and let Alex choose what to restore.",
+                  label: "Let Alex Pick What to Keep",
+                  description: "Show the old playlists and let Alex choose which ones to bring over.",
                 },
                 {
                   id: "fresh-start-option",
-                  label: "Fresh Start Option",
-                  description: "Offer a clean slate alongside the option to restore.",
+                  label: "Fresh Start",
+                  description: "Give Alex the choice: start fresh or bring over old stuff.",
                 },
               ],
             },
           },
           {
             id: "skip-and-learn",
-            label: "Skip Everything",
+            label: "Skip — Just Start Playing",
             description:
-              "No onboarding. Start trending, learn preferences from listening over time.",
+              "No questions at all. Start playing popular songs and learn what Alex likes over time.",
             followUp: {
-              scenarioText: "Without onboarding, the first session feels generic. How do you fix that?",
+              scenarioText: "Without asking any questions, the first songs might not be great. How do you fix that?",
               choices: [
                 {
                   id: "trending-local",
-                  label: "Local Trending",
-                  description: "Show what's popular in Alex's city for a personal touch.",
+                  label: "Play What's Popular Nearby",
+                  description: "Play songs that are popular in Alex's city — feels more personal.",
                 },
                 {
                   id: "genre-quick-pick",
-                  label: "Genre Quick Pick",
-                  description: "Show 6 genre bubbles — tap a few to seed recommendations.",
+                  label: "Tap a Few Genres",
+                  description: "Show 6 big bubbles like \"Pop\", \"Hip-Hop\", \"Rock\" — just tap a couple.",
                 },
                 {
                   id: "trust-the-algo",
-                  label: "Trust the Algorithm",
-                  description: "Let global trending play. The AI will figure Alex out within a day.",
+                  label: "Just Play Hits",
+                  description: "Play the most popular songs everywhere. The app will figure Alex out within a day.",
+                },
+              ],
+            },
+          },
+        ],
+      },
+      // ── TEST ──────────────────────────────
+      {
+        id: "spotify-testing",
+        order: 4,
+        round: 4,
+        type: "branching_path",
+        scenarioText:
+          "Before launching the redesign to everyone, how should Spotify test it?",
+        context:
+          "A bad update could make millions of people upset. Spotify needs to make sure the new design actually works better before giving it to everyone. Testing helps catch problems early.",
+        branches: [
+          {
+            id: "ab-test",
+            label: "Show It to Half the Users",
+            description:
+              "Give the new design to half the users and keep the old design for the other half. Compare which group likes theirs more.",
+            followUp: {
+              scenarioText: "How long should the test run before deciding?",
+              choices: [
+                {
+                  id: "one-week",
+                  label: "1 Week",
+                  description: "Quick results. But some people need more time to get used to changes.",
+                },
+                {
+                  id: "one-month",
+                  label: "1 Month",
+                  description: "More accurate. Gives people time to really try the new design.",
+                },
+                {
+                  id: "until-clear",
+                  label: "Until the Data Is Clear",
+                  description: "Keep running until there's a clear winner. Could be short or long.",
+                },
+              ],
+            },
+          },
+          {
+            id: "beta-testers",
+            label: "Ask Volunteers to Try It",
+            description:
+              "Let people sign up to try the new design early and give feedback. Only people who want to test it will see it.",
+            followUp: {
+              scenarioText: "How should testers give feedback?",
+              choices: [
+                {
+                  id: "in-app-survey",
+                  label: "Quick Survey Inside the App",
+                  description: "Pop up a short survey after they've used it for a few days.",
+                },
+                {
+                  id: "feedback-button",
+                  label: "\"Tell Us What You Think\" Button",
+                  description: "A button always visible so testers can share thoughts anytime.",
+                },
+                {
+                  id: "watch-behavior",
+                  label: "Just Watch What They Do",
+                  description: "Don't ask anything. Track what they tap, how long they stay, what they skip.",
+                },
+              ],
+            },
+          },
+          {
+            id: "gradual-rollout",
+            label: "Roll It Out Slowly",
+            description:
+              "Give the new design to 1% of users first, then 10%, then 50%, then everyone. Stop if something goes wrong.",
+            followUp: {
+              scenarioText: "What should make Spotify stop the rollout?",
+              choices: [
+                {
+                  id: "complaints-spike",
+                  label: "Too Many Complaints",
+                  description: "Stop if the number of people contacting support goes up a lot.",
+                },
+                {
+                  id: "usage-drops",
+                  label: "People Use It Less",
+                  description: "Stop if people are opening the app less than before.",
+                },
+                {
+                  id: "auto-monitor",
+                  label: "Computer Watches Everything",
+                  description: "A smart computer watches all the numbers and stops automatically if anything looks bad.",
                 },
               ],
             },
@@ -417,1178 +520,527 @@ export const CASE_STUDIES: CaseStudy[] = [
       },
     ],
     scoringCriteria: [
-      "User-centric decision making",
-      "Consistency across decisions",
-      "Understanding tradeoffs",
-      "Design reasoning quality",
+      "Thinking about what the user needs",
+      "Making choices that work well together",
+      "Understanding the tradeoffs",
+      "Explaining your thinking clearly",
     ],
     difficulty: "beginner",
     learningObjectives: [
-      "Understand how home screen design affects user engagement and retention",
-      "Learn to balance simplicity vs. feature richness in navigation",
-      "Explore the tradeoffs of adding social features to a content app",
-      "See how onboarding design impacts long-term user behavior",
+      "Understand how the home screen affects what people do in the app",
+      "Learn to balance keeping things simple vs. having lots of features",
+      "Think about whether adding friend features makes a music app better or worse",
+      "See how the first experience shapes whether someone keeps using an app",
+      "Learn why testing a design before launching it is important",
     ],
     whatsBroken: [
-      "Home screen is generic — no personalization for different contexts",
-      "Navigation hides popular features from casual users",
-      "No meaningful social features — losing younger users to TikTok",
+      "Home screen is the same for everyone — no personalization",
+      "The buttons at the bottom hide popular features",
+      "No way to share music with friends inside the app",
     ],
     successHints: [
-      "Think about Alex's use case — they want music that fits the moment, not endless browsing",
-      "Consider the 60/25 split: most users replay favorites, but a quarter want discovery",
-      "Social features should match the app's core value — listening — not become a separate social network",
-      "Good onboarding is fast, fun, and gives the algorithm enough signal to personalize immediately",
+      "Think about Alex — they want the right song fast, not endless scrolling",
+      "Most people replay the same songs, but some want to discover new ones. How do you help both?",
+      "Friend features should make the music better, not turn it into a social media app",
+      "If the first experience is boring or hard, people will just delete the app",
+      "Testing helps you fix problems before millions of people see them",
     ],
     designTips: {
       "spotify-home-layout":
-        "The best home screen reduces decision fatigue. What does Alex need at 7:30am vs. 6pm at the gym?",
+        "The best home screen shows you what you need without making you think. What does Alex need in the morning vs. at the gym?",
       "spotify-nav-complexity":
-        "Apps with 3-5 nav items score best on usability, but hiding features hurts discoverability.",
+        "Apps with 3-5 buttons work best. Too few hides stuff. Too many is confusing.",
       "spotify-social":
-        "Social in music works best when it enhances discovery, not distracts from listening.",
+        "Social features in a music app should help you discover songs, not distract from listening.",
       "spotify-onboarding":
-        "Best onboarding balances data collection with user patience. If it's a chore, users skip it.",
+        "The best first experience is fast, fun, and teaches the app what you like right away.",
+      "spotify-testing":
+        "Testing with real people catches problems you'd never think of on your own.",
     },
     funFact:
-      "Did you know? Spotify's Discover Weekly playlist has generated over 2.3 billion hours of listening. Personalization isn't just nice — it's the #1 driver of music app engagement!",
+      "Did you know? Spotify's Discover Weekly playlist has been listened to for over 2.3 billion hours. That's like listening to music non-stop for over 260,000 years!",
   },
   {
     id: "roblox",
     productName: "Roblox",
     productType: "Gaming Platform",
     shortDescription:
-      "Redesign how players discover games and connect with friends on Roblox.",
+      "Redesign how players find games and play with friends on Roblox.",
     story:
-      "Roblox has millions of experiences but players struggle to find games they'll love. 95% of new creator games get fewer than 100 plays. Your team will redesign the discovery and social experience to help players find great games and help creators get noticed.",
+      "Roblox has millions of games, but it's really hard to find the good ones. Most players only play the same popular games over and over. And if you make a game, almost nobody will ever find it. Your team gets to redesign Roblox so players find awesome games and creators get noticed!",
     persona: {
       name: "Maya Torres",
-      age: 14,
-      occupation: "Middle School Student & Game Creator",
-      bio: "Plays Roblox 2 hours daily after school. Has created 3 games in Roblox Studio but none get more than 10 plays. Wants to discover fun new games and get her own creations noticed.",
+      age: 11,
+      occupation: "5th Grader & Game Creator",
+      bio: "Maya plays Roblox every day after school. She's built 3 games in Roblox Studio but nobody plays them. She wants to find cool new games and get people to play the ones she made.",
       goals: [
         "Find fun new games quickly",
-        "Play with friends easily",
-        "Get her own games discovered by players",
+        "Play with friends without it being complicated",
+        "Get people to discover and play her games",
       ],
     },
     decisions: [
-      // ── Round 0 ──────────────────────────────
+      // ── EMPATHIZE ──────────────────────────────
       {
         id: "roblox-home-page",
         order: 0,
         round: 0,
         type: "branching_path",
         scenarioText:
-          "Maya opens Roblox after school. What should the home page show first?",
+          "Maya opens Roblox after school. What should she see first?",
         context:
-          "The current home page shows a wall of game thumbnails sorted by player count. 70% of plays go to the top 50 games. New games get almost zero visibility.",
+          "Right now, the home page shows a wall of game pictures sorted by how many people are playing. The same 50 popular games are always on top. New games almost never show up.",
         branches: [
           {
             id: "trending",
-            label: "Trending Games",
+            label: "What's Hot Right Now",
             description:
-              "Show the most popular games right now with live player counts and activity indicators.",
+              "Show the most popular games right now with how many people are playing each one.",
             followUp: {
               scenarioText:
-                "How should 'trending' be calculated?",
+                "How should Roblox decide which games are \"hot\"?",
               choices: [
                 {
                   id: "player-count",
-                  label: "Pure Player Count",
-                  description: "Most players online right now = most visible. Simple and transparent.",
+                  label: "Most Players = Most Popular",
+                  description: "The games with the most people playing right now go to the top.",
                 },
                 {
                   id: "growth-rate",
-                  label: "Growth Rate",
-                  description: "Games growing fastest in the last hour, even if they're small.",
+                  label: "Growing the Fastest",
+                  description: "Games that are getting more players quickly, even if they're small.",
                 },
                 {
                   id: "editors-picks",
-                  label: "Editor's Picks",
-                  description: "Roblox staff curate a featured games list weekly.",
+                  label: "Roblox Staff Picks",
+                  description: "People who work at Roblox pick the best games to feature each week.",
                 },
               ],
             },
           },
           {
             id: "for-you",
-            label: "For You Feed",
+            label: "Picked Just for Maya",
             description:
-              "AI-personalized feed based on Maya's play history, favorite genres, and time spent.",
+              "The app uses a smart computer to suggest games Maya would probably like, based on what she's played before.",
             followUp: {
               scenarioText:
-                "What should the AI prioritize when recommending games to Maya?",
+                "What should the computer focus on when picking games for Maya?",
               choices: [
                 {
                   id: "similar-played",
-                  label: "Similar to Played",
-                  description: "Recommend games like the ones Maya already plays and enjoys.",
+                  label: "Games Like Ones She Plays",
+                  description: "If Maya likes obbies, show her more obbies and similar games.",
                 },
                 {
                   id: "friends-enjoy",
-                  label: "Friends Enjoy",
-                  description: "Recommend games that Maya's friends have rated highly.",
+                  label: "Games Her Friends Like",
+                  description: "Show games that Maya's friends have played and enjoyed.",
                 },
                 {
                   id: "new-experiences",
-                  label: "New Experiences",
-                  description: "Push diversity — show genres and styles Maya hasn't tried yet.",
+                  label: "Try Something New",
+                  description: "Show games from types Maya hasn't tried yet — maybe she'll discover a new favorite!",
                 },
               ],
             },
           },
           {
             id: "friends-activity",
-            label: "Friends Activity",
+            label: "What Friends Are Playing",
             description:
-              "Show what Maya's friends are playing right now with one-tap join buttons.",
+              "Show Maya which of her friends are online right now and what games they're in, with a button to join them.",
             followUp: {
               scenarioText:
                 "What if none of Maya's friends are online?",
               choices: [
                 {
                   id: "recent-activity",
-                  label: "Show Recent Activity",
-                  description: "Display what friends played in the last 24 hours.",
+                  label: "Show What They Played Recently",
+                  description: "Show what friends played in the last day, so Maya can try those games.",
                 },
                 {
                   id: "suggest-friends",
                   label: "Suggest New Friends",
-                  description: "Connect Maya with players who enjoy similar games.",
+                  description: "Help Maya connect with other players who like the same games she does.",
                 },
                 {
                   id: "fallback-trending",
-                  label: "Fall Back to Trending",
-                  description: "Seamlessly switch to trending games when no friends are active.",
+                  label: "Switch to Popular Games",
+                  description: "When no friends are online, show the most popular games instead.",
                 },
               ],
             },
           },
         ],
       },
+      // ── DEFINE ──────────────────────────────
       {
         id: "roblox-search",
         order: 1,
-        round: 0,
+        round: 1,
         type: "branching_path",
         scenarioText:
-          "Maya wants to find a new horror game to play with friends. How should search work?",
+          "Maya wants to find a new horror game to play with friends. How should searching for games work?",
         context:
-          "Current search is text-only and returns thousands of results. 60% of players never use search — they only play games from the home page or friends' invites.",
+          "Right now, you can only type words to search and it shows thousands of results. Most players never even use search — they just play whatever shows up on the home page.",
         branches: [
           {
             id: "smart-filters",
-            label: "Smart Filters",
+            label: "Filter Buttons",
             description:
-              "Genre, player count, rating, friends playing, and game age filters with visual tags.",
+              "Add buttons to filter by type (Horror, Tycoon, Obby), number of players, and whether friends are playing.",
             followUp: {
               scenarioText:
-                "Which filter should be the most prominent?",
+                "Which filter should be the biggest and most obvious?",
               choices: [
                 {
                   id: "genre-tags",
-                  label: "Genre Tags",
+                  label: "Game Type",
                   description: "Horror, Tycoon, Obby, Simulator, Roleplay, etc.",
                 },
                 {
                   id: "play-style",
-                  label: "Play Style",
-                  description: "Solo, Co-op, Competitive, Casual, Creative.",
+                  label: "How You Want to Play",
+                  description: "By yourself, with friends, competitive, or just for fun.",
                 },
                 {
                   id: "time-to-play",
-                  label: "Time to Play",
-                  description: "Quick (5 min), Medium (15 min), Long (30+ min).",
+                  label: "How Long It Takes",
+                  description: "Quick (5 minutes), Medium (15 minutes), or Long (30+ minutes).",
                 },
               ],
             },
           },
           {
             id: "visual-browse",
-            label: "Visual Browse",
+            label: "Swipe Through Previews",
             description:
-              "TikTok-style swipeable game previews with auto-playing gameplay clips.",
+              "Like TikTok — swipe through short video clips of games to see what they look like before you play.",
             followUp: {
               scenarioText:
-                "What should the preview clips show?",
+                "What should the preview videos show?",
               choices: [
                 {
                   id: "gameplay-footage",
-                  label: "Gameplay Footage",
-                  description: "15-second auto-captured clips of real gameplay.",
+                  label: "Real Gameplay",
+                  description: "15-second clips recorded from actual people playing the game.",
                 },
                 {
                   id: "creator-trailers",
-                  label: "Creator Trailers",
-                  description: "Creator-made promotional videos showcasing the best moments.",
+                  label: "Trailers Made by Creators",
+                  description: "The person who made the game creates a cool trailer showing the best parts.",
                 },
                 {
                   id: "live-peek",
-                  label: "Live Peek",
-                  description: "Real-time spectator view of current players in the game.",
+                  label: "Watch People Play Live",
+                  description: "See what real players are doing in the game right now, like a live camera.",
                 },
               ],
             },
           },
           {
             id: "ai-search",
-            label: "AI Chat Search",
+            label: "Ask in Your Own Words",
             description:
-              "Natural language search: \"Find me a scary game for 4 players with puzzles.\"",
+              "Type something like \"Find me a scary game for 4 players with puzzles\" and a smart computer finds the best match.",
             followUp: {
               scenarioText:
-                "How should the AI handle vague searches like \"something fun\"?",
+                "What if Maya types something vague like \"something fun\"?",
               choices: [
                 {
                   id: "ask-followups",
-                  label: "Ask Follow-Ups",
-                  description: "AI asks clarifying questions before showing results.",
+                  label: "Ask More Questions",
+                  description: "The computer asks: \"What kind of fun? Scary fun? Silly fun? Adventure?\"",
                 },
                 {
                   id: "show-variety",
-                  label: "Show Variety",
-                  description: "Show diverse results across genres and let Maya browse.",
+                  label: "Show a Mix of Everything",
+                  description: "Show lots of different types of games and let Maya browse through them.",
                 },
                 {
                   id: "best-guess",
-                  label: "Best Guess",
-                  description: "AI picks the single best match and offers alternatives if wrong.",
+                  label: "Just Pick the Best One",
+                  description: "The computer picks what it thinks is best. If Maya doesn't like it, it tries again.",
                 },
               ],
             },
           },
         ],
       },
-      // ── Round 1 ──────────────────────────────
-      {
-        id: "roblox-ratings",
-        order: 2,
-        round: 1,
-        type: "branching_path",
-        scenarioText:
-          "Maya just played a game and wants to share her opinion. How should the rating system work?",
-        context:
-          "Currently there's only a thumbs up button. 90% of ratings are positive, making ratings useless for quality comparison. Creators want meaningful feedback to improve.",
-        branches: [
-          {
-            id: "star-rating",
-            label: "Star Rating (1-5)",
-            description:
-              "Classic 1-5 star system like app stores. Simple and universally understood.",
-            followUp: {
-              scenarioText:
-                "When should Maya be prompted to rate a game?",
-              choices: [
-                {
-                  id: "after-10-min",
-                  label: "After 10 Minutes",
-                  description: "Prompt after playing for 10+ minutes — ensures Maya actually tried it.",
-                },
-                {
-                  id: "on-exit",
-                  label: "On Exit",
-                  description: "Ask when leaving the game. Captures immediate reaction.",
-                },
-                {
-                  id: "never-prompt",
-                  label: "Never Prompt",
-                  description: "Only rate if Maya voluntarily goes to the rating page. Less data, no annoyance.",
-                },
-              ],
-            },
-          },
-          {
-            id: "category-ratings",
-            label: "Category Ratings",
-            description:
-              "Rate multiple aspects: Fun, Creativity, Difficulty, Social, and Replay Value.",
-            followUp: {
-              scenarioText:
-                "How many categories should players rate?",
-              choices: [
-                {
-                  id: "three-quick",
-                  label: "3 Quick Categories",
-                  description: "Fun, Creativity, Polish — fast enough that most players will do it.",
-                },
-                {
-                  id: "five-detailed",
-                  label: "5 Detailed Categories",
-                  description: "Fun, Creativity, Difficulty, Social, Replay Value — great data but slower.",
-                },
-                {
-                  id: "one-plus-word",
-                  label: "1 Score + 1 Word",
-                  description: "Overall score plus one word describing the game (fun, scary, creative, etc.).",
-                },
-              ],
-            },
-          },
-          {
-            id: "emoji-reactions",
-            label: "Emoji Reactions",
-            description:
-              "React with emojis instead of scores. Fun, Scary, Creative, Hard, Boring, Funny, etc.",
-            followUp: {
-              scenarioText:
-                "Should emoji reactions be shown publicly on the game page?",
-              choices: [
-                {
-                  id: "public-breakdown",
-                  label: "Public Emoji Breakdown",
-                  description: "Show percentages: 45% Fun, 30% Scary, 25% Creative. Players see what to expect.",
-                },
-                {
-                  id: "creator-only",
-                  label: "Creator Only",
-                  description: "Only the game creator sees detailed reactions. Public just sees total count.",
-                },
-                {
-                  id: "earned-badges",
-                  label: "Earned Badges",
-                  description: "Games earn badges like \"Most Fun\" or \"Super Scary\" based on reactions.",
-                },
-              ],
-            },
-          },
-        ],
-      },
+      // ── IDEATE ──────────────────────────────
       {
         id: "roblox-social",
-        order: 3,
-        round: 1,
+        order: 2,
+        round: 2,
         type: "branching_path",
         scenarioText:
-          "Maya wants to play with friends but they're in different games. How should the social system work?",
+          "Maya wants to play with her friends, but they're all in different games. How should playing together work?",
         context:
-          "Players can add friends and join their game, but there's no party system, no shared queue, and no way to browse games together. 55% of sessions are solo despite most players wanting to play with friends.",
+          "Right now you can add friends and join their game, but there's no way to pick a game together as a group. More than half of all play sessions are solo, even though most players would rather play with friends.",
         branches: [
           {
             id: "party-system",
-            label: "Party System",
+            label: "Party Mode",
             description:
-              "Create a party, browse and vote on games together, then join as a group.",
+              "Make a party with your friends, look at games together, and jump into one as a group.",
             followUp: {
               scenarioText:
-                "How should the party decide which game to play?",
+                "How should the group decide which game to play?",
               choices: [
                 {
                   id: "leader-picks",
-                  label: "Leader Picks",
-                  description: "Party leader chooses the game, everyone follows. Fast but not democratic.",
+                  label: "The Leader Picks",
+                  description: "One person picks the game and everyone follows. Quick but not everyone gets a say.",
                 },
                 {
                   id: "vote-system",
-                  label: "Vote System",
-                  description: "Everyone suggests games, majority vote wins. Fair but slower.",
+                  label: "Everyone Votes",
+                  description: "Each person suggests a game and the group votes. Fair but takes longer.",
                 },
                 {
                   id: "spin-wheel",
-                  label: "Spin the Wheel",
-                  description: "Random pick from party members' suggestions. Fun and surprising.",
+                  label: "Spin a Wheel",
+                  description: "Put all the suggestions on a wheel and spin it! Random and fun.",
                 },
               ],
             },
           },
           {
             id: "activity-feed",
-            label: "Activity Feed",
+            label: "Friend Feed",
             description:
-              "Live feed showing what friends are playing, recent achievements, and new favorite games.",
+              "A page that shows what your friends are playing, what they achieved, and what new games they liked.",
             followUp: {
               scenarioText:
-                "Should the feed update in real-time or as a digest?",
+                "Should the feed update instantly or once a day?",
               choices: [
                 {
                   id: "real-time",
-                  label: "Real-Time",
-                  description: "Live feed of friend activity as it happens. Always current but potentially noisy.",
+                  label: "Update Instantly",
+                  description: "See what friends do the moment it happens. Always up to date but can be a lot of info.",
                 },
                 {
                   id: "daily-digest",
-                  label: "Daily Digest",
-                  description: "Summary of friend activity once per day. Clean but not immediate.",
+                  label: "Once a Day Summary",
+                  description: "Get a neat summary of what happened with friends once per day. Less overwhelming.",
                 },
                 {
                   id: "smart-timing",
-                  label: "Smart Timing",
-                  description: "Show updates when Maya logs in, batch notifications during play sessions.",
+                  label: "Show When You Log In",
+                  description: "Save up all the updates and show them when Maya opens Roblox. Clean and timed well.",
                 },
               ],
             },
           },
           {
             id: "coop-queue",
-            label: "Co-op Queue",
+            label: "Auto-Match with Friends",
             description:
-              "Queue for games together and matchmake as a group automatically.",
+              "Get in line for a game together and the app puts your whole group in the same server automatically.",
             followUp: {
               scenarioText:
-                "What if the game doesn't support Maya's group size?",
+                "What if the game doesn't have room for Maya's whole friend group?",
               choices: [
                 {
                   id: "auto-split",
-                  label: "Auto-Split",
-                  description: "Split into smaller groups and put them on the same server.",
+                  label: "Split Into Smaller Groups",
+                  description: "Put smaller groups on the same server so everyone can still play.",
                 },
                 {
                   id: "filter-only",
-                  label: "Filter by Size",
-                  description: "Only show games that fit the group size. No splitting needed.",
+                  label: "Only Show Games That Fit",
+                  description: "Only show games that have room for the whole group. No splitting.",
                 },
                 {
                   id: "notify-creator",
-                  label: "Notify Creator",
-                  description: "Tell the game creator that players want larger group support.",
+                  label: "Ask the Creator to Add More Spots",
+                  description: "Send a message to the game creator saying \"Players want to play with bigger groups!\"",
                 },
               ],
             },
           },
         ],
       },
-      // ── Round 2 ──────────────────────────────
+      // ── PROTOTYPE ──────────────────────────────
       {
         id: "roblox-creator-discovery",
-        order: 4,
-        round: 2,
+        order: 3,
+        round: 3,
         type: "branching_path",
         scenarioText:
-          "Maya published a new obby game but nobody is playing it. How should Roblox help new creators get discovered?",
+          "Maya made a really cool obby game, but nobody knows about it. How should Roblox help new game creators get noticed?",
         context:
-          "95% of new games get fewer than 100 plays in their first week. The algorithm heavily favors already-popular games. New creators feel invisible.",
+          "Almost all new games get fewer than 100 plays in their first week. The home page keeps showing the same popular games over and over. New creators like Maya feel invisible.",
         branches: [
           {
             id: "creator-spotlight",
             label: "New Creator Spotlight",
             description:
-              "Dedicated home page section featuring games from new and emerging creators.",
+              "A special section on the home page that shows games made by new creators. It changes every day.",
             followUp: {
               scenarioText:
-                "How should spotlight games be selected?",
+                "How should Roblox pick which new games to feature?",
               choices: [
                 {
                   id: "random-rotation",
-                  label: "Random Rotation",
-                  description: "Random selection from recent uploads — everyone gets a fair turn.",
+                  label: "Everyone Gets a Turn",
+                  description: "Pick randomly from new games so every creator gets a fair chance to be seen.",
                 },
                 {
                   id: "quality-threshold",
-                  label: "Quality Threshold",
-                  description: "Games must pass a basic quality check (no crashes, has a thumbnail, etc.).",
+                  label: "Only Good-Quality Games",
+                  description: "The game has to pass a basic check first (not broken, has a good thumbnail, etc.).",
                 },
                 {
                   id: "community-nominated",
-                  label: "Community Nominated",
-                  description: "Players can nominate hidden gem games they've discovered.",
+                  label: "Players Nominate Games",
+                  description: "Players can suggest cool games they found that deserve more attention.",
                 },
               ],
             },
           },
           {
             id: "boost-system",
-            label: "Visibility Boost",
+            label: "Starter Boost",
             description:
-              "Give every new game a temporary visibility boost in recommendations for its first week.",
+              "Every new game gets a boost that shows it to more people for a little while when it first comes out.",
             followUp: {
               scenarioText:
                 "How long should the boost last?",
               choices: [
                 {
                   id: "24-hours",
-                  label: "24 Hours",
-                  description: "One day of enhanced visibility. Creates urgency for creators to polish before launch.",
+                  label: "1 Day",
+                  description: "24 hours of extra attention. Creators need to make their game great before launching!",
                 },
                 {
                   id: "until-threshold",
                   label: "Until 1,000 Plays",
-                  description: "Boost until the game reaches a play threshold. Fair regardless of timing.",
+                  description: "The boost stays until the game gets 1,000 plays. Fair no matter when you launch.",
                 },
                 {
                   id: "performance-based",
-                  label: "Performance-Based",
-                  description: "Boost continues if players are enjoying it (high playtime, ratings). Rewards quality.",
+                  label: "As Long as People Like It",
+                  description: "The boost keeps going if players are enjoying the game. Good games get more time.",
                 },
               ],
             },
           },
           {
             id: "creator-mentorship",
-            label: "Creator Mentorship",
+            label: "Creator Buddy Program",
             description:
-              "Pair new creators with experienced ones for feedback and guidance before publishing.",
+              "Pair new creators like Maya with experienced ones who can give tips and feedback before the game launches.",
             followUp: {
               scenarioText:
-                "What should mentors help with?",
+                "What should the buddy help with?",
               choices: [
                 {
                   id: "game-design",
-                  label: "Game Design",
-                  description: "Gameplay, level design, fun factor, and difficulty balance.",
+                  label: "Making the Game Better",
+                  description: "Help with how the game plays — is it fun? Too hard? Too easy?",
                 },
                 {
                   id: "marketing",
-                  label: "Marketing",
-                  description: "Thumbnails, descriptions, social media promotion, and first impressions.",
+                  label: "Getting People to Notice",
+                  description: "Help with the thumbnail, description, and how to share the game.",
                 },
                 {
                   id: "full-package",
-                  label: "Full Package",
-                  description: "Both design and marketing support — comprehensive but requires more mentors.",
-                },
-              ],
-            },
-          },
-        ],
-      },
-      {
-        id: "roblox-chat-safety",
-        order: 5,
-        round: 2,
-        type: "branching_path",
-        scenarioText:
-          "How should Roblox handle in-game chat to balance safety and usability?",
-        context:
-          "Younger players need protection from inappropriate content. But strict filters frustrate players — 40% say the chat filter is 'too aggressive' and blocks normal words. Some players bypass filters with creative spelling.",
-        branches: [
-          {
-            id: "strict-filtering",
-            label: "Strict Filtering",
-            description:
-              "Aggressively filter anything suspicious. Some normal messages get caught, but kids are safe.",
-            followUp: {
-              scenarioText:
-                "How should Roblox handle false positives (normal words getting blocked)?",
-              choices: [
-                {
-                  id: "appeal-button",
-                  label: "Appeal Button",
-                  description: "Players can tap to appeal blocked messages. Staff reviews within 24 hours.",
-                },
-                {
-                  id: "rephrase-suggest",
-                  label: "Rephrase Suggestion",
-                  description: "AI suggests an alternative way to say the blocked message.",
-                },
-                {
-                  id: "accept-tradeoff",
-                  label: "Accept the Tradeoff",
-                  description: "Safety is more important. Some false positives are the cost of protection.",
-                },
-              ],
-            },
-          },
-          {
-            id: "age-based",
-            label: "Age-Based Filtering",
-            description:
-              "Different filter levels by age: strict for under 13, moderate for 13-17, light for 18+.",
-            followUp: {
-              scenarioText:
-                "How should Roblox verify age for appropriate filtering?",
-              choices: [
-                {
-                  id: "account-birthday",
-                  label: "Account Birthday",
-                  description: "Use the birthday entered at signup. Simple but easily faked.",
-                },
-                {
-                  id: "parent-verification",
-                  label: "Parent Verification",
-                  description: "Require parent email/ID for under-18 accounts. More accurate but higher friction.",
-                },
-                {
-                  id: "behavior-based",
-                  label: "Behavior Detection",
-                  description: "AI detects likely age from typing patterns and vocabulary. No verification needed.",
-                },
-              ],
-            },
-          },
-          {
-            id: "light-moderation",
-            label: "Light Filter + Reporting",
-            description:
-              "Only block clearly harmful content. Rely on community reporting for edge cases.",
-            followUp: {
-              scenarioText:
-                "How quickly should reported messages be reviewed?",
-              choices: [
-                {
-                  id: "instant-ai",
-                  label: "Instant AI Review",
-                  description: "AI reviews reported messages immediately and takes action in seconds.",
-                },
-                {
-                  id: "human-review",
-                  label: "Human Review (1 hour)",
-                  description: "Human moderators review within 1 hour. More accurate but slower.",
-                },
-                {
-                  id: "community-jury",
-                  label: "Community Jury",
-                  description: "Random trusted players vote on reported messages. Crowdsourced moderation.",
-                },
-              ],
-            },
-          },
-        ],
-      },
-      // ── Round 3 ──────────────────────────────
-      {
-        id: "roblox-avatar-shop",
-        order: 6,
-        round: 3,
-        type: "branching_path",
-        scenarioText:
-          "Maya wants a new avatar look but has limited Robux. How should the avatar shop be designed?",
-        context:
-          "The avatar shop has millions of items. Players spend 15 minutes browsing on average. 35% leave without buying because they can't find what they want or feel overwhelmed.",
-        branches: [
-          {
-            id: "try-before-buy",
-            label: "Try Before Buy",
-            description:
-              "Preview any item on your avatar in a full 3D view before purchasing. See how it looks with your current outfit.",
-            followUp: {
-              scenarioText:
-                "Should there be a time-limited free trial?",
-              choices: [
-                {
-                  id: "no-trial",
-                  label: "Preview Only",
-                  description: "3D preview but no wearing. You buy to wear it. Clean and simple.",
-                },
-                {
-                  id: "one-hour-trial",
-                  label: "1-Hour Trial",
-                  description: "Wear any item free for 1 hour, then it disappears unless purchased.",
-                },
-                {
-                  id: "social-trial",
-                  label: "Private Server Trial",
-                  description: "Wear items free in private servers. Must purchase for public servers.",
-                },
-              ],
-            },
-          },
-          {
-            id: "outfit-bundles",
-            label: "Outfit Bundles",
-            description:
-              "Curated complete looks at a bundle discount. Full outfits ready to wear.",
-            followUp: {
-              scenarioText:
-                "Who should create the outfit bundles?",
-              choices: [
-                {
-                  id: "roblox-stylists",
-                  label: "Roblox Stylists",
-                  description: "Official curated bundles by Roblox's design team. Quality guaranteed.",
-                },
-                {
-                  id: "community-bundles",
-                  label: "Community Creators",
-                  description: "Players create and share outfit combinations. Community-driven variety.",
-                },
-                {
-                  id: "ai-bundles",
-                  label: "AI-Generated",
-                  description: "AI creates personalized bundles based on Maya's style and purchase history.",
-                },
-              ],
-            },
-          },
-          {
-            id: "budget-mode",
-            label: "Budget Mode",
-            description:
-              "Set a Robux budget and only see items within that price range, sorted by popularity.",
-            followUp: {
-              scenarioText:
-                "Should Roblox suggest ways to earn or save Robux?",
-              choices: [
-                {
-                  id: "wishlist-only",
-                  label: "Wishlist Only",
-                  description: "Save items to a wishlist for later. No financial suggestions.",
-                },
-                {
-                  id: "savings-goal",
-                  label: "Savings Goal",
-                  description: "Set a savings goal with progress tracking toward a specific item.",
-                },
-                {
-                  id: "earn-suggestions",
-                  label: "Earn Suggestions",
-                  description: "Show ways to earn Robux through creating games or participating in events.",
-                },
-              ],
-            },
-          },
-        ],
-      },
-      {
-        id: "roblox-pricing",
-        order: 7,
-        round: 3,
-        type: "branching_path",
-        scenarioText:
-          "How should game pass and item prices be displayed to players?",
-        context:
-          "Some players don't understand the Robux-to-dollar conversion. Parents complain about unexpected spending. 25% of support tickets are about pricing confusion.",
-        branches: [
-          {
-            id: "dual-currency",
-            label: "Dual Currency Display",
-            description:
-              "Show both Robux and real-money equivalent on every price tag.",
-            followUp: {
-              scenarioText:
-                "Where should dual pricing appear?",
-              choices: [
-                {
-                  id: "everywhere",
-                  label: "Everywhere",
-                  description: "Every single price shows both Robux and dollars. Maximum transparency.",
-                },
-                {
-                  id: "checkout-only",
-                  label: "Checkout Only",
-                  description: "Browse in Robux, see real money only at the final purchase screen.",
-                },
-                {
-                  id: "settings-toggle",
-                  label: "User Setting",
-                  description: "Players choose their preferred currency display in settings.",
-                },
-              ],
-            },
-          },
-          {
-            id: "spending-tracker",
-            label: "Spending Tracker",
-            description:
-              "Built-in dashboard showing daily, weekly, and monthly Robux spending with charts.",
-            followUp: {
-              scenarioText:
-                "Should parents get automatic spending reports?",
-              choices: [
-                {
-                  id: "weekly-email",
-                  label: "Weekly Email",
-                  description: "Parents receive automatic weekly spending summaries via email.",
-                },
-                {
-                  id: "parent-dashboard",
-                  label: "Parent Dashboard",
-                  description: "Parents can check a real-time dashboard anytime through the parent app.",
-                },
-                {
-                  id: "opt-in-only",
-                  label: "Only If Set Up",
-                  description: "Reports only sent if parent actively enables parental controls.",
-                },
-              ],
-            },
-          },
-          {
-            id: "price-categories",
-            label: "Price Tiers",
-            description:
-              "Label items as Common, Uncommon, Rare, Epic, Legendary instead of just showing Robux numbers.",
-            followUp: {
-              scenarioText:
-                "Should rarity affect availability?",
-              choices: [
-                {
-                  id: "always-available",
-                  label: "Always Available",
-                  description: "Rarity is just a label. Everything's always purchasable.",
-                },
-                {
-                  id: "limited-editions",
-                  label: "Limited Editions",
-                  description: "Rare and above items are truly limited — only available for a set time.",
-                },
-                {
-                  id: "rotating-shop",
-                  label: "Rotating Shop",
-                  description: "Items rotate in and out of the shop weekly. Creates excitement but FOMO.",
-                },
-              ],
-            },
-          },
-        ],
-      },
-      // ── Round 4 ──────────────────────────────
-      {
-        id: "roblox-creator-analytics",
-        order: 8,
-        round: 4,
-        type: "branching_path",
-        scenarioText:
-          "Maya wants to understand why her game isn't getting players. What analytics should Roblox show creators?",
-        context:
-          "Current analytics show only daily visits and Robux revenue. Creators can't see where players drop off, what's confusing, or how they compare to similar games.",
-        branches: [
-          {
-            id: "player-journey",
-            label: "Player Journey Map",
-            description:
-              "See exactly where players go, where they get stuck, and where they leave the game.",
-            followUp: {
-              scenarioText:
-                "How detailed should the player journey data be?",
-              choices: [
-                {
-                  id: "heatmaps",
-                  label: "Heatmaps",
-                  description: "Visual maps showing where players spend time and where they quit.",
-                },
-                {
-                  id: "funnel-view",
-                  label: "Funnel View",
-                  description: "Step-by-step drop-off: 100 joined → 80 played 1 min → 30 played 5 min.",
-                },
-                {
-                  id: "session-recordings",
-                  label: "Session Recordings",
-                  description: "Watch anonymous replays of player sessions. See exactly what happened.",
-                },
-              ],
-            },
-          },
-          {
-            id: "comparison-tools",
-            label: "Comparison Tools",
-            description:
-              "Compare your game's stats to similar games in your genre to see where you're underperforming.",
-            followUp: {
-              scenarioText:
-                "Should comparison data include specific game names?",
-              choices: [
-                {
-                  id: "anonymous-benchmarks",
-                  label: "Anonymous Benchmarks",
-                  description: "Compare to genre averages without naming specific games.",
-                },
-                {
-                  id: "public-leaderboards",
-                  label: "Public Leaderboards",
-                  description: "Show rankings within each genre. Competitive but transparent.",
-                },
-                {
-                  id: "opt-in-comparisons",
-                  label: "Opt-In Comparisons",
-                  description: "Creators choose to share their data for mutual comparison.",
-                },
-              ],
-            },
-          },
-          {
-            id: "ai-coach",
-            label: "AI Game Coach",
-            description:
-              "AI analyzes Maya's game and gives specific suggestions to improve player retention.",
-            followUp: {
-              scenarioText:
-                "What kind of suggestions should the AI coach give?",
-              choices: [
-                {
-                  id: "design-tips",
-                  label: "Design Tips",
-                  description: "\"Players quit at level 3 — it might be too hard. Try adding a checkpoint.\"",
-                },
-                {
-                  id: "marketing-tips",
-                  label: "Marketing Tips",
-                  description: "\"Your thumbnail doesn't show gameplay — try a screenshot instead.\"",
-                },
-                {
-                  id: "both-prioritized",
-                  label: "Both + Priorities",
-                  description: "Design and marketing tips ranked by potential impact on player count.",
-                },
-              ],
-            },
-          },
-        ],
-      },
-      {
-        id: "roblox-content-moderation",
-        order: 9,
-        round: 4,
-        type: "branching_path",
-        scenarioText:
-          "How strictly should Roblox moderate user-created game content?",
-        context:
-          "Moderation catches harmful content but also incorrectly removes creative games. 15% of moderation actions are appealed, and 30% of those appeals succeed. Creators lose trust.",
-        branches: [
-          {
-            id: "pre-review",
-            label: "Pre-Publish Review",
-            description:
-              "Every game is reviewed before it goes live. Nothing bad gets through, but publishing takes 24-48 hours.",
-            followUp: {
-              scenarioText:
-                "How should creators track their review status?",
-              choices: [
-                {
-                  id: "status-page",
-                  label: "Status Dashboard",
-                  description: "Real-time status page showing review progress and estimated completion.",
-                },
-                {
-                  id: "priority-queue",
-                  label: "Priority Queue",
-                  description: "Creators with clean track records get faster reviews (hours vs. days).",
-                },
-                {
-                  id: "auto-approve-updates",
-                  label: "Auto-Approve Updates",
-                  description: "First publish is reviewed. Updates to approved games go live instantly.",
-                },
-              ],
-            },
-          },
-          {
-            id: "ai-moderation",
-            label: "AI + Human Hybrid",
-            description:
-              "AI scans games on publish. Flagged games go to human reviewers. Clean games go live instantly.",
-            followUp: {
-              scenarioText:
-                "What should happen to a game while it's flagged for human review?",
-              choices: [
-                {
-                  id: "stay-live",
-                  label: "Stay Live",
-                  description: "Game stays playable until human confirms the issue. Risk of temporary bad content.",
-                },
-                {
-                  id: "limited-access",
-                  label: "Limited Access",
-                  description: "Game is hidden from search but playable via direct link during review.",
-                },
-                {
-                  id: "take-down",
-                  label: "Take Down",
-                  description: "Game is removed until review is complete. Safe but frustrating for false positives.",
-                },
-              ],
-            },
-          },
-          {
-            id: "community-moderation",
-            label: "Community-Driven",
-            description:
-              "Publish instantly. Rely on player reports and trusted community moderators to catch issues.",
-            followUp: {
-              scenarioText:
-                "How should community moderators be selected?",
-              choices: [
-                {
-                  id: "reputation-based",
-                  label: "Reputation System",
-                  description: "Players earn moderation privileges through account age, good behavior, and accuracy.",
-                },
-                {
-                  id: "application-process",
-                  label: "Application Process",
-                  description: "Players apply to become moderators. Roblox reviews and trains approved applicants.",
-                },
-                {
-                  id: "random-jury",
-                  label: "Random Jury",
-                  description: "Random trusted players are asked to vote on reported content. Distributed and fair.",
-                },
-              ],
-            },
-          },
-        ],
-      },
-      // ── Round 5 ──────────────────────────────
-      {
-        id: "roblox-notifications",
-        order: 10,
-        round: 5,
-        type: "branching_path",
-        scenarioText:
-          "How should Roblox notify Maya about games, friends, and updates?",
-        context:
-          "Players receive 20+ notifications daily. 65% have disabled notifications entirely. When notifications are off, engagement drops 40% — notifications matter, but they're broken.",
-        branches: [
-          {
-            id: "smart-digest",
-            label: "Smart Digest",
-            description:
-              "One daily notification summarizing everything important: friend invites, game updates, new games to try.",
-            followUp: {
-              scenarioText:
-                "When should the daily digest be sent?",
-              choices: [
-                {
-                  id: "after-school",
-                  label: "After School (3:30 PM)",
-                  description: "Send when Maya is most likely to play. Maximizes engagement.",
-                },
-                {
-                  id: "friends-active",
-                  label: "When Friends Are Online",
-                  description: "Send when most of Maya's friends come online. Social motivation.",
-                },
-                {
-                  id: "user-chooses",
-                  label: "Maya Chooses",
-                  description: "Let Maya pick her preferred notification time in settings.",
-                },
-              ],
-            },
-          },
-          {
-            id: "priority-only",
-            label: "Priority Only",
-            description:
-              "Only notify for direct friend invites and updates to games Maya is actively following.",
-            followUp: {
-              scenarioText:
-                "Should Roblox learn what Maya cares about over time?",
-              choices: [
-                {
-                  id: "explicit-prefs",
-                  label: "Explicit Preferences",
-                  description: "Maya checks boxes for exactly what she wants notifications about.",
-                },
-                {
-                  id: "smart-learning",
-                  label: "Smart Learning",
-                  description: "AI learns from what Maya clicks and adjusts notification types automatically.",
-                },
-                {
-                  id: "both-approach",
-                  label: "Preferences + AI",
-                  description: "Start with Maya's preferences, then AI refines over time.",
-                },
-              ],
-            },
-          },
-          {
-            id: "in-app-only",
-            label: "In-App Inbox Only",
-            description:
-              "No push notifications at all. Everything waits in an inbox that Maya checks when she opens Roblox.",
-            followUp: {
-              scenarioText:
-                "How should the in-app inbox be organized?",
-              choices: [
-                {
-                  id: "chronological",
-                  label: "Chronological",
-                  description: "Most recent first. Simple and predictable.",
-                },
-                {
-                  id: "by-category",
-                  label: "By Category",
-                  description: "Tabs for Friends, Games, System. Easy to find what you care about.",
-                },
-                {
-                  id: "priority-ranked",
-                  label: "Priority Ranked",
-                  description: "AI puts the most important messages at top. Smart but less predictable.",
-                },
-              ],
-            },
-          },
-        ],
-      },
-      {
-        id: "roblox-cross-platform",
-        order: 11,
-        round: 5,
-        type: "branching_path",
-        scenarioText:
-          "Maya plays on phone at school and PC at home. How should the experience differ across platforms?",
-        context:
-          "60% of Roblox players are on mobile, 30% on PC, 10% on console. Many players switch devices daily. Mobile has smaller screens and touch controls. PC has mouse precision and keyboard shortcuts.",
-        branches: [
-          {
-            id: "adaptive-ui",
-            label: "Adaptive UI",
-            description:
-              "Same features everywhere but the interface adapts to screen size and input method.",
-            followUp: {
-              scenarioText:
-                "How should game controls adapt between devices?",
-              choices: [
-                {
-                  id: "auto-detect",
-                  label: "Auto-Detect",
-                  description: "Automatically switch between touch, keyboard, and controller layouts.",
-                },
-                {
-                  id: "custom-presets",
-                  label: "Custom Presets",
-                  description: "Maya saves different control layouts for each device she uses.",
-                },
-                {
-                  id: "game-specific",
-                  label: "Game-Specific",
-                  description: "Each game creator defines optimal controls per platform.",
-                },
-              ],
-            },
-          },
-          {
-            id: "platform-optimized",
-            label: "Platform-Optimized",
-            description:
-              "Different experiences tuned for each device's strengths. PC gets extra features, mobile is simplified.",
-            followUp: {
-              scenarioText:
-                "Should some features be platform-exclusive?",
-              choices: [
-                {
-                  id: "no-exclusives",
-                  label: "No Exclusives",
-                  description: "Everything available everywhere, just different UI layouts.",
-                },
-                {
-                  id: "creation-pc-only",
-                  label: "Creation on PC Only",
-                  description: "Game creation and editing only on PC. Playing available on all devices.",
-                },
-                {
-                  id: "enhanced-features",
-                  label: "Enhanced Features",
-                  description: "PC gets advanced analytics and creation tools. Mobile gets social and discovery.",
-                },
-              ],
-            },
-          },
-          {
-            id: "cloud-sync",
-            label: "Cloud Sync Priority",
-            description:
-              "Focus on seamless progress and settings sync so switching devices feels invisible.",
-            followUp: {
-              scenarioText:
-                "What should sync between devices?",
-              choices: [
-                {
-                  id: "sync-everything",
                   label: "Everything",
-                  description: "All settings, inventory, controls, UI preferences, and progress.",
+                  description: "Help with both the game itself AND getting people to notice it.",
+                },
+              ],
+            },
+          },
+        ],
+      },
+      // ── TEST ──────────────────────────────
+      {
+        id: "roblox-testing",
+        order: 4,
+        round: 4,
+        type: "branching_path",
+        scenarioText:
+          "Before launching these changes to all of Roblox, how should the team test them?",
+        context:
+          "Roblox has millions of players. If a new design doesn't work well, it could ruin the experience for everyone. Testing with a small group first helps catch problems before they become big problems.",
+        branches: [
+          {
+            id: "beta-group",
+            label: "Test with Volunteers",
+            description:
+              "Let players sign up to try the new features early. They give feedback and help find problems.",
+            followUp: {
+              scenarioText: "How should the volunteers share their feedback?",
+              choices: [
+                {
+                  id: "in-app-survey",
+                  label: "Quick Survey in the App",
+                  description: "A short survey pops up after they've tried the new features for a few days.",
                 },
                 {
-                  id: "progress-only",
-                  label: "Progress Only",
-                  description: "Game progress and inventory sync. Settings are separate per device.",
+                  id: "feedback-button",
+                  label: "Feedback Button",
+                  description: "A button that's always there so testers can share thoughts whenever they want.",
                 },
                 {
-                  id: "smart-sync",
-                  label: "Smart Sync",
-                  description: "Sync important things automatically. Let Maya choose what else to sync.",
+                  id: "watch-behavior",
+                  label: "Just Watch What They Do",
+                  description: "Don't ask anything. Watch how they use the new features and see if they're having fun.",
+                },
+              ],
+            },
+          },
+          {
+            id: "slow-rollout",
+            label: "Roll It Out Slowly",
+            description:
+              "Give the new design to 1% of players first, then 10%, then 50%, then everyone. Stop and fix things if anything goes wrong.",
+            followUp: {
+              scenarioText: "What should make the team stop and fix things?",
+              choices: [
+                {
+                  id: "complaints-spike",
+                  label: "Lots of Complaints",
+                  description: "Stop if way more players than normal start reporting problems.",
+                },
+                {
+                  id: "usage-drops",
+                  label: "People Play Less",
+                  description: "Stop if people are spending less time on Roblox than before.",
+                },
+                {
+                  id: "auto-monitor",
+                  label: "Computer Watches Everything",
+                  description: "A smart computer watches all the numbers and stops automatically if anything looks bad.",
+                },
+              ],
+            },
+          },
+          {
+            id: "school-playtest",
+            label: "Test with a School",
+            description:
+              "Partner with a school and let students try the new Roblox in class. Watch how they use it and ask what they think.",
+            followUp: {
+              scenarioText: "What should the team pay the most attention to during the school test?",
+              choices: [
+                {
+                  id: "watch-discovery",
+                  label: "Can They Find Good Games?",
+                  description: "Watch if students find games they enjoy faster than before.",
+                },
+                {
+                  id: "watch-social",
+                  label: "Do They Play Together?",
+                  description: "Watch if students play with friends more easily than before.",
+                },
+                {
+                  id: "ask-feelings",
+                  label: "How Does It Feel?",
+                  description: "Ask students if the new version feels more fun, easier, or more confusing.",
                 },
               ],
             },
@@ -1597,63 +1049,44 @@ export const CASE_STUDIES: CaseStudy[] = [
       },
     ],
     scoringCriteria: [
-      "User-centric decision making",
-      "Consistency across decisions",
-      "Understanding tradeoffs",
-      "Design reasoning quality",
+      "Thinking about what players need",
+      "Making choices that work well together",
+      "Understanding the tradeoffs",
+      "Explaining your thinking clearly",
     ],
     difficulty: "beginner",
     learningObjectives: [
-      "Understand how discovery design affects what content gets seen",
-      "Learn to balance safety and usability in social platforms",
-      "Explore the creator economy and how platform design impacts creators",
-      "See how monetization UX affects player trust and spending behavior",
-      "Understand cross-platform design challenges for different devices",
-      "Learn how notification design affects user engagement and retention",
+      "Understand how the home page changes what games people find",
+      "Learn to define a clear problem before jumping to solutions",
+      "Practice brainstorming creative ideas for social features",
+      "Design a real feature to help game creators get noticed",
+      "Learn why testing a design before launching is important",
     ],
     whatsBroken: [
-      "Home page only promotes popular games — new creators are invisible",
-      "Search is text-only and returns thousands of unusable results",
-      "No party system — 55% of sessions are solo despite wanting to play with friends",
-      "Chat filter is overly aggressive and blocks normal conversation",
-      "Avatar shop is overwhelming with millions of items and no guidance",
-      "Notifications are spammy — 65% of players have turned them off entirely",
+      "Home page only shows the same popular games — new games are invisible",
+      "Search is confusing and shows too many results",
+      "No way to pick a game together with friends as a group",
     ],
     successHints: [
-      "Maya is both a player and a creator — solutions should serve both roles",
-      "Think about the 95% of new games that get no visibility — how does discovery change for them?",
-      "Safety is critical but so is usability — the best solution makes both better, not one at the expense of the other",
-      "Maya has limited Robux — pricing clarity builds trust and reduces support tickets",
-      "Cross-platform players switch devices daily — friction kills engagement",
-      "Fewer, better notifications beat many low-quality ones every time",
+      "Maya is both a player and a game creator — your choices should help her with both",
+      "Almost all new games get ignored. How can your design change that?",
+      "Playing with friends is the #1 reason people keep playing. Make it easy!",
+      "If new creators can't get noticed, they'll stop making games — that's bad for everyone",
+      "Testing helps you fix problems before millions of people see them",
     ],
     designTips: {
       "roblox-home-page":
-        "The home page is the single biggest factor in what gets played. Design it to balance discovery of new content with quick access to favorites.",
+        "The home page decides what games people play. Think about how to help people find new games, not just the same old popular ones.",
       "roblox-search":
-        "60% of players never use search. The best search feels like browsing — visual, fast, and forgiving of vague queries.",
-      "roblox-ratings":
-        "When 90% of ratings are positive, ratings become meaningless. The best rating system provides useful signal to both players and creators.",
+        "Most players never use search because it's too hard. The best search feels easy and fun.",
       "roblox-social":
-        "Playing with friends is the #1 driver of retention. Remove every possible barrier between wanting to play together and actually playing together.",
+        "Playing with friends is the #1 reason people keep playing. Make it super easy.",
       "roblox-creator-discovery":
-        "Creator ecosystem health depends on new creators believing they can succeed. If only the top 50 games get traffic, new creators stop creating.",
-      "roblox-chat-safety":
-        "Safety and usability aren't opposites. The best moderation systems are both safer AND less annoying than blunt keyword filters.",
-      "roblox-avatar-shop":
-        "Decision fatigue kills conversions. When there are millions of items, curation and personalization are more important than selection size.",
-      "roblox-pricing":
-        "Price transparency builds trust. Confusion about Robux-to-dollar conversion creates frustration and negative parent experiences.",
-      "roblox-creator-analytics":
-        "Data without actionable insights is just numbers. The best analytics tell creators exactly what to do next.",
-      "roblox-content-moderation":
-        "Every false positive moderation action costs a creator hours of work and trust. Balance thoroughness with accuracy.",
-      "roblox-notifications":
-        "65% of players disabled notifications — that's a design failure, not a user preference. Fix the notifications, don't blame the users.",
-      "roblox-cross-platform":
-        "The best cross-platform experience makes switching devices feel invisible. Any friction is a reason to stop playing.",
+        "If new creators can't get anyone to play their games, they'll stop making games. That's bad for everyone!",
+      "roblox-testing":
+        "Testing with real people catches problems you'd never think of on your own.",
     },
     funFact:
-      "Did you know? Roblox has over 40 million experiences created by users, but only about 5,000 have ever reached 1 million visits. That means 99.99% of games struggle to find an audience — discovery design literally determines which creators succeed!",
+      "Did you know? Roblox has over 40 million games created by players, but only about 5,000 have ever reached 1 million visits. That means 99.99% of games struggle to find players — how you design the home page literally decides which games succeed!",
   },
 ];

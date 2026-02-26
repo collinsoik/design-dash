@@ -4,6 +4,7 @@ import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   CASE_STUDIES,
+  DESIGN_PHASES,
   type CaseStudy,
   type DecisionPoint,
   type SubmittedDecision,
@@ -477,12 +478,41 @@ function PlayPageContent() {
       </header>
 
       <div className="max-w-3xl mx-auto px-6 py-8 space-y-6">
+        {/* Design phase label */}
+        {decision.round < DESIGN_PHASES.length && (
+          <div className={`rounded-xl px-5 py-3 ${
+            decision.round === 0 ? "bg-rose-50 border border-rose-200" :
+            decision.round === 1 ? "bg-amber-50 border border-amber-200" :
+            decision.round === 2 ? "bg-emerald-50 border border-emerald-200" :
+            decision.round === 3 ? "bg-blue-50 border border-blue-200" :
+            "bg-violet-50 border border-violet-200"
+          }`}>
+            <p className={`text-sm font-bold uppercase tracking-wide ${
+              decision.round === 0 ? "text-rose-600" :
+              decision.round === 1 ? "text-amber-600" :
+              decision.round === 2 ? "text-emerald-600" :
+              decision.round === 3 ? "text-blue-600" :
+              "text-violet-600"
+            }`}>
+              Step {decision.round + 1}: {DESIGN_PHASES[decision.round].name}
+            </p>
+            <p className={`text-xs mt-0.5 ${
+              decision.round === 0 ? "text-rose-500" :
+              decision.round === 1 ? "text-amber-500" :
+              decision.round === 2 ? "text-emerald-500" :
+              decision.round === 3 ? "text-blue-500" :
+              "text-violet-500"
+            }`}>
+              {DESIGN_PHASES[decision.round].description}
+            </p>
+          </div>
+        )}
+
         {/* Progress bar */}
         <div>
           <div className="flex items-center justify-between text-sm text-text-secondary mb-2">
             <span>
-              Round{" "}
-              {decision.round + 1}
+              Decision {currentDecisionIndex + 1} of {totalDecisions}
             </span>
             <span>
               {answeredCount} of {totalDecisions} answered

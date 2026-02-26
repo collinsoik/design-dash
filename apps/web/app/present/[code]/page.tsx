@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { CASE_STUDIES, type CaseStudy, type GamePublic } from "@design-dash/shared";
+import { CASE_STUDIES, DESIGN_PHASES, type CaseStudy, type GamePublic } from "@design-dash/shared";
 import { getGame, advanceGame, goBackGame } from "@/lib/api";
 import CaseStudyBriefing from "@/components/tutorial/CaseStudyBriefing";
 
@@ -144,11 +144,41 @@ export default function PresenterPage() {
         {/* ─── PRESENTING PHASE ─── */}
         {game.phase === "presenting" && (
           <>
-            {/* Round indicator */}
-            <div className="text-center">
-              <span className="badge-blue text-base px-4 py-1">
-                Round {game.currentRound + 1} of {game.totalRounds}
-              </span>
+            {/* Design phase + round indicator */}
+            <div className="text-center space-y-2">
+              {game.currentRound < DESIGN_PHASES.length && (
+                <div className={`inline-block rounded-xl px-5 py-3 ${
+                  game.currentRound === 0 ? "bg-rose-50 border border-rose-200" :
+                  game.currentRound === 1 ? "bg-amber-50 border border-amber-200" :
+                  game.currentRound === 2 ? "bg-emerald-50 border border-emerald-200" :
+                  game.currentRound === 3 ? "bg-blue-50 border border-blue-200" :
+                  "bg-violet-50 border border-violet-200"
+                }`}>
+                  <p className={`text-base font-bold uppercase tracking-wide ${
+                    game.currentRound === 0 ? "text-rose-600" :
+                    game.currentRound === 1 ? "text-amber-600" :
+                    game.currentRound === 2 ? "text-emerald-600" :
+                    game.currentRound === 3 ? "text-blue-600" :
+                    "text-violet-600"
+                  }`}>
+                    Step {game.currentRound + 1}: {DESIGN_PHASES[game.currentRound].name}
+                  </p>
+                  <p className={`text-sm mt-0.5 ${
+                    game.currentRound === 0 ? "text-rose-500" :
+                    game.currentRound === 1 ? "text-amber-500" :
+                    game.currentRound === 2 ? "text-emerald-500" :
+                    game.currentRound === 3 ? "text-blue-500" :
+                    "text-violet-500"
+                  }`}>
+                    {DESIGN_PHASES[game.currentRound].description}
+                  </p>
+                </div>
+              )}
+              <div>
+                <span className="badge-blue text-base px-4 py-1">
+                  Round {game.currentRound + 1} of {game.totalRounds}
+                </span>
+              </div>
             </div>
 
             {/* Round scenarios */}

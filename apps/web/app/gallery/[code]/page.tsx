@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import type { CaseStudy, Submission, PlayerDecision, DecisionPoint } from "@design-dash/shared";
-import { TEAM_COLORS } from "@design-dash/shared";
+import { TEAM_COLORS, DESIGN_PHASES } from "@design-dash/shared";
 import { getDesigns } from "@/lib/api";
 import PhoneFrame from "@/components/preview/PhoneFrame";
 import ProductPreview from "@/components/preview/ProductPreview";
@@ -313,8 +313,18 @@ export default function GalleryPage() {
 
           {rounds.map(([round, roundDecisions]) => (
             <div key={round} className="mb-8">
-              <h3 className="text-sm font-semibold text-text-secondary uppercase tracking-wide mb-3">
-                Round {round + 1}
+              <h3 className={`text-sm font-semibold uppercase tracking-wide mb-3 ${
+                round < DESIGN_PHASES.length
+                  ? round === 0 ? "text-rose-600" :
+                    round === 1 ? "text-amber-600" :
+                    round === 2 ? "text-emerald-600" :
+                    round === 3 ? "text-blue-600" :
+                    "text-violet-600"
+                  : "text-text-secondary"
+              }`}>
+                {round < DESIGN_PHASES.length
+                  ? `${DESIGN_PHASES[round].name}`
+                  : `Round ${round + 1}`}
               </h3>
               <div className="grid gap-3">
                 {roundDecisions.map((dp) => {
