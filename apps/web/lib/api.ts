@@ -4,6 +4,8 @@ import type {
   DesignsResponse,
   CreateGameResponse,
   SubmitDesignResponse,
+  TeamVotes,
+  VoteResponse,
 } from "@design-dash/shared";
 
 const API_URL =
@@ -59,4 +61,11 @@ export function submitDesign(
 
 export function getDesigns(code: string) {
   return request<DesignsResponse>(`/api/games/${code}/designs`);
+}
+
+export function submitVote(code: string, voterTeam: string, votes: TeamVotes) {
+  return request<VoteResponse>(`/api/games/${code}/vote`, {
+    method: "POST",
+    body: JSON.stringify({ voterTeam, votes }),
+  });
 }

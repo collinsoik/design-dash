@@ -78,11 +78,33 @@ export interface PlayerDecision {
   submittedAt: number;
 }
 
+// ── Awards & Voting ────────────────────────
+
+export const AWARD_CATEGORIES = [
+  { id: "most-creative", name: "Most Creative", description: "Most original and inventive design" },
+  { id: "best-ux", name: "Best for Users", description: "Most user-friendly design" },
+  { id: "would-use", name: "Would Use It", description: "The product you'd actually want to use" },
+] as const;
+
+export type AwardCategoryId = typeof AWARD_CATEGORIES[number]["id"];
+
+export interface TeamVotes {
+  [categoryId: string]: string; // award category id → team name voted for
+}
+
+export interface AwardResult {
+  categoryId: string;
+  categoryName: string;
+  winnerTeam: string;
+  winnerVotes: number;
+  totalVotes: number;
+}
+
 // ── REST API Game Model ─────────────────────
 // Self-paced, presenter-driven game with offline team submissions.
 // No persistent connections — all operations are idempotent REST calls.
 
-export type RestGamePhase = "presenting" | "submission" | "gallery";
+export type RestGamePhase = "presenting" | "submission" | "gallery" | "voting" | "awards";
 
 export interface RestGame {
   code: string;
@@ -92,6 +114,7 @@ export interface RestGame {
   totalRounds: number;
   phase: RestGamePhase;
   submissions: Record<string, Submission>; // teamKey (lowercase name) → submission
+  votes: Record<string, TeamVotes>; // voterTeamKey → their votes
   createdAt: number;
 }
 
@@ -103,6 +126,7 @@ export interface GamePublic {
   totalRounds: number;
   phase: RestGamePhase;
   submittedTeams: string[]; // display names of teams that have submitted
+  votedTeams: string[]; // display names of teams that have voted
   createdAt: number;
 }
 
@@ -145,10 +169,22 @@ export interface SubmitDesignResponse {
   teamName: string;
 }
 
+export interface VoteRequest {
+  voterTeam: string;
+  votes: TeamVotes;
+}
+
+export interface VoteResponse {
+  success: boolean;
+  voterTeam: string;
+}
+
 export interface DesignsResponse {
   caseStudy: CaseStudy;
   submissions: Submission[];
   phase: RestGamePhase;
+  votedTeams: string[];
+  awards: AwardResult[];
 }
 
 export interface ApiError {

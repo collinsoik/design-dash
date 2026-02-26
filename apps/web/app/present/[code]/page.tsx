@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { CASE_STUDIES, DESIGN_PHASES, type CaseStudy, type GamePublic } from "@design-dash/shared";
-import { getGame, advanceGame, goBackGame } from "@/lib/api";
+import { CASE_STUDIES, DESIGN_PHASES, AWARD_CATEGORIES, TEAM_COLORS, type CaseStudy, type GamePublic, type AwardResult } from "@design-dash/shared";
+import { getGame, advanceGame, goBackGame, getDesigns } from "@/lib/api";
 import CaseStudyBriefing from "@/components/tutorial/CaseStudyBriefing";
 
 export default function PresenterPage() {
@@ -17,6 +17,8 @@ export default function PresenterPage() {
   const [advancing, setAdvancing] = useState(false);
   const [goingBack, setGoingBack] = useState(false);
   const [showBriefing, setShowBriefing] = useState(false);
+  const [awards, setAwards] = useState<AwardResult[]>([]);
+  const [submissionNames, setSubmissionNames] = useState<string[]>([]);
 
   // Load admin token from sessionStorage
   useEffect(() => {
@@ -44,12 +46,35 @@ export default function PresenterPage() {
     fetchGame();
   }, [fetchGame]);
 
-  // Poll for submissions in submission phase
+  // Poll for submissions in submission phase and votes in voting phase
   useEffect(() => {
-    if (!game || game.phase !== "submission") return;
+    if (!game || (game.phase !== "submission" && game.phase !== "voting")) return;
     const interval = setInterval(fetchGame, 3000);
     return () => clearInterval(interval);
   }, [game?.phase, fetchGame]);
+
+  // Fetch awards when entering awards phase
+  useEffect(() => {
+    if (!game || game.phase !== "awards") return;
+    (async () => {
+      try {
+        const data = await getDesigns(code);
+        setAwards(data.awards || []);
+        setSubmissionNames(data.submissions.map((s) => s.teamName));
+      } catch {}
+    })();
+  }, [game?.phase, code]);
+
+  // Fetch submission names for voting phase display
+  useEffect(() => {
+    if (!game || (game.phase !== "voting" && game.phase !== "gallery")) return;
+    (async () => {
+      try {
+        const data = await getDesigns(code);
+        setSubmissionNames(data.submissions.map((s) => s.teamName));
+      } catch {}
+    })();
+  }, [game?.phase, code]);
 
   async function handleAdvance() {
     if (!adminToken) return;
@@ -127,18 +152,23 @@ export default function PresenterPage() {
       <div className="max-w-4xl mx-auto px-6 py-8 space-y-8">
         {/* Phase indicator */}
         <div className="flex items-center gap-3">
-          {(["presenting", "submission", "gallery"] as const).map((phase) => (
-            <div
-              key={phase}
-              className={`flex-1 h-2 rounded-full transition-colors ${
-                game.phase === phase
-                  ? "bg-accent-primary"
-                  : game.phase === "gallery" || (game.phase === "submission" && phase === "presenting")
-                    ? "bg-accent-green"
-                    : "bg-surface-tertiary"
-              }`}
-            />
-          ))}
+          {(["presenting", "submission", "gallery", "voting", "awards"] as const).map((p) => {
+            const order = ["presenting", "submission", "gallery", "voting", "awards"];
+            const currentIdx = order.indexOf(game.phase);
+            const thisIdx = order.indexOf(p);
+            return (
+              <div
+                key={p}
+                className={`flex-1 h-2 rounded-full transition-colors ${
+                  thisIdx === currentIdx
+                    ? "bg-accent-primary"
+                    : thisIdx < currentIdx
+                      ? "bg-accent-green"
+                      : "bg-surface-tertiary"
+                }`}
+              />
+            );
+          })}
         </div>
 
         {/* ─── PRESENTING PHASE ─── */}
@@ -337,19 +367,155 @@ export default function PresenterPage() {
 
         {/* ─── GALLERY PHASE ─── */}
         {game.phase === "gallery" && (
-          <div className="text-center space-y-4">
-            <h2 className="text-2xl font-bold text-text-primary">
-              Gallery is Live
-            </h2>
-            <p className="text-text-secondary">
-              Everyone can now view the designs.
-            </p>
-            <button
-              onClick={() => router.push(`/gallery/${code}`)}
-              className="btn-primary text-lg px-8 py-3"
-            >
-              View Gallery
-            </button>
+          <div className="space-y-6">
+            <div className="text-center space-y-4">
+              <h2 className="text-2xl font-bold text-text-primary">
+                Gallery is Live
+              </h2>
+              <p className="text-text-secondary">
+                Everyone can now view the designs.
+              </p>
+              <button
+                onClick={() => router.push(`/gallery/${code}`)}
+                className="btn-primary text-lg px-8 py-3"
+              >
+                View Gallery
+              </button>
+            </div>
+            <div className="text-center pt-4 border-t border-border-primary">
+              <p className="text-sm text-text-tertiary mb-3">
+                When everyone has seen the designs:
+              </p>
+              <button
+                onClick={handleAdvance}
+                disabled={advancing}
+                className="btn-green text-lg px-8 py-3"
+              >
+                {advancing ? "..." : "Open Voting"}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ─── VOTING PHASE ─── */}
+        {game.phase === "voting" && (
+          <div className="space-y-6">
+            <div className="text-center">
+              <p className="text-4xl mb-2">&#127942;</p>
+              <h2 className="text-2xl font-bold text-text-primary mb-2">
+                Voting Open
+              </h2>
+              <p className="text-text-secondary">
+                Teams are voting for awards on their devices
+              </p>
+            </div>
+
+            {/* Award categories */}
+            <div className="card-elevated">
+              <h3 className="text-sm font-semibold text-text-secondary uppercase tracking-wide mb-4">
+                Award Categories
+              </h3>
+              <div className="grid gap-3">
+                {AWARD_CATEGORIES.map((cat) => (
+                  <div key={cat.id} className="bg-surface-tertiary rounded-lg p-3">
+                    <p className="text-base font-semibold text-text-primary">{cat.name}</p>
+                    <p className="text-xs text-text-secondary mt-0.5">{cat.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Voted teams */}
+            <div className="card-elevated">
+              <h3 className="text-sm font-semibold text-text-secondary uppercase tracking-wide mb-4">
+                Teams Voted ({game.votedTeams.length} of {game.submittedTeams.length})
+              </h3>
+              {game.votedTeams.length === 0 ? (
+                <p className="text-text-tertiary text-sm animate-pulse">
+                  Waiting for teams to vote...
+                </p>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {game.votedTeams.map((name) => (
+                    <span key={name} className="badge-green text-sm px-3 py-1">
+                      {name}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="text-center pt-4">
+              <button
+                onClick={handleAdvance}
+                disabled={advancing}
+                className="btn-primary text-lg px-8 py-3"
+              >
+                {advancing ? "..." : "Reveal Awards"}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ─── AWARDS PHASE ─── */}
+        {game.phase === "awards" && (
+          <div className="space-y-8">
+            <div className="text-center">
+              <p className="text-5xl mb-3">&#127942;</p>
+              <h2 className="text-3xl font-bold text-text-primary">
+                Design Awards
+              </h2>
+            </div>
+
+            {awards.length > 0 ? (
+              <div className="grid gap-6">
+                {awards.map((award, i) => {
+                  const teamIdx = submissionNames.indexOf(award.winnerTeam);
+                  const color = teamIdx >= 0
+                    ? TEAM_COLORS[teamIdx % TEAM_COLORS.length]
+                    : "#6B7280";
+                  const trophies = ["&#129351;", "&#129352;", "&#129353;"];
+
+                  return (
+                    <div
+                      key={award.categoryId}
+                      className="bg-white rounded-2xl border-2 p-8 text-center shadow-elevated"
+                      style={{ borderColor: color }}
+                    >
+                      <p
+                        className="text-5xl mb-3"
+                        dangerouslySetInnerHTML={{ __html: trophies[i] || "&#127942;" }}
+                      />
+                      <p className="text-sm font-semibold text-text-tertiary uppercase tracking-wide mb-2">
+                        {award.categoryName}
+                      </p>
+                      <p
+                        className="text-4xl font-bold mb-2"
+                        style={{ color }}
+                      >
+                        {award.winnerTeam}
+                      </p>
+                      <p className="text-base text-text-tertiary">
+                        {award.winnerVotes} vote{award.winnerVotes !== 1 ? "s" : ""} out of {award.totalVotes}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-text-tertiary text-center animate-pulse">
+                Loading awards...
+              </p>
+            )}
+
+            <div className="text-center pt-4">
+              <button
+                onClick={() => router.push(`/gallery/${code}`)}
+                className="btn-ghost"
+              >
+                View Full Gallery
+              </button>
+            </div>
           </div>
         )}
 

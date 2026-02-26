@@ -1,7 +1,7 @@
 import initSqlJs, { Database } from "sql.js";
 import fs from "fs";
 import path from "path";
-import { RestGame, Submission } from "@design-dash/shared";
+import { RestGame, Submission, TeamVotes } from "@design-dash/shared";
 
 const DB_PATH =
   process.env.DB_PATH || path.join(__dirname, "..", "data", "designdash.db");
@@ -53,6 +53,16 @@ export async function initDb(): Promise<void> {
     );
   `);
 
+  db.run(`
+    CREATE TABLE IF NOT EXISTS rest_votes (
+      game_code TEXT NOT NULL,
+      voter_team_key TEXT NOT NULL,
+      voter_team_name TEXT NOT NULL,
+      votes_json TEXT NOT NULL,
+      PRIMARY KEY (game_code, voter_team_key)
+    );
+  `);
+
   persistDb();
 }
 
@@ -75,6 +85,21 @@ export function loadGames(): RestGame[] {
       "SELECT code, admin_token, case_study_id, current_round, total_rounds, phase, created_at FROM rest_games"
     );
     if (gameRows.length === 0) return results;
+
+    // Load all votes and group by game_code
+    const votesByGame = new Map<string, Array<{ teamKey: string; teamName: string; votesJson: string }>>();
+    const voteRows = db.exec(
+      "SELECT game_code, voter_team_key, voter_team_name, votes_json FROM rest_votes"
+    );
+    if (voteRows.length > 0) {
+      for (const row of voteRows[0].values) {
+        const [gameCode, teamKey, teamName, votesJson] = row as [string, string, string, string];
+        if (!votesByGame.has(gameCode)) {
+          votesByGame.set(gameCode, []);
+        }
+        votesByGame.get(gameCode)!.push({ teamKey, teamName, votesJson });
+      }
+    }
 
     // Load all submissions and group by game_code
     const submissionsByGame = new Map<string, Array<{ teamKey: string; teamName: string; decisionsJson: string; submittedAt: number }>>();
@@ -102,6 +127,7 @@ export function loadGames(): RestGame[] {
         totalRounds: totalRounds as number,
         phase: phase as RestGame["phase"],
         submissions: {},
+        votes: {},
         createdAt: createdAt as number,
       };
 
@@ -113,6 +139,12 @@ export function loadGames(): RestGame[] {
           decisions: JSON.parse(sub.decisionsJson),
           submittedAt: sub.submittedAt,
         };
+      }
+
+      // Attach votes
+      const gameVotes = votesByGame.get(code as string) || [];
+      for (const v of gameVotes) {
+        game.votes[v.teamKey] = JSON.parse(v.votesJson);
       }
 
       results.push(game);
@@ -135,6 +167,21 @@ export function saveGame(game: RestGame): void {
     persistDb();
   } catch (err) {
     console.error("Failed to save game:", err);
+  }
+}
+
+export function saveVote(gameCode: string, voterTeamName: string, votes: TeamVotes): void {
+  try {
+    const teamKey = voterTeamName.trim().toLowerCase();
+    db.run(
+      `INSERT OR REPLACE INTO rest_votes
+        (game_code, voter_team_key, voter_team_name, votes_json)
+       VALUES (?, ?, ?, ?)`,
+      [gameCode, teamKey, voterTeamName, JSON.stringify(votes)]
+    );
+    persistDb();
+  } catch (err) {
+    console.error("Failed to save vote:", err);
   }
 }
 

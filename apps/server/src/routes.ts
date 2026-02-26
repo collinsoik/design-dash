@@ -2,12 +2,15 @@ import { Router } from "express";
 import crypto from "crypto";
 import {
   CASE_STUDIES,
+  AWARD_CATEGORIES,
   RestGame,
   GamePublic,
   Submission,
   CaseStudy,
+  AwardResult,
+  TeamVotes,
 } from "@design-dash/shared";
-import { saveGame, saveSubmission, loadGames } from "./db";
+import { saveGame, saveSubmission, saveVote, loadGames } from "./db";
 
 const router = Router();
 
@@ -36,6 +39,13 @@ function getTotalRounds(caseStudy: CaseStudy): number {
 }
 
 function toPublic(game: RestGame): GamePublic {
+  // Build voted team display names from vote keys + submissions
+  const votedTeams: string[] = [];
+  for (const voterKey of Object.keys(game.votes)) {
+    const sub = game.submissions[voterKey];
+    votedTeams.push(sub ? sub.teamName : voterKey);
+  }
+
   return {
     code: game.code,
     caseStudyId: game.caseStudyId,
@@ -43,8 +53,45 @@ function toPublic(game: RestGame): GamePublic {
     totalRounds: game.totalRounds,
     phase: game.phase,
     submittedTeams: Object.values(game.submissions).map((s) => s.teamName),
+    votedTeams,
     createdAt: game.createdAt,
   };
+}
+
+function computeAwards(game: RestGame): AwardResult[] {
+  const results: AwardResult[] = [];
+  const allVotes = Object.values(game.votes);
+
+  for (const cat of AWARD_CATEGORIES) {
+    // Count votes per team for this category
+    const tally = new Map<string, number>();
+    for (const v of allVotes) {
+      const teamName = v[cat.id];
+      if (teamName) {
+        tally.set(teamName, (tally.get(teamName) || 0) + 1);
+      }
+    }
+
+    // Find winner (most votes, alphabetical tie-break)
+    let winnerTeam = "";
+    let winnerVotes = 0;
+    for (const [team, count] of tally.entries()) {
+      if (count > winnerVotes || (count === winnerVotes && team < winnerTeam)) {
+        winnerTeam = team;
+        winnerVotes = count;
+      }
+    }
+
+    results.push({
+      categoryId: cat.id,
+      categoryName: cat.name,
+      winnerTeam: winnerTeam || "No votes",
+      winnerVotes,
+      totalVotes: allVotes.length,
+    });
+  }
+
+  return results;
 }
 
 /** Populate in-memory map from DB on startup */
@@ -85,6 +132,7 @@ router.post("/games", (req, res) => {
     totalRounds,
     phase: "presenting",
     submissions: {},
+    votes: {},
     createdAt: Date.now(),
   };
 
@@ -131,6 +179,10 @@ router.post("/games/:code/advance", (req, res) => {
     }
   } else if (game.phase === "submission") {
     game.phase = "gallery";
+  } else if (game.phase === "gallery") {
+    game.phase = "voting";
+  } else if (game.phase === "voting") {
+    game.phase = "awards";
   }
 
   saveGame(game);
@@ -157,6 +209,8 @@ router.post("/games/:code/go-back", (req, res) => {
   } else if (game.phase === "submission") {
     // Go back to the last round of presenting
     game.phase = "presenting";
+  } else if (game.phase === "voting") {
+    game.phase = "gallery";
   } else {
     res.status(400).json({ error: "Cannot go back further" });
     return;
@@ -222,8 +276,78 @@ router.post("/games/:code/submit", (req, res) => {
   res.json({ success: true, teamName: submission.teamName });
 });
 
+// ─── POST /api/games/:code/vote ─────────────
+// Team submits their votes for awards.
+// Idempotent: same voter overwrites previous votes.
+router.post("/games/:code/vote", (req, res) => {
+  const game = games.get(req.params.code);
+  if (!game) {
+    res.status(404).json({ error: "Game not found" });
+    return;
+  }
+
+  if (game.phase !== "voting") {
+    res.status(400).json({ error: "Voting is not open" });
+    return;
+  }
+
+  const { voterTeam, votes } = req.body;
+
+  if (!voterTeam || typeof voterTeam !== "string" || voterTeam.trim().length === 0) {
+    res.status(400).json({ error: "Voter team name is required" });
+    return;
+  }
+
+  if (!votes || typeof votes !== "object") {
+    res.status(400).json({ error: "Votes are required" });
+    return;
+  }
+
+  const voterKey = voterTeam.trim().toLowerCase();
+
+  // Voter must be a submitted team
+  if (!game.submissions[voterKey]) {
+    res.status(400).json({ error: "Only submitted teams can vote" });
+    return;
+  }
+
+  // Validate each vote: must be for a valid submitted team, not self
+  const validTeamKeys = new Set(Object.keys(game.submissions));
+  const validCategoryIds = new Set<string>(AWARD_CATEGORIES.map((c) => c.id));
+  const cleanVotes: TeamVotes = {};
+
+  for (const [categoryId, teamName] of Object.entries(votes)) {
+    if (!validCategoryIds.has(categoryId)) continue;
+    if (typeof teamName !== "string") continue;
+
+    const votedKey = teamName.trim().toLowerCase();
+    if (!validTeamKeys.has(votedKey)) {
+      res.status(400).json({ error: `Invalid team: ${teamName}` });
+      return;
+    }
+    if (votedKey === voterKey) {
+      res.status(400).json({ error: "You cannot vote for your own team" });
+      return;
+    }
+
+    cleanVotes[categoryId] = game.submissions[votedKey].teamName;
+  }
+
+  // Must vote for all 3 categories
+  if (Object.keys(cleanVotes).length !== AWARD_CATEGORIES.length) {
+    res.status(400).json({ error: "Please vote in all categories" });
+    return;
+  }
+
+  game.votes[voterKey] = cleanVotes;
+  saveGame(game);
+  saveVote(game.code, voterTeam.trim(), cleanVotes);
+
+  res.json({ success: true, voterTeam: voterTeam.trim() });
+});
+
 // ─── GET /api/games/:code/designs ────────────
-// View all submitted designs (available in submission + gallery phases).
+// View all submitted designs (available after presenting phase).
 router.get("/games/:code/designs", (req, res) => {
   const game = games.get(req.params.code);
   if (!game) {
@@ -238,10 +362,19 @@ router.get("/games/:code/designs", (req, res) => {
 
   const caseStudy = CASE_STUDIES.find((cs) => cs.id === game.caseStudyId);
 
+  // Build voted team names
+  const votedTeams: string[] = [];
+  for (const voterKey of Object.keys(game.votes)) {
+    const sub = game.submissions[voterKey];
+    votedTeams.push(sub ? sub.teamName : voterKey);
+  }
+
   res.json({
     caseStudy,
     submissions: Object.values(game.submissions),
     phase: game.phase,
+    votedTeams,
+    awards: game.phase === "awards" ? computeAwards(game) : [],
   });
 });
 
