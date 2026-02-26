@@ -2,7 +2,9 @@
 
 ## Overview
 
-DesignDash is a multiplayer design challenge game with a **Vercel frontend** and a **Node.js + Socket.IO backend** running in **Docker** on a shared VM (`dev` server). The container is exposed to the internet through a **shared Cloudflare Tunnel**.
+DesignDash is a presenter-paced design challenge game with a **Vercel frontend** and a **Node.js REST API backend** running in **Docker** on a shared VM (`dev` server). The container is exposed to the internet through a **shared Cloudflare Tunnel**.
+
+The backend uses plain HTTP REST (no WebSocket/Socket.IO) so it handles lost packets and connection problems gracefully — all operations are idempotent and safe to retry.
 
 ## Architecture
 
@@ -13,14 +15,33 @@ DesignDash is a multiplayer design challenge game with a **Vercel frontend** and
 │  design-dash-two.vercel.app ────▶ cloudflared (systemd)                  │
 │  (Next.js app)           │      │   └─▶ dash-api.collinsoik.dev          │
 │                          │      │        └─▶ localhost:3002               │
-│  Uses Socket.IO client   │      │             └─▶ Docker: server-game-   │
-│  for real-time comms     │      │                  server-1               │
+│  Uses fetch() for REST   │      │             └─▶ Docker: server-game-   │
+│  API calls               │      │                  server-1               │
 └──────────────────────────┘      │                                         │
                                   │  Also on this VM:                       │
                                   │  ├─ Landscape   :3004  (PM2)            │
                                   │  └─ EngiQuest   :3005  (PM2)            │
                                   └─────────────────────────────────────────┘
 ```
+
+## API Endpoints
+
+| Method | Path | Auth | Purpose |
+|--------|------|------|---------|
+| GET | `/health` | — | Health check |
+| POST | `/api/games` | — | Create game (returns code + adminToken) |
+| GET | `/api/games/:code` | — | Get game state (phase, round, submitted teams) |
+| POST | `/api/games/:code/advance` | adminToken | Advance round or phase |
+| POST | `/api/games/:code/submit` | — | Submit team decisions (idempotent) |
+| GET | `/api/games/:code/designs` | — | View all submitted designs |
+
+## Game Flow
+
+1. Presenter creates a game → gets a 4-digit code + admin token
+2. Presenter advances through rounds at their own pace (no timers)
+3. After all rounds, game enters `submission` phase
+4. Teams enter the game code on the website and submit their design decisions
+5. Presenter advances to `gallery` phase — everyone can view all submissions
 
 ## Backend Process Management
 
@@ -47,7 +68,7 @@ Environment variables are set in `docker-compose.yml` under the `environment` ke
 - `CORS_ORIGIN` — must match the Vercel deployment URL (`https://design-dash-two.vercel.app`)
 
 **Vercel environment variable:**
-- `NEXT_PUBLIC_SOCKET_URL=https://dash-api.collinsoik.dev`
+- `NEXT_PUBLIC_API_URL=https://dash-api.collinsoik.dev`
 
 ## Cloudflare Tunnel (Shared)
 
@@ -98,7 +119,3 @@ No PM2 involvement — this project uses Docker exclusively.
 - `docker compose logs` from the `apps/server/` directory
 - Check if port 3002 is already in use: `lsof -i :3002`
 - Rebuild: `docker compose up -d --build`
-
-**Room creation hanging on frontend:**
-- Check `~/server-status.sh` for a full picture
-- Verify `NEXT_PUBLIC_SOCKET_URL` is set in Vercel

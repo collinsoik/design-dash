@@ -180,6 +180,83 @@ export interface BestDecisionAward {
   teamName: string;
 }
 
+// ── REST API Game Model ─────────────────────
+// Self-paced, presenter-driven game with offline team submissions.
+// No persistent connections — all operations are idempotent REST calls.
+
+export type RestGamePhase = "presenting" | "submission" | "gallery";
+
+export interface RestGame {
+  code: string;
+  adminToken: string;
+  caseStudyId: string;
+  currentRound: number;
+  totalRounds: number;
+  phase: RestGamePhase;
+  submissions: Record<string, Submission>; // teamKey (lowercase name) → submission
+  createdAt: number;
+}
+
+/** Public view of a game (omits adminToken) */
+export interface GamePublic {
+  code: string;
+  caseStudyId: string;
+  currentRound: number;
+  totalRounds: number;
+  phase: RestGamePhase;
+  submittedTeams: string[]; // display names of teams that have submitted
+  createdAt: number;
+}
+
+export interface Submission {
+  teamName: string;
+  decisions: SubmittedDecision[];
+  submittedAt: number;
+}
+
+export interface SubmittedDecision {
+  decisionPointId: string;
+  choiceId?: string;
+  sliderValue?: number;
+  branchId?: string;
+  followUpChoiceId?: string;
+}
+
+// ── REST API Request / Response Types ───────
+
+export interface CreateGameRequest {
+  caseStudyId: string;
+}
+
+export interface CreateGameResponse {
+  code: string;
+  adminToken: string;
+}
+
+export interface AdvanceRequest {
+  adminToken: string;
+}
+
+export interface SubmitDesignRequest {
+  teamName: string;
+  decisions: SubmittedDecision[];
+}
+
+export interface SubmitDesignResponse {
+  success: boolean;
+  teamName: string;
+}
+
+export interface DesignsResponse {
+  caseStudy: CaseStudy;
+  submissions: Submission[];
+  phase: RestGamePhase;
+}
+
+export interface ApiError {
+  error: string;
+}
+
 // ── Constants ───────────────────────────────
 
 export const TEAM_COLORS = [
@@ -191,6 +268,14 @@ export const TEAM_COLORS = [
   "#F76808", // Orange
   "#12A594", // Teal
   "#E54666", // Rose
+  "#0091FF", // Sky
+  "#AB4ABA", // Plum
+  "#D6409F", // Pink
+  "#FFB224", // Amber
+  "#7CE2FE", // Cyan
+  "#3D9970", // Moss
+  "#6E56CF", // Iris
+  "#E93D82", // Crimson
 ] as const;
 
 export const TEAM_NAMES = [
@@ -202,4 +287,12 @@ export const TEAM_NAMES = [
   "Studio Ember",
   "Studio Teal",
   "Studio Rose",
+  "Studio Sky",
+  "Studio Plum",
+  "Studio Pink",
+  "Studio Amber",
+  "Studio Cyan",
+  "Studio Moss",
+  "Studio Iris",
+  "Studio Crimson",
 ] as const;

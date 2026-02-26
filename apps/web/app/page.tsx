@@ -1,46 +1,52 @@
 "use client";
 
-import { useState, useEffect, FormEvent } from "react";
+import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import HowToPlay from "@/components/tutorial/HowToPlay";
-import { useGameStore } from "@/lib/game-store";
-import { disconnectSocket } from "@/lib/socket";
+import { CASE_STUDIES } from "@design-dash/shared";
+import { createGame } from "@/lib/api";
 
 export default function LandingPage() {
   const router = useRouter();
-  const [roomCode, setRoomCode] = useState("");
-  const [playerName, setPlayerName] = useState("");
+
+  // Join / Submit
+  const [gameCode, setGameCode] = useState("");
   const [isJoining, setIsJoining] = useState(false);
-  const [showTutorial, setShowTutorial] = useState(false);
 
-  // Reset previous game state when landing page mounts (e.g. after "Play Again")
-  useEffect(() => {
-    useGameStore.getState().reset();
-    disconnectSocket();
-  }, []);
+  // Create
+  const [caseStudyId, setCaseStudyId] = useState(CASE_STUDIES[0].id);
+  const [isCreating, setIsCreating] = useState(false);
+  const [createError, setCreateError] = useState("");
 
-  function handleRoomCodeChange(value: string) {
-    // Only allow digits, max 4 chars
+  function handleCodeChange(value: string) {
     const cleaned = value.replace(/[^0-9]/g, "");
-    if (cleaned.length <= 4) {
-      setRoomCode(cleaned);
-    }
+    if (cleaned.length <= 4) setGameCode(cleaned);
   }
 
   function handleJoin(e: FormEvent) {
     e.preventDefault();
-    if (roomCode.trim().length !== 4 || !playerName.trim()) return;
-
+    if (gameCode.length !== 4) return;
     setIsJoining(true);
-    const encodedName = encodeURIComponent(playerName.trim());
-    router.push(`/lobby/${roomCode.trim()}?name=${encodedName}`);
+    router.push(`/submit/${gameCode}`);
+  }
+
+  async function handleCreate() {
+    setIsCreating(true);
+    setCreateError("");
+    try {
+      const { code, adminToken } = await createGame(caseStudyId);
+      // Store admin token in sessionStorage so presenter page can use it
+      sessionStorage.setItem(`admin-${code}`, adminToken);
+      router.push(`/present/${code}`);
+    } catch (err: any) {
+      setCreateError(err.message || "Failed to create game");
+      setIsCreating(false);
+    }
   }
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-4 relative overflow-hidden bg-surface-primary">
+    <main className="min-h-screen flex flex-col items-center justify-center px-4 bg-surface-primary">
       {/* Title */}
-      <div className="text-center mb-12 relative z-10">
+      <div className="text-center mb-12">
         <h1 className="text-5xl md:text-6xl font-bold text-text-primary mb-4 tracking-tight">
           DesignDash
         </h1>
@@ -50,45 +56,33 @@ export default function LandingPage() {
       </div>
 
       {/* Action Cards */}
-      <div className="flex flex-col md:flex-row gap-8 w-full max-w-3xl relative z-10">
-        {/* JOIN GAME Card */}
+      <div className="flex flex-col md:flex-row gap-8 w-full max-w-3xl">
+        {/* SUBMIT DESIGNS Card */}
         <div className="flex-1 card">
           <h2 className="text-lg font-semibold text-text-primary mb-6 text-center">
-            Join Game
+            Submit Designs
           </h2>
           <form onSubmit={handleJoin} className="space-y-4">
             <div>
               <label className="text-sm font-medium text-text-secondary block mb-2">
-                Room Code
+                Game Code
               </label>
               <input
                 type="text"
-                value={roomCode}
-                onChange={(e) => handleRoomCodeChange(e.target.value)}
+                inputMode="numeric"
+                value={gameCode}
+                onChange={(e) => handleCodeChange(e.target.value)}
                 placeholder="1234"
                 maxLength={4}
-                className="input font-mono tracking-widest"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-text-secondary block mb-2">
-                Your Name
-              </label>
-              <input
-                type="text"
-                value={playerName}
-                onChange={(e) => setPlayerName(e.target.value)}
-                placeholder="Player name"
-                maxLength={20}
-                className="input"
+                className="input font-mono tracking-widest text-center text-2xl"
               />
             </div>
             <button
               type="submit"
-              disabled={roomCode.trim().length !== 4 || !playerName.trim() || isJoining}
+              disabled={gameCode.length !== 4 || isJoining}
               className="w-full btn-primary disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              {isJoining ? "Joining..." : "Join"}
+              {isJoining ? "Loading..." : "Enter Game"}
             </button>
           </form>
         </div>
@@ -98,40 +92,48 @@ export default function LandingPage() {
           <span className="text-sm text-text-tertiary">or</span>
         </div>
 
-        {/* HOST GAME Card */}
-        <div className="flex-1 card flex flex-col items-center justify-center min-h-[280px]">
+        {/* CREATE GAME Card (Presenter) */}
+        <div className="flex-1 card">
           <h2 className="text-lg font-semibold text-text-primary mb-6 text-center">
-            Host Game
+            Present a Game
           </h2>
-          <p className="text-text-secondary text-sm text-center mb-8 leading-relaxed">
-            Create a new game room, choose a product scenario, and invite your
-            players to join.
-          </p>
-          <Link href="/host" className="btn-green inline-block text-center">
-            Create Room
-          </Link>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-text-secondary block mb-2">
+                Case Study
+              </label>
+              <select
+                value={caseStudyId}
+                onChange={(e) => setCaseStudyId(e.target.value)}
+                className="input"
+              >
+                {CASE_STUDIES.map((cs) => (
+                  <option key={cs.id} value={cs.id}>
+                    {cs.productName} — {cs.shortDescription}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <button
+              onClick={handleCreate}
+              disabled={isCreating}
+              className="w-full btn-green disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {isCreating ? "Creating..." : "Create Game"}
+            </button>
+            {createError && (
+              <p className="text-sm text-accent-red text-center">{createError}</p>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* How to Play Button */}
-      <div className="mt-10 relative z-10">
-        <button
-          onClick={() => setShowTutorial(true)}
-          className="btn-ghost"
-        >
-          How to Play
-        </button>
-      </div>
-
       {/* Footer */}
-      <div className="mt-8 text-center relative z-10">
+      <div className="mt-10 text-center">
         <p className="text-xs text-text-disabled">
-          A multiplayer product design game
+          A product design decision game for the classroom
         </p>
       </div>
-
-      {/* Tutorial Modal */}
-      {showTutorial && <HowToPlay onClose={() => setShowTutorial(false)} />}
     </main>
   );
 }

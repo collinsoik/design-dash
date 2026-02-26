@@ -1,7 +1,7 @@
 import initSqlJs, { Database } from "sql.js";
 import fs from "fs";
 import path from "path";
-import { Room, GameResults } from "@design-dash/shared";
+import { RestGame, Submission } from "@design-dash/shared";
 
 const DB_PATH =
   process.env.DB_PATH || path.join(__dirname, "..", "data", "designdash.db");
@@ -16,7 +16,6 @@ export async function initDb(): Promise<void> {
 
   const SQL = await initSqlJs();
 
-  // Load existing database if it exists
   if (fs.existsSync(DB_PATH)) {
     const buffer = fs.readFileSync(DB_PATH);
     db = new SQL.Database(buffer);
@@ -24,47 +23,33 @@ export async function initDb(): Promise<void> {
     db = new SQL.Database();
   }
 
-  // Create tables
+  // Drop legacy tables from the old Socket.IO-based schema
+  db.run("DROP TABLE IF EXISTS decisions");
+  db.run("DROP TABLE IF EXISTS players");
+  db.run("DROP TABLE IF EXISTS teams");
+  db.run("DROP TABLE IF EXISTS games");
+
+  // New schema
   db.run(`
-    CREATE TABLE IF NOT EXISTS games (
-      id TEXT PRIMARY KEY,
-      room_code TEXT,
-      case_study_id TEXT,
-      team_size INTEGER,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      ended_at DATETIME
+    CREATE TABLE IF NOT EXISTS rest_games (
+      code TEXT PRIMARY KEY,
+      admin_token TEXT NOT NULL,
+      case_study_id TEXT NOT NULL,
+      current_round INTEGER DEFAULT 0,
+      total_rounds INTEGER NOT NULL,
+      phase TEXT DEFAULT 'presenting',
+      created_at INTEGER NOT NULL
     );
   `);
+
   db.run(`
-    CREATE TABLE IF NOT EXISTS teams (
-      id TEXT PRIMARY KEY,
-      game_id TEXT REFERENCES games(id),
-      name TEXT,
-      peer_score REAL DEFAULT 0,
-      judge_score REAL DEFAULT 0,
-      final_score REAL DEFAULT 0
-    );
-  `);
-  db.run(`
-    CREATE TABLE IF NOT EXISTS players (
-      id TEXT PRIMARY KEY,
-      game_id TEXT REFERENCES games(id),
-      team_id TEXT REFERENCES teams(id),
-      display_name TEXT
-    );
-  `);
-  db.run(`
-    CREATE TABLE IF NOT EXISTS decisions (
-      id TEXT PRIMARY KEY,
-      game_id TEXT REFERENCES games(id),
-      team_id TEXT REFERENCES teams(id),
-      decision_point_id TEXT,
-      decision_type TEXT,
-      choice_id TEXT,
-      slider_value INTEGER,
-      branch_id TEXT,
-      follow_up_choice_id TEXT,
-      submitted_at DATETIME
+    CREATE TABLE IF NOT EXISTS rest_submissions (
+      game_code TEXT NOT NULL,
+      team_key TEXT NOT NULL,
+      team_name TEXT NOT NULL,
+      decisions_json TEXT NOT NULL,
+      submitted_at INTEGER NOT NULL,
+      PRIMARY KEY (game_code, team_key)
     );
   `);
 
@@ -81,76 +66,89 @@ function persistDb(): void {
   }
 }
 
-export function saveGame(room: Room): void {
-  const gameId = `game-${room.code}-${Date.now()}`;
+/** Load all games (with their submissions) from the database. */
+export function loadGames(): RestGame[] {
+  const results: RestGame[] = [];
 
-  db.run(
-    "INSERT INTO games (id, room_code, case_study_id, team_size, created_at) VALUES (?, ?, ?, ?, ?)",
-    [gameId, room.code, room.config.caseStudyId, room.config.teamSize, new Date().toISOString()]
-  );
-
-  for (const team of Object.values(room.teams)) {
-    if (team.members.length === 0) continue;
-    db.run(
-      "INSERT INTO teams (id, game_id, name) VALUES (?, ?, ?)",
-      [`${gameId}-${team.id}`, gameId, team.name]
+  try {
+    const gameRows = db.exec(
+      "SELECT code, admin_token, case_study_id, current_round, total_rounds, phase, created_at FROM rest_games"
     );
+    if (gameRows.length === 0) return results;
 
-    for (const memberId of team.members) {
-      const player = room.players[memberId];
-      if (player) {
-        db.run(
-          "INSERT INTO players (id, game_id, team_id, display_name) VALUES (?, ?, ?, ?)",
-          [`${gameId}-${memberId}`, gameId, `${gameId}-${team.id}`, player.displayName]
-        );
+    // Load all submissions and group by game_code
+    const submissionsByGame = new Map<string, Array<{ teamKey: string; teamName: string; decisionsJson: string; submittedAt: number }>>();
+    const subRows = db.exec(
+      "SELECT game_code, team_key, team_name, decisions_json, submitted_at FROM rest_submissions"
+    );
+    if (subRows.length > 0) {
+      for (const row of subRows[0].values) {
+        const [gameCode, teamKey, teamName, decisionsJson, submittedAt] = row as [string, string, string, string, number];
+        if (!submissionsByGame.has(gameCode)) {
+          submissionsByGame.set(gameCode, []);
+        }
+        submissionsByGame.get(gameCode)!.push({ teamKey, teamName, decisionsJson, submittedAt });
       }
     }
-  }
 
-  persistDb();
-}
+    for (const row of gameRows[0].values) {
+      const [code, adminToken, caseStudyId, currentRound, totalRounds, phase, createdAt] = row;
 
-export function updateGameResults(room: Room, results: GameResults): void {
-  for (const teamResult of results.teams) {
-    db.run(
-      "UPDATE teams SET peer_score = ?, judge_score = ?, final_score = ? WHERE game_id LIKE ? AND name = ?",
-      [teamResult.peerScore, teamResult.judgeScore, teamResult.finalScore, `game-${room.code}-%`, teamResult.teamName]
-    );
-  }
+      const game: RestGame = {
+        code: code as string,
+        adminToken: adminToken as string,
+        caseStudyId: caseStudyId as string,
+        currentRound: currentRound as number,
+        totalRounds: totalRounds as number,
+        phase: phase as RestGame["phase"],
+        submissions: {},
+        createdAt: createdAt as number,
+      };
 
-  db.run(
-    "UPDATE games SET ended_at = ? WHERE room_code = ? AND ended_at IS NULL",
-    [new Date().toISOString(), room.code]
-  );
-
-  // Save decisions
-  if (room.gameState) {
-    const gameIdPrefix = `game-${room.code}-`;
-    for (const [teamId, teamState] of Object.entries(room.gameState.teamDecisions)) {
-      for (const [dpId, decision] of Object.entries(teamState.decisions)) {
-        const decisionId = `${gameIdPrefix}${teamId}-${dpId}`;
-        db.run(
-          `INSERT OR REPLACE INTO decisions (id, game_id, team_id, decision_point_id, decision_type, choice_id, slider_value, branch_id, follow_up_choice_id, submitted_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-          [
-            decisionId,
-            gameIdPrefix,
-            `${gameIdPrefix}${teamId}`,
-            dpId,
-            decision.type,
-            decision.choiceId || null,
-            decision.sliderValue ?? null,
-            decision.branchId || null,
-            decision.followUpChoiceId || null,
-            new Date(decision.submittedAt).toISOString(),
-          ]
-        );
+      // Attach submissions
+      const subs = submissionsByGame.get(code as string) || [];
+      for (const sub of subs) {
+        game.submissions[sub.teamKey] = {
+          teamName: sub.teamName,
+          decisions: JSON.parse(sub.decisionsJson),
+          submittedAt: sub.submittedAt,
+        };
       }
+
+      results.push(game);
     }
+  } catch (err) {
+    console.error("Failed to load games from database:", err);
   }
 
-  persistDb();
+  return results;
 }
 
-export function getDb(): Database {
-  return db;
+export function saveGame(game: RestGame): void {
+  try {
+    db.run(
+      `INSERT OR REPLACE INTO rest_games
+        (code, admin_token, case_study_id, current_round, total_rounds, phase, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [game.code, game.adminToken, game.caseStudyId, game.currentRound, game.totalRounds, game.phase, game.createdAt]
+    );
+    persistDb();
+  } catch (err) {
+    console.error("Failed to save game:", err);
+  }
+}
+
+export function saveSubmission(gameCode: string, submission: Submission): void {
+  try {
+    const teamKey = submission.teamName.trim().toLowerCase();
+    db.run(
+      `INSERT OR REPLACE INTO rest_submissions
+        (game_code, team_key, team_name, decisions_json, submitted_at)
+       VALUES (?, ?, ?, ?, ?)`,
+      [gameCode, teamKey, submission.teamName, JSON.stringify(submission.decisions), submission.submittedAt]
+    );
+    persistDb();
+  } catch (err) {
+    console.error("Failed to save submission:", err);
+  }
 }

@@ -1,49 +1,44 @@
 import express from "express";
-import { createServer } from "http";
-import { Server } from "socket.io";
-import { handleRoomEvents } from "./rooms";
-import { handleTurnEvents } from "./turns";
-import { handleVotingEvents } from "./voting";
 import { initDb } from "./db";
+import { router, loadPersistedGames } from "./routes";
 
 const app = express();
-const httpServer = createServer(app);
 
 const CORS_ORIGIN = process.env.CORS_ORIGIN || "http://localhost:3000";
-// Support comma-separated origins for multiple Vercel preview URLs
 const allowedOrigins = CORS_ORIGIN.split(",").map((s) => s.trim());
 
-const io = new Server(httpServer, {
-  cors: {
-    origin: allowedOrigins.length === 1 ? allowedOrigins[0] : allowedOrigins,
-    methods: ["GET", "POST"],
-  },
+// CORS middleware (no extra dependency needed)
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+  }
+  res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type");
+  if (req.method === "OPTIONS") {
+    res.sendStatus(204);
+    return;
+  }
+  next();
 });
 
-// Health check endpoint
+app.use(express.json());
+
+// Health check
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", timestamp: Date.now() });
 });
 
-// Socket.IO connection handling
-io.on("connection", (socket) => {
-  console.log(`Client connected: ${socket.id}`);
-
-  handleRoomEvents(io, socket);
-  handleTurnEvents(io, socket);
-  handleVotingEvents(io, socket);
-
-  socket.on("disconnect", () => {
-    console.log(`Client disconnected: ${socket.id}`);
-  });
-});
+// REST API
+app.use("/api", router);
 
 const PORT = process.env.PORT || 3001;
 
 async function start() {
   await initDb();
-  httpServer.listen(PORT, () => {
-    console.log(`DesignDash game server running on port ${PORT}`);
+  loadPersistedGames();
+  app.listen(PORT, () => {
+    console.log(`DesignDash API server running on port ${PORT}`);
   });
 }
 
@@ -51,5 +46,3 @@ start().catch((err) => {
   console.error("Failed to start server:", err);
   process.exit(1);
 });
-
-export { io };
