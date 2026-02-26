@@ -11,7 +11,7 @@ import type {
   RestGamePhase,
   TeamVotes,
 } from "@design-dash/shared";
-import { TEAM_COLORS, DESIGN_PHASES, AWARD_CATEGORIES } from "@design-dash/shared";
+import { TEAM_COLORS, DESIGN_PHASES, AWARD_CATEGORIES, CASE_STUDIES } from "@design-dash/shared";
 import { getDesigns, submitVote } from "@/lib/api";
 import PhoneFrame from "@/components/preview/PhoneFrame";
 import ProductPreview from "@/components/preview/ProductPreview";
@@ -69,6 +69,8 @@ export default function GalleryPage() {
   const router = useRouter();
 
   const [caseStudy, setCaseStudy] = useState<CaseStudy | null>(null);
+  const [isAllGame, setIsAllGame] = useState(false);
+  const [dataLoaded, setDataLoaded] = useState(false);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [phase, setPhase] = useState<RestGamePhase>("gallery");
   const [awards, setAwards] = useState<AwardResult[]>([]);
@@ -77,7 +79,7 @@ export default function GalleryPage() {
   const [autoPlay, setAutoPlay] = useState(false);
   const [phoneWidth, setPhoneWidth] = useState(480);
 
-  // Voting state
+  // Voting state — pre-fill from sessionStorage
   const [voterTeam, setVoterTeam] = useState("");
   const [votes, setVotes] = useState<TeamVotes>({});
   const [voteSubmitting, setVoteSubmitting] = useState(false);
@@ -87,9 +89,14 @@ export default function GalleryPage() {
   const fetchData = useCallback(async () => {
     try {
       const data = await getDesigns(code);
-      setCaseStudy(data.caseStudy);
+      if (data.caseStudy === null) {
+        setIsAllGame(true);
+      } else {
+        setCaseStudy(data.caseStudy);
+      }
       setSubmissions(data.submissions);
       setPhase(data.phase);
+      setDataLoaded(true);
       if (data.awards && data.awards.length > 0) {
         setAwards(data.awards);
       }
@@ -100,14 +107,17 @@ export default function GalleryPage() {
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+    // Pre-fill voter team from sessionStorage
+    const savedTeam = sessionStorage.getItem(`team-${code}`);
+    if (savedTeam) setVoterTeam(savedTeam);
+  }, [fetchData, code]);
 
   // Poll for phase changes (voting/awards transitions)
   useEffect(() => {
-    if (!caseStudy) return;
+    if (!dataLoaded) return;
     const interval = setInterval(fetchData, 3000);
     return () => clearInterval(interval);
-  }, [caseStudy, fetchData]);
+  }, [dataLoaded, fetchData]);
 
   // Responsive phone width
   useEffect(() => {
@@ -154,7 +164,7 @@ export default function GalleryPage() {
     );
   }
 
-  if (!caseStudy) {
+  if (!dataLoaded) {
     return (
       <main className="min-h-screen flex items-center justify-center bg-surface-primary">
         <p className="text-text-tertiary animate-pulse">Loading gallery...</p>
@@ -185,7 +195,7 @@ export default function GalleryPage() {
           <div className="max-w-4xl mx-auto flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-text-primary">
-                {caseStudy.productName} — Awards
+                {isAllGame ? "DesignDash" : caseStudy?.productName} — Awards
               </h1>
               <p className="text-base text-text-secondary">
                 {submissions.length} team{submissions.length !== 1 ? "s" : ""} competed
@@ -254,13 +264,19 @@ export default function GalleryPage() {
   const decisions = toDecisionRecord(current.decisions);
   const phoneScale = phoneWidth / 180;
 
+  // Look up the case study for the current submission
+  const currentCaseStudy = isAllGame
+    ? CASE_STUDIES.find((cs) => cs.id === current.caseStudyId) || null
+    : caseStudy;
+
   const goNext = () => setCurrentIndex((i) => (i + 1) % submissions.length);
   const goPrev = () =>
     setCurrentIndex((i) => (i - 1 + submissions.length) % submissions.length);
 
-  // Group all case study decisions by round for display
+  // Group the submission's case study decisions by round for display
+  const currentDecisions = currentCaseStudy?.decisions || [];
   const roundsMap = new Map<number, DecisionPoint[]>();
-  for (const dp of caseStudy.decisions) {
+  for (const dp of currentDecisions) {
     if (!roundsMap.has(dp.round)) roundsMap.set(dp.round, []);
     roundsMap.get(dp.round)!.push(dp);
   }
@@ -278,7 +294,7 @@ export default function GalleryPage() {
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-text-primary">
-              {caseStudy.productName} — Design Gallery
+              {isAllGame ? "DesignDash" : caseStudy?.productName} — Design Gallery
             </h1>
             <p className="text-base text-text-secondary">
               {submissions.length} team{submissions.length !== 1 ? "s" : ""}{" "}
@@ -338,29 +354,31 @@ export default function GalleryPage() {
                 {current.teamName}
               </p>
               <p className="text-sm text-text-tertiary mt-1">
-                {current.decisions.length} decision
+                {currentCaseStudy ? currentCaseStudy.productName : ""} — {current.decisions.length} decision
                 {current.decisions.length !== 1 ? "s" : ""}
               </p>
             </div>
 
             {/* Phone preview — uses CSS zoom for crisp rendering */}
-            <div
-              style={{
-                zoom: phoneScale,
-                width: "180px",
-              }}
-            >
-              <PhoneFrame
-                teamColor={teamColor}
-                productName={caseStudy.productName}
-                dark={caseStudy.id === "roblox"}
+            {currentCaseStudy && (
+              <div
+                style={{
+                  zoom: phoneScale,
+                  width: "180px",
+                }}
               >
-                <ProductPreview
-                  caseStudyId={caseStudy.id}
-                  decisions={decisions}
-                />
-              </PhoneFrame>
-            </div>
+                <PhoneFrame
+                  teamColor={teamColor}
+                  productName={currentCaseStudy.productName}
+                  dark={currentCaseStudy.id === "roblox"}
+                >
+                  <ProductPreview
+                    caseStudyId={currentCaseStudy.id}
+                    decisions={decisions}
+                  />
+                </PhoneFrame>
+              </div>
+            )}
 
             {/* Dot indicators */}
             <div className="flex items-center gap-2">
@@ -435,6 +453,7 @@ export default function GalleryPage() {
                   onChange={(e) => setVoterTeam(e.target.value)}
                   placeholder="Enter your team name"
                   maxLength={30}
+                  readOnly={!!sessionStorage.getItem(`team-${code}`)}
                   className="input"
                 />
               </div>

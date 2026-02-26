@@ -12,6 +12,7 @@ export default function PresenterPage() {
 
   const [game, setGame] = useState<GamePublic | null>(null);
   const [caseStudy, setCaseStudy] = useState<CaseStudy | null>(null);
+  const [isAllGame, setIsAllGame] = useState(false);
   const [adminToken, setAdminToken] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [advancing, setAdvancing] = useState(false);
@@ -35,8 +36,14 @@ export default function PresenterPage() {
     try {
       const g = await getGame(code);
       setGame(g);
-      const cs = CASE_STUDIES.find((c) => c.id === g.caseStudyId);
-      if (cs) setCaseStudy(cs);
+      if (g.caseStudyId === "all") {
+        setIsAllGame(true);
+        // Use first case study as a fallback for structure (rounds display)
+        setCaseStudy(CASE_STUDIES[0]);
+      } else {
+        const cs = CASE_STUDIES.find((c) => c.id === g.caseStudyId);
+        if (cs) setCaseStudy(cs);
+      }
     } catch (err: any) {
       setError(err.message);
     }
@@ -121,10 +128,17 @@ export default function PresenterPage() {
     );
   }
 
-  // Decision points for the current round
-  const roundDecisions = caseStudy.decisions.filter(
-    (d) => d.round === game.currentRound
-  );
+  // For "all" games, gather decisions from all case studies for the current round
+  const allCaseStudies = isAllGame ? CASE_STUDIES : [caseStudy];
+  const roundDecisionsGrouped = allCaseStudies.map((cs) => ({
+    caseStudy: cs,
+    decisions: cs.decisions.filter((d) => d.round === game.currentRound),
+  })).filter((g) => g.decisions.length > 0);
+
+  // Decision points for the current round (flat, for single-study compat)
+  const roundDecisions = isAllGame
+    ? roundDecisionsGrouped.flatMap((g) => g.decisions)
+    : caseStudy.decisions.filter((d) => d.round === game.currentRound);
 
   const isLastRound = game.currentRound >= game.totalRounds - 1;
   const isFirstRound = game.currentRound === 0;
@@ -136,9 +150,11 @@ export default function PresenterPage() {
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-text-primary">
-              {caseStudy.productName}
+              {isAllGame ? "DesignDash" : caseStudy.productName}
             </h1>
-            <p className="text-sm text-text-secondary">{caseStudy.shortDescription}</p>
+            <p className="text-sm text-text-secondary">
+              {isAllGame ? "Players choose their own case study" : caseStudy.shortDescription}
+            </p>
           </div>
           <div className="text-right">
             <div className="text-3xl font-mono font-bold text-accent-primary tracking-widest">
@@ -213,62 +229,71 @@ export default function PresenterPage() {
 
             {/* Round scenarios */}
             <div className="space-y-6">
-              {roundDecisions.map((decision) => (
-                <div key={decision.id} className="card-elevated">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="badge-blue">
-                      {decision.type === "multiple_choice"
-                        ? "Choice"
-                        : decision.type === "tradeoff_slider"
-                          ? "Tradeoff"
-                          : "Branch"}
-                    </span>
-                  </div>
-                  <p className="text-lg text-text-primary leading-relaxed mb-2">
-                    {decision.scenarioText}
-                  </p>
-                  {decision.context && (
-                    <p className="text-sm text-text-tertiary italic">
-                      {decision.context}
-                    </p>
+              {roundDecisionsGrouped.map((group) => (
+                <div key={group.caseStudy.id}>
+                  {isAllGame && (
+                    <h3 className="text-base font-semibold text-text-secondary mb-3">
+                      {group.caseStudy.productName}
+                    </h3>
                   )}
-
-                  {/* Show the options so presenter can read them */}
-                  {decision.type === "multiple_choice" && decision.choices && (
-                    <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {decision.choices.map((c) => (
-                        <div key={c.id} className="bg-surface-tertiary rounded-lg p-3">
-                          <p className="text-sm font-semibold text-text-primary">{c.label}</p>
-                          <p className="text-xs text-text-secondary mt-1">{c.description}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {decision.type === "tradeoff_slider" && decision.tradeoff && (
-                    <div className="mt-4 flex justify-between bg-surface-tertiary rounded-lg p-3">
-                      <div>
-                        <p className="text-sm font-semibold text-accent-red">{decision.tradeoff.leftLabel}</p>
-                        <p className="text-xs text-text-secondary">{decision.tradeoff.leftDescription}</p>
+                  {group.decisions.map((decision) => (
+                    <div key={decision.id} className="card-elevated mb-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="badge-blue">
+                          {decision.type === "multiple_choice"
+                            ? "Choice"
+                            : decision.type === "tradeoff_slider"
+                              ? "Tradeoff"
+                              : "Branch"}
+                        </span>
                       </div>
-                      <div className="text-center text-text-tertiary px-4">vs</div>
-                      <div className="text-right">
-                        <p className="text-sm font-semibold text-accent-green">{decision.tradeoff.rightLabel}</p>
-                        <p className="text-xs text-text-secondary">{decision.tradeoff.rightDescription}</p>
-                      </div>
-                    </div>
-                  )}
+                      <p className="text-lg text-text-primary leading-relaxed mb-2">
+                        {decision.scenarioText}
+                      </p>
+                      {decision.context && (
+                        <p className="text-sm text-text-tertiary italic">
+                          {decision.context}
+                        </p>
+                      )}
 
-                  {decision.type === "branching_path" && decision.branches && (
-                    <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {decision.branches.map((b) => (
-                        <div key={b.id} className="bg-surface-tertiary rounded-lg p-3">
-                          <p className="text-sm font-semibold text-text-primary">{b.label}</p>
-                          <p className="text-xs text-text-secondary mt-1">{b.description}</p>
+                      {/* Show the options so presenter can read them */}
+                      {decision.type === "multiple_choice" && decision.choices && (
+                        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {decision.choices.map((c) => (
+                            <div key={c.id} className="bg-surface-tertiary rounded-lg p-3">
+                              <p className="text-sm font-semibold text-text-primary">{c.label}</p>
+                              <p className="text-xs text-text-secondary mt-1">{c.description}</p>
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      )}
+
+                      {decision.type === "tradeoff_slider" && decision.tradeoff && (
+                        <div className="mt-4 flex justify-between bg-surface-tertiary rounded-lg p-3">
+                          <div>
+                            <p className="text-sm font-semibold text-accent-red">{decision.tradeoff.leftLabel}</p>
+                            <p className="text-xs text-text-secondary">{decision.tradeoff.leftDescription}</p>
+                          </div>
+                          <div className="text-center text-text-tertiary px-4">vs</div>
+                          <div className="text-right">
+                            <p className="text-sm font-semibold text-accent-green">{decision.tradeoff.rightLabel}</p>
+                            <p className="text-xs text-text-secondary">{decision.tradeoff.rightDescription}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {decision.type === "branching_path" && decision.branches && (
+                        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {decision.branches.map((b) => (
+                            <div key={b.id} className="bg-surface-tertiary rounded-lg p-3">
+                              <p className="text-sm font-semibold text-text-primary">{b.label}</p>
+                              <p className="text-xs text-text-secondary mt-1">{b.description}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  )}
+                  ))}
                 </div>
               ))}
             </div>
@@ -276,12 +301,14 @@ export default function PresenterPage() {
             {/* Controls */}
             <div className="flex items-center justify-between pt-4">
               <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setShowBriefing(true)}
-                  className="btn-ghost"
-                >
-                  View Briefing
-                </button>
+                {!isAllGame && (
+                  <button
+                    onClick={() => setShowBriefing(true)}
+                    className="btn-ghost"
+                  >
+                    View Briefing
+                  </button>
+                )}
                 {!isFirstRound && (
                   <button
                     onClick={handleGoBack}
@@ -525,7 +552,7 @@ export default function PresenterPage() {
       </div>
 
       {/* Briefing modal */}
-      {showBriefing && (
+      {showBriefing && !isAllGame && (
         <CaseStudyBriefing
           caseStudy={caseStudy}
           onReady={() => setShowBriefing(false)}
