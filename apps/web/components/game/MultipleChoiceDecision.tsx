@@ -25,7 +25,7 @@ export default function MultipleChoiceDecision({
             onClick={() => !disabled && onSelect(choice.id)}
             disabled={disabled}
             className={`
-              relative text-left p-4 rounded-lg border transition-all
+              relative text-left p-5 rounded-lg border transition-all
               ${
                 isSelected
                   ? "border-accent-green bg-accent-green-light shadow-card"
@@ -44,10 +44,10 @@ export default function MultipleChoiceDecision({
               </div>
             )}
 
-            <h4 className="text-sm font-semibold text-text-primary mb-1 pr-6">
+            <h4 className="text-base font-semibold text-text-primary mb-1 pr-6">
               {choice.label}
             </h4>
-            <p className="text-sm text-text-secondary leading-relaxed">
+            <p className="text-base text-text-secondary leading-relaxed">
               {choice.description}
             </p>
           </button>

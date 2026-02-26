@@ -27,7 +27,7 @@ export default function BranchingPath({
     <div className="space-y-4">
       {/* Branch selection */}
       <div>
-        <p className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-2">
+        <p className="text-sm font-medium text-text-tertiary uppercase tracking-wide mb-2">
           Choose Your Direction
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -57,10 +57,10 @@ export default function BranchingPath({
                   </div>
                 )}
 
-                <h4 className="text-sm font-semibold text-text-primary mb-1 pr-6">
+                <h4 className="text-base font-semibold text-text-primary mb-1 pr-6">
                   {branch.label}
                 </h4>
-                <p className="text-sm text-text-secondary leading-relaxed">
+                <p className="text-base text-text-secondary leading-relaxed">
                   {branch.description}
                 </p>
               </button>
@@ -76,7 +76,7 @@ export default function BranchingPath({
             <p className="text-xs font-semibold text-accent-yellow uppercase tracking-wide mb-1">
               Follow-up
             </p>
-            <p className="text-sm text-text-secondary leading-relaxed">
+            <p className="text-base text-text-secondary leading-relaxed">
               {selectedBranch.followUp.scenarioText}
             </p>
           </div>

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   CASE_STUDIES,
   type CaseStudy,
@@ -13,6 +13,7 @@ import MultipleChoiceDecision from "@/components/game/MultipleChoiceDecision";
 import TradeoffSlider from "@/components/game/TradeoffSlider";
 import BranchingPath from "@/components/game/BranchingPath";
 import CaseStudyBriefing from "@/components/tutorial/CaseStudyBriefing";
+import DiscussionPrompt from "@/components/game/DiscussionPrompt";
 
 interface DecisionDraft {
   choiceId: string | null;
@@ -22,17 +23,37 @@ interface DecisionDraft {
 }
 
 export default function PlayPage() {
+  return (
+    <Suspense>
+      <PlayPageContent />
+    </Suspense>
+  );
+}
+
+function PlayPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const initialCode = searchParams.get("code") || "";
+  const groupMode = searchParams.get("group") === "true";
 
   // Case study selection
   const [caseStudy, setCaseStudy] = useState<CaseStudy | null>(null);
   const [showBriefing, setShowBriefing] = useState(false);
 
+  // Team info gate (group mode)
+  const [teamInfoReady, setTeamInfoReady] = useState(false);
+
+  // Discussion prompts (group mode)
+  const [revealedDecisions, setRevealedDecisions] = useState<Set<string>>(
+    new Set()
+  );
+
   // Decision drafts keyed by decisionPointId
   const [drafts, setDrafts] = useState<Record<string, DecisionDraft>>({});
 
   // Submission
-  const [gameCode, setGameCode] = useState("");
+  const [gameCode, setGameCode] = useState(initialCode);
   const [teamName, setTeamName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -40,7 +61,9 @@ export default function PlayPage() {
 
   function selectCaseStudy(cs: CaseStudy) {
     setCaseStudy(cs);
-    setShowBriefing(true);
+    if (!groupMode) {
+      setShowBriefing(true);
+    }
     // Initialize drafts
     const initial: Record<string, DecisionDraft> = {};
     for (const d of cs.decisions) {
@@ -52,6 +75,10 @@ export default function PlayPage() {
       };
     }
     setDrafts(initial);
+  }
+
+  function revealDecision(id: string) {
+    setRevealedDecisions((prev) => new Set(prev).add(id));
   }
 
   function updateDraft(id: string, patch: Partial<DecisionDraft>) {
@@ -115,8 +142,18 @@ export default function PlayPage() {
       <main className="min-h-screen flex items-center justify-center px-4 bg-surface-primary">
         <div className="card-elevated text-center max-w-md">
           <div className="w-16 h-16 rounded-full bg-accent-green-light flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-accent-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            <svg
+              className="w-8 h-8 text-accent-green"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
             </svg>
           </div>
           <h2 className="text-xl font-bold text-text-primary mb-2">
@@ -193,116 +230,19 @@ export default function PlayPage() {
     );
   }
 
-  // ─── DECISIONS + SUBMIT ───
-  const rounds = new Map<number, DecisionPoint[]>();
-  for (const d of caseStudy.decisions) {
-    if (!rounds.has(d.round)) rounds.set(d.round, []);
-    rounds.get(d.round)!.push(d);
-  }
-
-  return (
-    <main className="min-h-screen bg-surface-primary">
-      {/* Header */}
-      <header className="bg-white border-b border-border-primary px-6 py-4">
-        <div className="max-w-3xl mx-auto flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-text-primary">
-              {caseStudy.productName}
-            </h1>
-            <p className="text-sm text-text-secondary">
-              Go through each decision, then submit at the bottom
-            </p>
-          </div>
-          <button
-            onClick={() => setShowBriefing(true)}
-            className="btn-ghost text-sm"
-          >
-            Briefing
-          </button>
-        </div>
-      </header>
-
-      <div className="max-w-3xl mx-auto px-6 py-8 space-y-8">
-        {/* Decisions grouped by round */}
-        {Array.from(rounds.entries()).map(([round, decisions]) => (
-          <div key={round} className="space-y-4">
-            <h3 className="text-sm font-semibold text-text-secondary uppercase tracking-wide">
-              Round {round + 1}
-            </h3>
-            {decisions.map((decision) => {
-              const draft = drafts[decision.id];
-              if (!draft) return null;
-
-              return (
-                <div key={decision.id} className="card-elevated">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="badge-blue">
-                      {decision.type === "multiple_choice"
-                        ? "Choice"
-                        : decision.type === "tradeoff_slider"
-                          ? "Tradeoff"
-                          : "Branch"}
-                    </span>
-                  </div>
-                  <p className="text-base text-text-primary leading-relaxed mb-1">
-                    {decision.scenarioText}
-                  </p>
-                  {decision.context && (
-                    <p className="text-sm text-text-tertiary italic mb-4">
-                      {decision.context}
-                    </p>
-                  )}
-
-                  <div className="mt-4">
-                    {decision.type === "multiple_choice" && decision.choices && (
-                      <MultipleChoiceDecision
-                        choices={decision.choices}
-                        selectedId={draft.choiceId}
-                        onSelect={(id) => updateDraft(decision.id, { choiceId: id })}
-                      />
-                    )}
-
-                    {decision.type === "tradeoff_slider" && decision.tradeoff && (
-                      <TradeoffSlider
-                        tradeoff={decision.tradeoff}
-                        value={draft.sliderValue}
-                        onChange={(v) => updateDraft(decision.id, { sliderValue: v })}
-                      />
-                    )}
-
-                    {decision.type === "branching_path" && decision.branches && (
-                      <BranchingPath
-                        branches={decision.branches}
-                        selectedBranchId={draft.branchId}
-                        selectedFollowUpId={draft.followUpChoiceId}
-                        onSelectBranch={(id) =>
-                          updateDraft(decision.id, {
-                            branchId: id,
-                            followUpChoiceId: null,
-                          })
-                        }
-                        onSelectFollowUp={(id) =>
-                          updateDraft(decision.id, { followUpChoiceId: id })
-                        }
-                      />
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ))}
-
-        {/* ─── SUBMIT SECTION ─── */}
-        <div className="border-t-2 border-border-primary pt-8 space-y-4">
-          <h2 className="text-lg font-bold text-text-primary text-center">
-            Submit Your Design
+  // ─── TEAM SETUP (group mode) ───
+  if (groupMode && !teamInfoReady) {
+    return (
+      <main className="min-h-screen flex items-center justify-center px-4 bg-surface-primary">
+        <div className="card-elevated max-w-md w-full">
+          <h2 className="text-xl font-bold text-text-primary mb-2 text-center">
+            Team Setup
           </h2>
-          <p className="text-sm text-text-secondary text-center">
-            Enter the game code from your presenter and your team name
+          <p className="text-text-secondary text-center mb-6">
+            Enter your team info before starting decisions
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto">
+          <div className="space-y-4">
             <div>
               <label className="text-sm font-medium text-text-secondary block mb-1">
                 Game Code
@@ -331,6 +271,205 @@ export default function PlayPage() {
               />
             </div>
           </div>
+
+          <div className="text-center mt-6">
+            <button
+              onClick={() => setTeamInfoReady(true)}
+              disabled={!teamName.trim() || gameCode.length !== 4}
+              className="btn-primary text-lg px-8 py-3 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Start Decisions
+            </button>
+          </div>
+
+          <button
+            onClick={() => setShowBriefing(true)}
+            className="btn-ghost text-sm w-full mt-4"
+          >
+            View Briefing
+          </button>
+        </div>
+
+        {showBriefing && (
+          <CaseStudyBriefing
+            caseStudy={caseStudy}
+            onReady={() => setShowBriefing(false)}
+          />
+        )}
+      </main>
+    );
+  }
+
+  // ─── DECISIONS + SUBMIT ───
+  const rounds = new Map<number, DecisionPoint[]>();
+  for (const d of caseStudy.decisions) {
+    if (!rounds.has(d.round)) rounds.set(d.round, []);
+    rounds.get(d.round)!.push(d);
+  }
+
+  return (
+    <main className="min-h-screen bg-surface-primary">
+      {/* Header */}
+      <header className="bg-white border-b border-border-primary px-6 py-4">
+        <div className="max-w-3xl mx-auto flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-bold text-text-primary">
+              {caseStudy.productName}
+            </h1>
+            <p className="text-base text-text-secondary">
+              Go through each decision, then submit at the bottom
+            </p>
+          </div>
+          <button
+            onClick={() => setShowBriefing(true)}
+            className="btn-ghost text-sm"
+          >
+            Briefing
+          </button>
+        </div>
+      </header>
+
+      <div className="max-w-3xl mx-auto px-6 py-8 space-y-8">
+        {/* Decisions grouped by round */}
+        {Array.from(rounds.entries()).map(([round, decisions]) => (
+          <div key={round} className="space-y-4">
+            <h3 className="text-base font-semibold text-text-secondary uppercase tracking-wide">
+              Round {round + 1}
+            </h3>
+            {decisions.map((decision) => {
+              const draft = drafts[decision.id];
+              if (!draft) return null;
+
+              const isRevealed =
+                !groupMode || revealedDecisions.has(decision.id);
+
+              return (
+                <div key={decision.id} className="card-elevated">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="badge-blue">
+                      {decision.type === "multiple_choice"
+                        ? "Choice"
+                        : decision.type === "tradeoff_slider"
+                          ? "Tradeoff"
+                          : "Branch"}
+                    </span>
+                  </div>
+                  <p className="text-lg text-text-primary leading-relaxed mb-1">
+                    {decision.scenarioText}
+                  </p>
+                  {decision.context && (
+                    <p className="text-base text-text-tertiary italic mb-4">
+                      {decision.context}
+                    </p>
+                  )}
+
+                  <div className="mt-4">
+                    {!isRevealed ? (
+                      <DiscussionPrompt
+                        onReveal={() => revealDecision(decision.id)}
+                      />
+                    ) : (
+                      <>
+                        {decision.type === "multiple_choice" &&
+                          decision.choices && (
+                            <MultipleChoiceDecision
+                              choices={decision.choices}
+                              selectedId={draft.choiceId}
+                              onSelect={(id) =>
+                                updateDraft(decision.id, { choiceId: id })
+                              }
+                            />
+                          )}
+
+                        {decision.type === "tradeoff_slider" &&
+                          decision.tradeoff && (
+                            <TradeoffSlider
+                              tradeoff={decision.tradeoff}
+                              value={draft.sliderValue}
+                              onChange={(v) =>
+                                updateDraft(decision.id, { sliderValue: v })
+                              }
+                            />
+                          )}
+
+                        {decision.type === "branching_path" &&
+                          decision.branches && (
+                            <BranchingPath
+                              branches={decision.branches}
+                              selectedBranchId={draft.branchId}
+                              selectedFollowUpId={draft.followUpChoiceId}
+                              onSelectBranch={(id) =>
+                                updateDraft(decision.id, {
+                                  branchId: id,
+                                  followUpChoiceId: null,
+                                })
+                              }
+                              onSelectFollowUp={(id) =>
+                                updateDraft(decision.id, {
+                                  followUpChoiceId: id,
+                                })
+                              }
+                            />
+                          )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ))}
+
+        {/* ─── SUBMIT SECTION ─── */}
+        <div className="border-t-2 border-border-primary pt-8 space-y-4">
+          <h2 className="text-lg font-bold text-text-primary text-center">
+            Submit Your Design
+          </h2>
+
+          {groupMode && teamInfoReady ? (
+            <>
+              <p className="text-base text-text-secondary text-center">
+                Submitting as <strong>{teamName}</strong> to game{" "}
+                <strong>{gameCode}</strong>
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-text-secondary text-center">
+                Enter the game code from your presenter and your team name
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto">
+                <div>
+                  <label className="text-sm font-medium text-text-secondary block mb-1">
+                    Game Code
+                  </label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={gameCode}
+                    onChange={(e) => handleCodeChange(e.target.value)}
+                    placeholder="1234"
+                    maxLength={4}
+                    className="input font-mono tracking-widest text-center text-xl"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-text-secondary block mb-1">
+                    Team Name
+                  </label>
+                  <input
+                    type="text"
+                    value={teamName}
+                    onChange={(e) => setTeamName(e.target.value)}
+                    placeholder="e.g. The Innovators"
+                    maxLength={30}
+                    className="input"
+                  />
+                </div>
+              </div>
+            </>
+          )}
 
           {error && (
             <p className="text-sm text-accent-red text-center">{error}</p>

@@ -32,10 +32,10 @@ export default function TradeoffSlider({
     <div className="space-y-4">
       {/* End labels */}
       <div className="flex justify-between items-center">
-        <span className="text-sm font-semibold text-accent-red">
+        <span className="text-base font-semibold text-accent-red">
           {tradeoff.leftLabel}
         </span>
-        <span className="text-sm font-semibold text-accent-green">
+        <span className="text-base font-semibold text-accent-green">
           {tradeoff.rightLabel}
         </span>
       </div>
@@ -99,7 +99,7 @@ export default function TradeoffSlider({
                 : "text-text-tertiary"
             }`}
           >
-            <span className="text-xs leading-tight block">{desc}</span>
+            <span className="text-sm leading-tight block">{desc}</span>
           </div>
         ))}
       </div>
