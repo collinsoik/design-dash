@@ -1,39 +1,65 @@
+import RobloxSocial from "./RobloxSocial";
+import RobloxCreator from "./RobloxCreator";
+
 interface RobloxHomeProps {
   variant: "trending" | "for-you" | "friends-activity" | null;
   searchVariant: "smart-filters" | "visual-browse" | "ai-search" | null;
+  socialVariant: "party-system" | "activity-feed" | "coop-queue" | null;
+  creatorVariant: "creator-spotlight" | "boost-system" | "creator-mentorship" | null;
+}
+
+function GameTile({ name, rating, players, gradient }: {
+  name: string;
+  rating: string;
+  players: string;
+  gradient: string;
+}) {
+  return (
+    <div className="flex-1 min-w-0">
+      <div className={`bg-gradient-to-br ${gradient} rounded-lg aspect-square mb-0.5`} />
+      <p className="text-[4px] font-semibold text-white truncate">{name}</p>
+      <div className="flex items-center gap-0.5">
+        <svg viewBox="0 0 16 16" className="w-1.5 h-1.5 text-[#00b06f] shrink-0">
+          <path d="M2 10l4 4 8-10" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" />
+        </svg>
+        <p className="text-[3px] text-[#838486]">{rating}</p>
+        <p className="text-[3px] text-[#838486] ml-auto">{players}</p>
+      </div>
+    </div>
+  );
 }
 
 function SearchBar({ searchVariant }: { searchVariant: string | null }) {
   return (
-    <div className="mb-1">
+    <div className="mb-1.5">
       {searchVariant === "ai-search" ? (
-        <div className="flex items-center gap-1 bg-gray-100 rounded-lg px-1.5 py-1">
+        <div className="flex items-center gap-1 bg-[#393b3d] rounded-lg px-1.5 py-1">
           <svg viewBox="0 0 16 16" className="w-2.5 h-2.5 text-violet-400 shrink-0">
-            <circle cx="8" cy="6" r="4" fill="none" stroke="currentColor" strokeWidth="1.2" />
-            <path d="M6 10v3M10 10v3M8 10v4" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+            <path d="M8 2l1.5 3.5L13 7l-3.5 1.5L8 12l-1.5-3.5L3 7l3.5-1.5z" fill="currentColor" />
           </svg>
-          <p className="text-[4px] text-gray-400 italic">Ask AI: &quot;Find me a scary game...&quot;</p>
+          <p className="text-[4px] text-[#838486] italic">Ask AI: &quot;Find me a scary game...&quot;</p>
         </div>
       ) : searchVariant === "visual-browse" ? (
-        <div className="flex items-center gap-1 bg-gray-100 rounded-lg px-1.5 py-1">
-          <svg viewBox="0 0 16 16" className="w-2.5 h-2.5 text-gray-400 shrink-0">
-            <polygon points="2,1 10,6 2,11" fill="currentColor" />
+        <div className="flex items-center gap-1 bg-[#393b3d] rounded-lg px-1.5 py-1">
+          <svg viewBox="0 0 16 16" className="w-2.5 h-2.5 text-[#babbbc] shrink-0">
+            <polygon points="3,1 13,8 3,15" fill="currentColor" />
           </svg>
-          <p className="text-[4px] text-gray-400">Swipe to browse games</p>
+          <p className="text-[4px] text-[#838486]">Swipe to browse games</p>
         </div>
       ) : (
-        <div className="flex items-center gap-1 bg-gray-100 rounded-lg px-1.5 py-1">
-          <svg viewBox="0 0 16 16" className="w-2.5 h-2.5 text-gray-400 shrink-0">
+        <div className="flex items-center gap-1 bg-[#393b3d] rounded-lg px-1.5 py-1">
+          <svg viewBox="0 0 16 16" className="w-2.5 h-2.5 text-[#838486] shrink-0">
             <circle cx="7" cy="7" r="4" stroke="currentColor" strokeWidth="1.5" fill="none" />
+            <path d="M10 10l3.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
-          <p className="text-[4px] text-gray-400">Search games...</p>
+          <p className="text-[4px] text-[#838486]">Search experiences</p>
           {searchVariant === "smart-filters" && (
             <div className="flex gap-0.5 ml-auto">
-              <div className="bg-emerald-100 rounded-full px-1">
-                <p className="text-[3px] text-emerald-600">Horror</p>
+              <div className="bg-emerald-600/30 rounded-full px-1">
+                <p className="text-[3px] text-emerald-400">Horror</p>
               </div>
-              <div className="bg-blue-100 rounded-full px-1">
-                <p className="text-[3px] text-blue-600">Co-op</p>
+              <div className="bg-blue-600/30 rounded-full px-1">
+                <p className="text-[3px] text-blue-400">Co-op</p>
               </div>
             </div>
           )}
@@ -45,30 +71,31 @@ function SearchBar({ searchVariant }: { searchVariant: string | null }) {
 
 function Trending() {
   const games = [
-    { name: "Adopt Me!", players: "234K", gradient: "from-pink-300 to-rose-400" },
-    { name: "Brookhaven", players: "189K", gradient: "from-sky-300 to-blue-400" },
-    { name: "Tower Defense", players: "156K", gradient: "from-amber-300 to-orange-400" },
-    { name: "Murder Mystery", players: "98K", gradient: "from-red-300 to-red-500" },
+    { name: "Adopt Me!", players: "234K", gradient: "from-pink-500 to-rose-600", rank: 1 },
+    { name: "Brookhaven", players: "189K", gradient: "from-sky-500 to-blue-600", rank: 2 },
+    { name: "Tower Defense", players: "156K", gradient: "from-amber-500 to-orange-600", rank: 3 },
+    { name: "Murder Mystery", players: "98K", gradient: "from-red-500 to-red-700", rank: 4 },
   ];
   return (
     <div className="space-y-1">
-      <p className="text-[5px] font-bold text-gray-400 uppercase">Trending Now</p>
-      {games.map((g, i) => (
-        <div key={g.name} className={`flex items-center gap-1.5 bg-gradient-to-r ${g.gradient} rounded-lg px-1.5 py-1.5`}>
-          <div className="w-5 h-5 rounded-md bg-white/60 flex items-center justify-center shrink-0 text-[6px] font-bold text-gray-600">
-            #{i + 1}
-          </div>
+      <p className="text-[5px] font-bold text-[#babbbc] uppercase tracking-wide">Trending Now</p>
+      {games.map((g) => (
+        <div key={g.name} className="flex items-center gap-1 bg-[#2c2e30] rounded-lg px-1 py-1">
+          <p className="text-[6px] font-extrabold text-[#838486] w-3 text-center shrink-0">
+            {g.rank}
+          </p>
+          <div className={`w-5 h-5 rounded-md bg-gradient-to-br ${g.gradient} shrink-0`} />
           <div className="flex-1 min-w-0">
-            <p className="text-[5px] font-bold text-white truncate">{g.name}</p>
-            <p className="text-[4px] text-white/70">{g.players} playing</p>
+            <p className="text-[4.5px] font-bold text-white truncate">{g.name}</p>
+            <p className="text-[3.5px] text-[#838486]">{g.players} playing</p>
           </div>
-          <div className="w-2 h-2 rounded-full bg-green-300 animate-pulse shrink-0" />
+          <div className="w-1.5 h-1.5 rounded-full bg-[#00b06f] animate-pulse shrink-0" />
         </div>
       ))}
       <div className="flex items-center gap-1 mt-0.5">
-        <div className="h-px bg-gray-200 flex-1" />
-        <p className="text-[4px] text-gray-300">Updated live</p>
-        <div className="h-px bg-gray-200 flex-1" />
+        <div className="h-px bg-[#393b3d] flex-1" />
+        <p className="text-[3.5px] text-[#838486]">Updated live</p>
+        <div className="h-px bg-[#393b3d] flex-1" />
       </div>
     </div>
   );
@@ -77,32 +104,32 @@ function Trending() {
 function ForYou() {
   return (
     <div className="space-y-1.5">
-      <p className="text-[5px] font-bold text-gray-400 uppercase">For You</p>
-      <div className="rounded-lg bg-gradient-to-br from-emerald-400 to-cyan-400 p-2 relative overflow-hidden">
-        <svg viewBox="0 0 40 40" className="absolute right-0 top-0 w-8 h-8 text-white/20">
-          <rect x="8" y="8" width="24" height="24" rx="4" fill="none" stroke="currentColor" strokeWidth="2" />
+      <p className="text-[5px] font-bold text-[#babbbc] uppercase tracking-wide">For You</p>
+      <div className="rounded-lg bg-gradient-to-br from-emerald-600 to-cyan-600 p-2 relative overflow-hidden">
+        <svg viewBox="0 0 40 40" className="absolute right-0 top-0 w-8 h-8 text-white/10">
           <polygon points="16,14 28,20 16,26" fill="currentColor" />
         </svg>
-        <p className="text-[6px] font-bold text-white">Recommended for Maya</p>
-        <p className="text-[4px] text-white/70 mt-0.5">Based on your play history</p>
+        <p className="text-[5.5px] font-bold text-white">Recommended for Maya</p>
+        <p className="text-[3.5px] text-white/60 mt-0.5">Based on your play history</p>
       </div>
-      <p className="text-[5px] font-semibold text-gray-400">Because you play Obbies</p>
+      <p className="text-[4.5px] font-semibold text-[#babbbc]">Because you play Obbies</p>
       <div className="flex gap-1">
         {[
-          { title: "Mega Obby", gradient: "from-violet-200 to-purple-300" },
-          { title: "Sky Jump", gradient: "from-cyan-200 to-blue-300" },
-          { title: "Lava Run", gradient: "from-orange-200 to-red-300" },
-        ].map((m, i) => (
-          <div key={i} className={`flex-1 rounded-lg bg-gradient-to-br ${m.gradient} p-1 py-1.5`}>
-            <p className="text-[4px] font-bold text-white">{m.title}</p>
-            <p className="text-[3px] text-white/60">12K plays</p>
-          </div>
+          { title: "Mega Obby", rating: "92%", players: "12K", gradient: "from-violet-500 to-purple-600" },
+          { title: "Sky Jump", rating: "89%", players: "8K", gradient: "from-cyan-500 to-blue-600" },
+          { title: "Lava Run", rating: "85%", players: "6K", gradient: "from-orange-500 to-red-600" },
+        ].map((g) => (
+          <GameTile key={g.title} name={g.title} rating={g.rating} players={g.players} gradient={g.gradient} />
         ))}
       </div>
-      <p className="text-[5px] font-semibold text-gray-400">New This Week</p>
+      <p className="text-[4.5px] font-semibold text-[#babbbc]">New This Week</p>
       <div className="flex gap-1">
-        {["bg-pink-200", "bg-lime-200", "bg-sky-200"].map((c, i) => (
-          <div key={i} className={`flex-1 aspect-square rounded-lg ${c}`} />
+        {[
+          { title: "Color Run", rating: "78%", players: "3K", gradient: "from-pink-500 to-fuchsia-600" },
+          { title: "Tycoon X", rating: "81%", players: "5K", gradient: "from-lime-500 to-green-600" },
+          { title: "Speed Race", rating: "76%", players: "2K", gradient: "from-sky-500 to-indigo-600" },
+        ].map((g) => (
+          <GameTile key={g.title} name={g.title} rating={g.rating} players={g.players} gradient={g.gradient} />
         ))}
       </div>
     </div>
@@ -111,31 +138,34 @@ function ForYou() {
 
 function FriendsActivity() {
   const friends = [
-    { name: "Jake", initials: "J", color: "bg-blue-300", game: "Brookhaven" },
-    { name: "Ava", initials: "A", color: "bg-emerald-300", game: "Adopt Me!" },
-    { name: "Leo", initials: "L", color: "bg-amber-300", game: "Tower Defense" },
-    { name: "Mia", initials: "M", color: "bg-pink-300", game: "Murder Mystery" },
+    { name: "Jake", initials: "J", color: "bg-blue-500", game: "Brookhaven", status: "In game" },
+    { name: "Ava", initials: "A", color: "bg-emerald-500", game: "Adopt Me!", status: "In lobby" },
+    { name: "Leo", initials: "L", color: "bg-amber-500", game: "Tower Defense", status: "In game" },
+    { name: "Mia", initials: "M", color: "bg-pink-500", game: "Murder Mystery", status: "Online" },
   ];
   return (
     <div className="space-y-1">
-      <p className="text-[5px] font-bold text-gray-400 uppercase">Friends Playing</p>
+      <p className="text-[5px] font-bold text-[#babbbc] uppercase tracking-wide">Friends Playing</p>
       {friends.map((f) => (
-        <div key={f.name} className="flex items-center gap-1.5 bg-gray-50 rounded-lg px-1.5 py-1">
-          <div className={`w-5 h-5 rounded-full ${f.color} flex items-center justify-center text-[5px] font-bold text-white shrink-0`}>
-            {f.initials}
+        <div key={f.name} className="flex items-center gap-1 bg-[#2c2e30] rounded-lg px-1.5 py-1">
+          <div className="relative shrink-0">
+            <div className={`w-4.5 h-4.5 rounded-full ${f.color} flex items-center justify-center text-[4.5px] font-bold text-white`}>
+              {f.initials}
+            </div>
+            <div className="absolute -bottom-px -right-px w-1.5 h-1.5 rounded-full bg-[#00b06f] border border-[#2c2e30]" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[5px] font-semibold text-gray-700 truncate">{f.name}</p>
-            <p className="text-[4px] text-gray-400 truncate">{f.game}</p>
+            <p className="text-[4.5px] font-semibold text-white truncate">{f.name}</p>
+            <p className="text-[3.5px] text-[#838486] truncate">{f.game} · {f.status}</p>
           </div>
-          <div className="bg-emerald-100 rounded-full px-1.5 py-0.5">
-            <p className="text-[4px] font-semibold text-emerald-600">Join</p>
+          <div className="bg-[#00b06f]/20 rounded px-1.5 py-0.5">
+            <p className="text-[3.5px] font-semibold text-[#00b06f]">Join</p>
           </div>
         </div>
       ))}
-      <div className="bg-blue-50 rounded-lg px-1.5 py-1">
-        <p className="text-[5px] font-semibold text-blue-600">4 friends online</p>
-        <p className="text-[4px] text-blue-400">Tap any friend to join their game</p>
+      <div className="bg-[#2c2e30] rounded-lg px-1.5 py-1">
+        <p className="text-[4px] font-semibold text-[#00b06f]">4 friends online</p>
+        <p className="text-[3px] text-[#838486]">Tap any friend to join their game</p>
       </div>
     </div>
   );
@@ -144,33 +174,34 @@ function FriendsActivity() {
 function DefaultHome() {
   return (
     <div className="space-y-1.5">
-      <p className="text-[5px] font-bold text-gray-400 uppercase">Popular Games</p>
+      <p className="text-[5px] font-bold text-[#babbbc] uppercase tracking-wide">Popular Games</p>
       <div className="grid grid-cols-2 gap-1">
         {[
-          { title: "Adopt Me!", gradient: "from-pink-300 to-rose-400", players: "234K" },
-          { title: "Brookhaven", gradient: "from-sky-300 to-blue-400", players: "189K" },
-          { title: "Tower Defense", gradient: "from-amber-300 to-orange-400", players: "156K" },
-          { title: "Obby Creator", gradient: "from-emerald-300 to-teal-400", players: "89K" },
+          { title: "Adopt Me!", gradient: "from-pink-500 to-rose-600", rating: "95%", players: "234K" },
+          { title: "Brookhaven", gradient: "from-sky-500 to-blue-600", rating: "93%", players: "189K" },
+          { title: "Tower Defense", gradient: "from-amber-500 to-orange-600", rating: "90%", players: "156K" },
+          { title: "Obby Creator", gradient: "from-emerald-500 to-teal-600", rating: "88%", players: "89K" },
         ].map((g) => (
-          <div key={g.title} className={`rounded-lg bg-gradient-to-br ${g.gradient} p-1.5 aspect-square flex flex-col justify-end`}>
-            <p className="text-[4px] font-bold text-white leading-tight">{g.title}</p>
-            <p className="text-[3px] text-white/60">{g.players}</p>
-          </div>
+          <GameTile key={g.title} name={g.title} rating={g.rating} players={g.players} gradient={g.gradient} />
         ))}
       </div>
-      <p className="text-[5px] font-semibold text-gray-400">Continue Playing</p>
+      <p className="text-[4.5px] font-semibold text-[#babbbc]">Continue Playing</p>
       <div className="flex gap-1">
-        {["bg-violet-200", "bg-cyan-200", "bg-orange-200"].map((c, i) => (
-          <div key={i} className={`flex-1 h-4 rounded-lg ${c}`} />
+        {[
+          { title: "My Obby", rating: "82%", players: "1K", gradient: "from-violet-500 to-purple-600" },
+          { title: "Build It", rating: "79%", players: "4K", gradient: "from-cyan-500 to-teal-600" },
+          { title: "Race Wars", rating: "84%", players: "7K", gradient: "from-orange-500 to-amber-600" },
+        ].map((g) => (
+          <GameTile key={g.title} name={g.title} rating={g.rating} players={g.players} gradient={g.gradient} />
         ))}
       </div>
     </div>
   );
 }
 
-export default function RobloxHome({ variant, searchVariant }: RobloxHomeProps) {
+export default function RobloxHome({ variant, searchVariant, socialVariant, creatorVariant }: RobloxHomeProps) {
   return (
-    <div className="space-y-1">
+    <div className="space-y-2 pb-1">
       <SearchBar searchVariant={searchVariant} />
       {!variant ? (
         <DefaultHome />
@@ -180,6 +211,16 @@ export default function RobloxHome({ variant, searchVariant }: RobloxHomeProps) 
         <ForYou />
       ) : (
         <FriendsActivity />
+      )}
+      {socialVariant && (
+        <div className="pt-1 border-t border-[#393b3d]">
+          <RobloxSocial variant={socialVariant} />
+        </div>
+      )}
+      {creatorVariant && (
+        <div className="pt-1 border-t border-[#393b3d]">
+          <RobloxCreator variant={creatorVariant} />
+        </div>
       )}
     </div>
   );
