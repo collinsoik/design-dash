@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CASE_STUDIES } from "@design-dash/shared";
 import { createGame } from "@/lib/api";
@@ -8,33 +8,16 @@ import { createGame } from "@/lib/api";
 export default function LandingPage() {
   const router = useRouter();
 
-  // Join / Submit
-  const [gameCode, setGameCode] = useState("");
-  const [isJoining, setIsJoining] = useState(false);
-
   // Create
   const [caseStudyId, setCaseStudyId] = useState(CASE_STUDIES[0].id);
   const [isCreating, setIsCreating] = useState(false);
   const [createError, setCreateError] = useState("");
-
-  function handleCodeChange(value: string) {
-    const cleaned = value.replace(/[^0-9]/g, "");
-    if (cleaned.length <= 4) setGameCode(cleaned);
-  }
-
-  function handleJoin(e: FormEvent) {
-    e.preventDefault();
-    if (gameCode.length !== 4) return;
-    setIsJoining(true);
-    router.push(`/submit/${gameCode}`);
-  }
 
   async function handleCreate() {
     setIsCreating(true);
     setCreateError("");
     try {
       const { code, adminToken } = await createGame(caseStudyId);
-      // Store admin token in sessionStorage so presenter page can use it
       sessionStorage.setItem(`admin-${code}`, adminToken);
       router.push(`/present/${code}`);
     } catch (err: any) {
@@ -57,34 +40,21 @@ export default function LandingPage() {
 
       {/* Action Cards */}
       <div className="flex flex-col md:flex-row gap-8 w-full max-w-3xl">
-        {/* SUBMIT DESIGNS Card */}
-        <div className="flex-1 card">
-          <h2 className="text-lg font-semibold text-text-primary mb-6 text-center">
-            Submit Designs
+        {/* PLAY Card (Students) */}
+        <div className="flex-1 card flex flex-col items-center justify-center min-h-[260px]">
+          <h2 className="text-lg font-semibold text-text-primary mb-4 text-center">
+            Play
           </h2>
-          <form onSubmit={handleJoin} className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-text-secondary block mb-2">
-                Game Code
-              </label>
-              <input
-                type="text"
-                inputMode="numeric"
-                value={gameCode}
-                onChange={(e) => handleCodeChange(e.target.value)}
-                placeholder="1234"
-                maxLength={4}
-                className="input font-mono tracking-widest text-center text-2xl"
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={gameCode.length !== 4 || isJoining}
-              className="w-full btn-primary disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              {isJoining ? "Loading..." : "Enter Game"}
-            </button>
-          </form>
+          <p className="text-text-secondary text-sm text-center mb-6 leading-relaxed">
+            Go through the design decisions at your own pace.
+            Submit with the game code when you&apos;re ready.
+          </p>
+          <button
+            onClick={() => router.push("/play")}
+            className="btn-primary"
+          >
+            Start Playing
+          </button>
         </div>
 
         {/* Divider */}
@@ -92,7 +62,7 @@ export default function LandingPage() {
           <span className="text-sm text-text-tertiary">or</span>
         </div>
 
-        {/* CREATE GAME Card (Presenter) */}
+        {/* PRESENT Card (Teacher) */}
         <div className="flex-1 card">
           <h2 className="text-lg font-semibold text-text-primary mb-6 text-center">
             Present a Game
