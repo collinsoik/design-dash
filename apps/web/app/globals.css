@@ -37,20 +37,8 @@
     @apply opacity-40 cursor-not-allowed;
   }
 
-  .btn-red {
-    @apply btn bg-accent-red text-white hover:opacity-90;
-  }
-
   .btn-green {
     @apply btn bg-accent-green text-white hover:opacity-90;
-  }
-
-  .btn-yellow {
-    @apply btn bg-accent-yellow text-text-primary hover:opacity-90;
-  }
-
-  .btn-blue {
-    @apply btn bg-accent-blue text-white hover:opacity-90;
   }
 
   .btn-ghost {
@@ -83,17 +71,5 @@
     @apply badge bg-accent-blue-light text-accent-blue;
   }
 
-  .badge-purple {
-    @apply badge bg-accent-purple-light text-accent-purple;
-  }
-
-  .badge-gray {
-    @apply badge bg-surface-tertiary text-text-secondary;
-  }
 }
 
-@layer utilities {
-  .animate-pulse-slow {
-    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-}

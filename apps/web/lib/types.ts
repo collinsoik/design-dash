@@ -7,7 +7,6 @@ export type {
   BranchOption,
   UserPersona,
   PlayerDecision,
-  RestGame,
   GamePublic,
   RestGamePhase,
   Submission,

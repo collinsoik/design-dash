@@ -3,24 +3,6 @@
 // Product Design Decision Game
 // ==========================================
 
-export interface Player {
-  id: string;
-  displayName: string;
-  teamId: string | null;
-  isHost: boolean;
-  connected: boolean;
-}
-
-export interface Team {
-  id: string;
-  name: string;
-  color: string;
-  members: string[]; // player IDs
-  peerScore: number;
-  judgeScore: number;
-  finalScore: number;
-}
-
 // ── Decision Types ──────────────────────────
 
 export type DecisionType = "multiple_choice" | "tradeoff_slider" | "branching_path";
@@ -86,29 +68,6 @@ export interface CaseStudy {
   funFact: string;
 }
 
-// ── Game State ──────────────────────────────
-
-export interface RoomConfig {
-  teamSize: number;
-  turnTimer: number; // seconds per round
-  caseStudyId: string;
-  peerVoteWeight: number; // 0-100, percentage
-  judgeWeight: number; // 0-100, percentage
-}
-
-export interface Room {
-  code: string;
-  hostId: string;
-  config: RoomConfig;
-  players: Record<string, Player>;
-  teams: Record<string, Team>;
-  phase: GamePhase;
-  gameState: GameState | null;
-  createdAt: number;
-}
-
-export type GamePhase = "lobby" | "playing" | "voting" | "results";
-
 export interface PlayerDecision {
   decisionPointId: string;
   type: DecisionType;
@@ -117,67 +76,6 @@ export interface PlayerDecision {
   branchId?: string;        // for branching_path
   followUpChoiceId?: string; // for branching_path follow-up
   submittedAt: number;
-}
-
-export interface TeamDecisionState {
-  decisions: Record<string, PlayerDecision>; // decisionPointId -> decision
-}
-
-export interface GameState {
-  caseStudy: CaseStudy;
-  teamDecisions: Record<string, TeamDecisionState>; // teamId -> decisions
-  currentTurn: TurnState;
-  totalRounds: number;
-}
-
-export interface TurnState {
-  round: number;
-  activePlayerIds: Record<string, string>; // teamId -> playerId
-  timeRemaining: number;
-  submittedTeams: string[]; // teamIds that have submitted this round
-}
-
-export interface BrainstormMessage {
-  id: string;
-  playerId: string;
-  playerName: string;
-  teamId: string;
-  text: string;
-  timestamp: number;
-}
-
-// ── Voting & Results ────────────────────────
-
-export interface Vote {
-  voterId: string;
-  teamId: string;
-  rating: number; // 1-5
-}
-
-export interface JudgeScore {
-  teamId: string;
-  score: number; // 1-10
-  notes?: string;
-}
-
-export interface GameResults {
-  teams: TeamResult[];
-  bestDecisions: BestDecisionAward[];
-}
-
-export interface TeamResult {
-  teamId: string;
-  teamName: string;
-  peerScore: number;
-  judgeScore: number;
-  finalScore: number;
-  rank: number;
-}
-
-export interface BestDecisionAward {
-  decisionLabel: string;
-  teamId: string;
-  teamName: string;
 }
 
 // ── REST API Game Model ─────────────────────
