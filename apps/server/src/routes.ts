@@ -3,6 +3,7 @@ import crypto from "crypto";
 import {
   CASE_STUDIES,
   AWARD_CATEGORIES,
+  TEAM_NAMES,
   RestGame,
   GamePublic,
   Submission,
@@ -107,22 +108,21 @@ export function loadPersistedGames(): void {
 // ─── POST /api/games ─────────────────────────
 // Presenter creates a new game session.
 router.post("/games", (req, res) => {
-  const { caseStudyId } = req.body;
+  const { caseStudyId: requestedId } = req.body;
+  const caseStudyId = requestedId || "all";
 
-  if (!caseStudyId) {
-    res.status(400).json({ error: "caseStudyId is required" });
-    return;
-  }
-
-  const caseStudy = CASE_STUDIES.find((cs) => cs.id === caseStudyId);
-  if (!caseStudy) {
-    res.status(400).json({ error: "Invalid case study" });
-    return;
+  let totalRounds = 5; // default for "all" games
+  if (caseStudyId !== "all") {
+    const caseStudy = CASE_STUDIES.find((cs) => cs.id === caseStudyId);
+    if (!caseStudy) {
+      res.status(400).json({ error: "Invalid case study" });
+      return;
+    }
+    totalRounds = getTotalRounds(caseStudy);
   }
 
   const code = getUniqueCode();
   const adminToken = generateAdminToken();
-  const totalRounds = getTotalRounds(caseStudy);
 
   const game: RestGame = {
     code,
@@ -222,7 +222,7 @@ router.post("/games/:code/go-back", (req, res) => {
 
 // ─── POST /api/games/:code/submit ────────────
 // Team submits their design decisions.
-// Idempotent: same team name overwrites previous submission (safe to retry).
+// Auto-assigns a studio name. If client sends teamName (retry), reuse it.
 router.post("/games/:code/submit", (req, res) => {
   const game = games.get(req.params.code);
   if (!game) {
@@ -235,10 +235,10 @@ router.post("/games/:code/submit", (req, res) => {
     return;
   }
 
-  const { teamName, decisions } = req.body;
+  const { teamName: clientTeamName, caseStudyId: submissionCaseStudyId, decisions } = req.body;
 
-  if (!teamName || typeof teamName !== "string" || teamName.trim().length === 0) {
-    res.status(400).json({ error: "Team name is required" });
+  if (!submissionCaseStudyId || typeof submissionCaseStudyId !== "string") {
+    res.status(400).json({ error: "caseStudyId is required" });
     return;
   }
 
@@ -247,10 +247,10 @@ router.post("/games/:code/submit", (req, res) => {
     return;
   }
 
-  // Validate decision point IDs exist in the case study
-  const caseStudy = CASE_STUDIES.find((cs) => cs.id === game.caseStudyId);
+  // Validate decision point IDs exist in the submitted case study
+  const caseStudy = CASE_STUDIES.find((cs) => cs.id === submissionCaseStudyId);
   if (!caseStudy) {
-    res.status(500).json({ error: "Case study not found" });
+    res.status(400).json({ error: "Invalid case study" });
     return;
   }
 
@@ -262,9 +262,21 @@ router.post("/games/:code/submit", (req, res) => {
     }
   }
 
-  const key = teamName.trim().toLowerCase();
+  // Auto-assign team name or reuse client-provided name (retry)
+  let assignedName: string;
+  if (clientTeamName && typeof clientTeamName === "string" && clientTeamName.trim().length > 0) {
+    // Retry: reuse the previously assigned name
+    assignedName = clientTeamName.trim();
+  } else {
+    // New submission: auto-assign from TEAM_NAMES
+    const submissionCount = Object.keys(game.submissions).length;
+    assignedName = TEAM_NAMES[submissionCount % TEAM_NAMES.length];
+  }
+
+  const key = assignedName.toLowerCase();
   const submission: Submission = {
-    teamName: teamName.trim(),
+    teamName: assignedName,
+    caseStudyId: submissionCaseStudyId,
     decisions,
     submittedAt: Date.now(),
   };
@@ -360,7 +372,9 @@ router.get("/games/:code/designs", (req, res) => {
     return;
   }
 
-  const caseStudy = CASE_STUDIES.find((cs) => cs.id === game.caseStudyId);
+  const caseStudy = game.caseStudyId === "all"
+    ? null
+    : CASE_STUDIES.find((cs) => cs.id === game.caseStudyId) || null;
 
   // Build voted team names
   const votedTeams: string[] = [];

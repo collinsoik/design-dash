@@ -49,9 +49,17 @@ export async function initDb(): Promise<void> {
       team_name TEXT NOT NULL,
       decisions_json TEXT NOT NULL,
       submitted_at INTEGER NOT NULL,
+      case_study_id TEXT NOT NULL DEFAULT '',
       PRIMARY KEY (game_code, team_key)
     );
   `);
+
+  // Migration: add case_study_id column if missing
+  try {
+    db.run(`ALTER TABLE rest_submissions ADD COLUMN case_study_id TEXT NOT NULL DEFAULT ''`);
+  } catch {
+    // column already exists
+  }
 
   db.run(`
     CREATE TABLE IF NOT EXISTS rest_votes (
@@ -102,17 +110,17 @@ export function loadGames(): RestGame[] {
     }
 
     // Load all submissions and group by game_code
-    const submissionsByGame = new Map<string, Array<{ teamKey: string; teamName: string; decisionsJson: string; submittedAt: number }>>();
+    const submissionsByGame = new Map<string, Array<{ teamKey: string; teamName: string; decisionsJson: string; submittedAt: number; caseStudyId: string }>>();
     const subRows = db.exec(
-      "SELECT game_code, team_key, team_name, decisions_json, submitted_at FROM rest_submissions"
+      "SELECT game_code, team_key, team_name, decisions_json, submitted_at, case_study_id FROM rest_submissions"
     );
     if (subRows.length > 0) {
       for (const row of subRows[0].values) {
-        const [gameCode, teamKey, teamName, decisionsJson, submittedAt] = row as [string, string, string, string, number];
+        const [gameCode, teamKey, teamName, decisionsJson, submittedAt, caseStudyId] = row as [string, string, string, string, number, string];
         if (!submissionsByGame.has(gameCode)) {
           submissionsByGame.set(gameCode, []);
         }
-        submissionsByGame.get(gameCode)!.push({ teamKey, teamName, decisionsJson, submittedAt });
+        submissionsByGame.get(gameCode)!.push({ teamKey, teamName, decisionsJson, submittedAt, caseStudyId: caseStudyId || '' });
       }
     }
 
@@ -136,6 +144,7 @@ export function loadGames(): RestGame[] {
       for (const sub of subs) {
         game.submissions[sub.teamKey] = {
           teamName: sub.teamName,
+          caseStudyId: sub.caseStudyId,
           decisions: JSON.parse(sub.decisionsJson),
           submittedAt: sub.submittedAt,
         };
@@ -190,9 +199,9 @@ export function saveSubmission(gameCode: string, submission: Submission): void {
     const teamKey = submission.teamName.trim().toLowerCase();
     db.run(
       `INSERT OR REPLACE INTO rest_submissions
-        (game_code, team_key, team_name, decisions_json, submitted_at)
-       VALUES (?, ?, ?, ?, ?)`,
-      [gameCode, teamKey, submission.teamName, JSON.stringify(submission.decisions), submission.submittedAt]
+        (game_code, team_key, team_name, decisions_json, submitted_at, case_study_id)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [gameCode, teamKey, submission.teamName, JSON.stringify(submission.decisions), submission.submittedAt, submission.caseStudyId]
     );
     persistDb();
   } catch (err) {

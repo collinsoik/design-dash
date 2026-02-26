@@ -10,122 +10,113 @@ export const DESIGN_PHASES = [
 
 export const CASE_STUDIES: CaseStudy[] = [
   {
-    id: "spotify",
-    productName: "Spotify",
-    productType: "Music Streaming App",
+    id: "youtube",
+    productName: "YouTube",
+    productType: "Video Platform",
     shortDescription:
-      "Redesign Spotify so people love using it even more.",
+      "Redesign YouTube so it's awesome and safe for kids who create and watch videos.",
     story:
-      "Spotify is a music app with millions of users, but some people are getting bored and switching to other apps like TikTok to find new songs. Your team gets to decide how to redesign the app so people have more fun using it!",
+      "YouTube has billions of videos, but it can be hard for kids to find good stuff without getting sucked into watching for hours. And if you make your own videos, it's almost impossible to get anyone to watch them. Your team gets to redesign YouTube so it's more fun, safer, and better for young creators!",
     persona: {
-      name: "Alex Chen",
-      age: 22,
-      occupation: "College Student",
-      bio: "Alex listens to music while walking to class and working out. They want to find the right song fast without scrolling forever.",
+      name: "Jordan Rivera",
+      age: 11,
+      occupation: "5th Grader & LEGO YouTuber",
+      bio: "Jordan watches YouTube every day after school and has a small channel where they post LEGO build videos. They have 12 subscribers (mostly family). Jordan wants to grow their channel but also struggles with spending too much time watching videos.",
       goals: [
-        "Find music that matches what they're doing",
-        "Discover cool new songs easily",
-        "Keep the app simple and not confusing",
+        "Find cool videos without wasting hours scrolling",
+        "Get more people to watch their LEGO videos",
+        "Stay safe from mean comments and weird content",
       ],
     },
     decisions: [
       // ── EMPATHIZE ──────────────────────────────
       {
-        id: "spotify-home-layout",
+        id: "youtube-home-feed",
         order: 0,
         round: 0,
         type: "branching_path",
         scenarioText:
-          "Alex opens Spotify. What should they see first on the home screen?",
+          "Jordan opens YouTube after school. What should they see on the home page?",
         context:
-          "Most people listen to the same songs over and over. Only about 1 out of 4 people look for new music each week. The home screen right now is kind of boring and the same for everyone.",
+          "Right now, the home page shows a long wall of recommended videos picked by a computer. The computer mostly suggests videos that keep you watching the longest — not necessarily the best ones. Kids often end up watching for way longer than they planned.",
         branches: [
           {
-            id: "activity-based",
-            label: "What Are You Doing?",
+            id: "topic-based",
+            label: "Pick a Topic First",
             description:
-              "Show music based on what Alex is doing right now — walking, studying, exercising, or relaxing.",
+              "Instead of a wall of random videos, Jordan picks a topic first — like LEGO, science experiments, or funny animals — and then sees videos about that topic.",
             followUp: {
               scenarioText:
-                "How should Spotify figure out what Alex is doing?",
+                "What if Jordan doesn't know what they want to watch?",
               choices: [
                 {
-                  id: "time-based",
-                  label: "Check the Time",
-                  description:
-                    "Use the time of day — morning means commute music, evening means chill music.",
+                  id: "surprise-me",
+                  label: "\"Surprise Me!\" Button",
+                  description: "A fun button that picks a random topic and shows cool videos Jordan hasn't seen before.",
                 },
                 {
-                  id: "motion-sensors",
-                  label: "Use the Phone's Sensors",
-                  description:
-                    "The phone can tell if Alex is walking, in a car, or sitting still.",
+                  id: "top-three",
+                  label: "Show Top 3 Topics",
+                  description: "Show the 3 topics Jordan watches most, so they can jump right in.",
                 },
                 {
-                  id: "manual-modes",
-                  label: "Let Alex Pick",
-                  description:
-                    "Show buttons like \"Studying\", \"Workout\", \"Hanging Out\" that Alex can tap.",
+                  id: "explore-wheel",
+                  label: "Spin a Topic Wheel",
+                  description: "A colorful wheel with different topics. Spin it and see what you land on!",
                 },
               ],
             },
           },
           {
-            id: "social-feed",
-            label: "What Friends Are Listening To",
+            id: "friends-trending",
+            label: "What Friends Are Watching",
             description:
-              "Show what Alex's friends are playing right now, plus popular songs everyone likes.",
+              "Show videos that Jordan's friends and classmates have liked or shared recently, so they can watch the same stuff and talk about it at school.",
             followUp: {
               scenarioText:
-                "Should Alex's friends be able to see what Alex is listening to?",
+                "What if Jordan's friends are watching stuff that isn't great for kids?",
               choices: [
                 {
-                  id: "opt-in",
-                  label: "Only If Alex Says OK",
-                  description:
-                    "Alex has to turn on sharing first. Nothing is shared until they choose to.",
+                  id: "age-filter",
+                  label: "Age Filter",
+                  description: "Only show friend videos that are rated safe for kids under 13.",
                 },
                 {
-                  id: "public-default",
-                  label: "Shared Automatically",
-                  description:
-                    "Friends can see what Alex listens to unless Alex turns it off.",
+                  id: "teacher-approved",
+                  label: "Teacher/Parent Approved",
+                  description: "A trusted adult can mark which friend recommendations are okay to show.",
                 },
                 {
-                  id: "anonymous-trends",
-                  label: "Keep It Secret",
-                  description:
-                    "Show what songs are popular with friends, but don't say who listened to what.",
+                  id: "mix-sources",
+                  label: "Mix Friends + Safe Picks",
+                  description: "Show some friend picks and some YouTube-approved kid-friendly videos together.",
                 },
               ],
             },
           },
           {
-            id: "discovery-engine",
-            label: "Songs Picked Just For You",
+            id: "mood-picker",
+            label: "How Are You Feeling?",
             description:
-              "The app uses a smart computer to pick songs it thinks Alex will love based on what they've listened to before.",
+              "Jordan picks a mood — like \"I want to laugh,\" \"I want to learn something,\" or \"I'm bored\" — and YouTube picks videos that match.",
             followUp: {
               scenarioText:
-                "How many new songs should the app suggest vs. songs Alex already knows?",
+                "How many mood options should there be?",
               choices: [
                 {
-                  id: "gentle-mix",
-                  label: "Mostly Favorites",
-                  description:
-                    "80% songs Alex already likes, 20% new songs to try.",
+                  id: "four-moods",
+                  label: "4 Big Moods",
+                  description: "Happy, Curious, Bored, Chill — keep it simple with big colorful buttons.",
                 },
                 {
-                  id: "bold-discovery",
-                  label: "Half and Half",
-                  description:
-                    "50% familiar songs, 50% brand new ones. More surprises!",
+                  id: "emoji-picker",
+                  label: "Emoji Mood Board",
+                  description: "A grid of emojis that Jordan taps to show how they feel. Fun and expressive!",
                 },
                 {
-                  id: "user-control",
-                  label: "Alex Decides",
-                  description:
-                    "A slider lets Alex choose how many new songs vs. favorites they want.",
+                  id: "mood-learns",
+                  label: "It Learns Your Moods",
+                  description: "Over time, YouTube figures out that Jordan is usually curious after school and chill on weekends.",
                 },
               ],
             },
@@ -134,100 +125,92 @@ export const CASE_STUDIES: CaseStudy[] = [
       },
       // ── DEFINE ──────────────────────────────
       {
-        id: "spotify-nav-complexity",
+        id: "youtube-screen-time",
         order: 1,
         round: 1,
         type: "branching_path",
         scenarioText:
-          "How should the buttons at the bottom of the app be set up?",
+          "Jordan keeps watching YouTube for 3 hours without realizing it. How should YouTube help kids manage their watch time?",
         context:
-          "Right now the app has 3 buttons at the bottom: Home, Search, and Library. Some people want more buttons so they can find things faster. Other people think more buttons make it confusing.",
+          "Studies show that most kids spend way more time on YouTube than they planned. The app is designed to keep playing the next video automatically, which makes it hard to stop. Parents get frustrated, and kids feel bad afterward.",
         branches: [
           {
-            id: "minimal-nav",
-            label: "Keep It Simple (3 Buttons)",
+            id: "gentle-reminders",
+            label: "Friendly Reminders",
             description:
-              "Just Home, Search, and Library. Clean and easy. Other features are hidden in menus.",
+              "After a while, a friendly message pops up saying something like \"You've been watching for an hour! Maybe take a break?\" Jordan can snooze it or stop.",
             followUp: {
               scenarioText:
-                "Where should the hidden features go, like Radio and Podcasts?",
+                "How often should the reminders pop up?",
               choices: [
                 {
-                  id: "search-subtabs",
-                  label: "Inside Search",
-                  description:
-                    "When you tap Search, you can also find Radio and Podcasts there.",
+                  id: "every-30",
+                  label: "Every 30 Minutes",
+                  description: "Frequent enough to keep Jordan aware, but might get annoying.",
                 },
                 {
-                  id: "home-cards",
-                  label: "On the Home Screen",
-                  description:
-                    "Show them as cards on the home page that you can scroll to.",
+                  id: "every-60",
+                  label: "Every Hour",
+                  description: "Less annoying, but Jordan might already be deep into a binge by then.",
                 },
                 {
-                  id: "long-press",
-                  label: "Hold Down a Button",
-                  description:
-                    "Press and hold the Search button to see a menu with all the extra features.",
+                  id: "smart-timing",
+                  label: "Between Videos Only",
+                  description: "Only show reminders when a video ends, never in the middle of one.",
                 },
               ],
             },
           },
           {
-            id: "balanced-nav",
-            label: "More Buttons (5 Buttons)",
+            id: "watch-budget",
+            label: "Daily Watch Budget",
             description:
-              "Home, Search, Radio, Library, and Profile. Everything is one tap away.",
+              "Jordan (or their parents) sets a daily limit like 1 hour. A fun progress bar shows how much time is left, like a battery draining.",
             followUp: {
-              scenarioText: "5 buttons takes up a lot of space on the screen. How do you keep it looking clean?",
+              scenarioText:
+                "What happens when Jordan uses up all their watch time?",
               choices: [
                 {
-                  id: "icon-only",
-                  label: "Pictures Only",
-                  description:
-                    "Just show the little pictures (icons), no words underneath. Saves space.",
+                  id: "hard-stop",
+                  label: "Videos Stop Playing",
+                  description: "YouTube stops playing videos and suggests doing something else, like going outside.",
                 },
                 {
-                  id: "active-label",
-                  label: "Only Label the One You're On",
-                  description:
-                    "The button you tapped shows its name. The others just show pictures.",
+                  id: "earn-more",
+                  label: "Earn Bonus Time",
+                  description: "Jordan can earn extra minutes by doing something creative, like uploading a video or leaving a nice comment.",
                 },
                 {
-                  id: "scrollable",
-                  label: "Scroll Sideways",
-                  description:
-                    "You can swipe the bottom bar left and right to see more buttons.",
+                  id: "wind-down",
+                  label: "Wind-Down Mode",
+                  description: "The screen slowly goes gray and the next video doesn't auto-play. Jordan can still watch but it's less tempting.",
                 },
               ],
             },
           },
           {
-            id: "adaptive-nav",
-            label: "Smart Buttons (Changes for You)",
+            id: "no-autoplay",
+            label: "Stop Auto-Playing Videos",
             description:
-              "The buttons change based on what Alex uses most. If Alex never uses Radio, it disappears and something else takes its place.",
+              "Turn off the feature that automatically plays the next video. Jordan has to choose each video on purpose, so they don't accidentally watch for hours.",
             followUp: {
               scenarioText:
-                "What if the buttons keep changing and Alex gets confused?",
+                "If videos don't auto-play, what should happen when a video ends?",
               choices: [
                 {
-                  id: "pin-favorites",
-                  label: "Pin Your Favorites",
-                  description:
-                    "Alex picks their top 3 buttons. Only the 4th one changes based on what they do.",
+                  id: "pick-next",
+                  label: "Show 3 Choices",
+                  description: "Show 3 video thumbnails and let Jordan pick which one to watch next.",
                 },
                 {
-                  id: "animation-hint",
-                  label: "Show the Change",
-                  description:
-                    "When a button changes, it slides over with an animation so Alex notices.",
+                  id: "done-screen",
+                  label: "\"All Done!\" Screen",
+                  description: "Show a fun screen that says \"Nice watching!\" with a button to keep going or leave.",
                 },
                 {
-                  id: "learn-slowly",
-                  label: "Change Slowly",
-                  description:
-                    "Only change after 2 weeks of Alex using the app the same way. Very stable.",
+                  id: "challenge-prompt",
+                  label: "Creative Challenge",
+                  description: "After each video, suggest a fun activity: \"Can you build what you just watched?\"",
                 },
               ],
             },
@@ -236,100 +219,92 @@ export const CASE_STUDIES: CaseStudy[] = [
       },
       // ── IDEATE ──────────────────────────────
       {
-        id: "spotify-social",
+        id: "youtube-creator-tools",
         order: 2,
         round: 2,
         type: "branching_path",
         scenarioText:
-          "Spotify wants to add ways for friends to share music together. What should they do?",
+          "Jordan has made 8 LEGO videos but only gets 5-10 views each. How should YouTube help small creators like Jordan get noticed?",
         context:
-          "A lot of young people find new music on TikTok instead of Spotify. Spotify Wrapped (the year-end music summary) goes viral every year, so people clearly like sharing music. But adding social features to a music app is tricky.",
+          "Almost all views on YouTube go to big channels with millions of subscribers. Small creators like Jordan feel invisible. If nobody watches their videos, they'll stop creating — and that means fewer cool videos for everyone.",
         branches: [
           {
-            id: "passive-social",
-            label: "Quiet Sharing",
+            id: "creator-spotlight",
+            label: "New Creator Spotlight",
             description:
-              "Just show what friends are listening to. No messages or comments — keep it simple.",
+              "A special section on the home page that features videos from small channels. It changes every day so lots of creators get a turn.",
             followUp: {
-              scenarioText: "Where should you see what friends are listening to?",
+              scenarioText:
+                "How should YouTube pick which small creators to spotlight?",
               choices: [
                 {
-                  id: "home-widget",
-                  label: "Small Box on Home Screen",
-                  description:
-                    "A little card on the home page that says \"Friends are listening to...\"",
+                  id: "random-fair",
+                  label: "Everyone Gets a Turn",
+                  description: "Pick randomly so every small creator gets a fair chance to be seen.",
                 },
                 {
-                  id: "dedicated-tab",
-                  label: "Its Own Page",
-                  description:
-                    "A separate page just for seeing all your friends' music activity.",
+                  id: "quality-check",
+                  label: "Only Good Videos",
+                  description: "The video has to be decent quality first — good lighting, clear audio, interesting content.",
                 },
                 {
-                  id: "inline-tracks",
-                  label: "Friend Faces on Songs",
-                  description:
-                    "When you see a song, tiny friend profile pictures show up if they listened to it.",
+                  id: "viewer-nominated",
+                  label: "Viewers Nominate",
+                  description: "Viewers can tap a \"This deserves more views!\" button to recommend small creators.",
                 },
               ],
             },
           },
           {
-            id: "active-social",
-            label: "Full Social Features",
+            id: "creator-coach",
+            label: "Creator Coach",
             description:
-              "Let friends make playlists together, comment on songs, share music, and even listen together at the same time.",
+              "A friendly AI helper inside YouTube that gives Jordan tips like \"Your thumbnail is too dark\" or \"Try adding music to your intro\" to help make better videos.",
             followUp: {
               scenarioText:
-                "Some people might not want all these social features. How do you handle that?",
+                "When should the coach give tips?",
               choices: [
                 {
-                  id: "opt-in-gradual",
-                  label: "Start with It Hidden",
-                  description:
-                    "Social features are off at first. After 2 weeks, ask if Alex wants to turn them on.",
+                  id: "after-upload",
+                  label: "Right After Uploading",
+                  description: "Check the video right away and suggest improvements before it goes live.",
                 },
                 {
-                  id: "onboarding-choice",
-                  label: "Ask at the Start",
-                  description:
-                    "When Alex first opens the app, ask: \"Do you want Social mode or Solo mode?\"",
+                  id: "weekly-report",
+                  label: "Weekly Report Card",
+                  description: "Once a week, send Jordan a fun report showing what's working and what to try next.",
                 },
                 {
-                  id: "always-on",
-                  label: "Turn It On for Everyone",
-                  description:
-                    "Everyone gets social features. If you don't like it, you can turn it off yourself.",
+                  id: "ask-anytime",
+                  label: "Ask Anytime",
+                  description: "Jordan can ask the coach questions whenever they want, like a helpful teacher.",
                 },
               ],
             },
           },
           {
-            id: "no-social",
-            label: "Skip Social Stuff",
+            id: "collab-connector",
+            label: "Collab Connector",
             description:
-              "Don't add social features. Instead, make the music sound better and the recommendations smarter.",
+              "Match Jordan with other kid creators who make similar content, so they can collaborate on videos and share each other's audiences.",
             followUp: {
               scenarioText:
-                "If no social features, what should Spotify spend time building instead?",
+                "How should YouTube make sure collabs are safe for kids?",
               choices: [
                 {
-                  id: "ai-dj",
-                  label: "AI DJ",
-                  description:
-                    "A smart DJ that blends songs together smoothly, like a real DJ at a party.",
+                  id: "parent-approved",
+                  label: "Parents Approve First",
+                  description: "Both kids' parents have to say yes before they can collaborate together.",
                 },
                 {
-                  id: "lossless-audio",
-                  label: "Amazing Sound Quality",
-                  description:
-                    "Make the music sound way better than any other app. Super clear and crisp.",
+                  id: "in-app-only",
+                  label: "Keep It Inside YouTube",
+                  description: "Kids can only collaborate through YouTube's own tools — no sharing personal info.",
                 },
                 {
-                  id: "mood-engine",
-                  label: "Mood Music",
-                  description:
-                    "The app figures out your mood and plays music that matches how you're feeling.",
+                  id: "mentor-supervised",
+                  label: "Adult Mentor Helps",
+                  description: "A YouTube mentor (like a teacher) helps guide the collab and makes sure everything's okay.",
                 },
               ],
             },
@@ -338,89 +313,92 @@ export const CASE_STUDIES: CaseStudy[] = [
       },
       // ── PROTOTYPE ──────────────────────────────
       {
-        id: "spotify-onboarding",
+        id: "youtube-comments-safety",
         order: 3,
         round: 3,
         type: "branching_path",
         scenarioText:
-          "Alex just downloaded Spotify for the first time. What should happen when they open it?",
+          "Jordan got a mean comment on their latest LEGO video and it really hurt their feelings. How should YouTube make comments safer for kids?",
         context:
-          "Right now, new users are asked to pick 5 artists from a huge list of 50. Only 4 out of 10 people finish doing it. People who skip this step are 3 times more likely to delete the app later because the song suggestions aren't good.",
+          "Comments can be awesome — people say nice things and give ideas. But mean comments, spam, and creepy messages are a big problem, especially for young creators. Some kids stop making videos entirely because of bad comments.",
         branches: [
           {
-            id: "quick-listen",
-            label: "Quick Music Quiz",
+            id: "approve-first",
+            label: "Approve Before Posting",
             description:
-              "Play short clips of songs and Alex taps thumbs up or thumbs down. Takes about 60 seconds and feels like a game!",
+              "Jordan (or a parent) gets to read every comment before it shows up on the video. Mean comments never get posted.",
             followUp: {
-              scenarioText: "How many song clips should Alex hear before getting recommendations?",
+              scenarioText:
+                "What if Jordan gets tons of comments and can't review them all?",
               choices: [
                 {
-                  id: "five-clips",
-                  label: "5 Songs (30 seconds)",
-                  description: "Quick and easy. Good enough to get started.",
+                  id: "ai-pre-filter",
+                  label: "Computer Filters First",
+                  description: "A smart computer removes obviously mean comments, and Jordan only reviews the ones that seem okay.",
                 },
                 {
-                  id: "ten-clips",
-                  label: "10 Songs (1 minute)",
-                  description: "A little longer but the recommendations will be much better.",
+                  id: "trusted-reviewers",
+                  label: "Trusted Friends Help",
+                  description: "Jordan picks a few trusted friends or family members who can help approve comments.",
                 },
                 {
-                  id: "adaptive-count",
-                  label: "Keep Going Until It's Good",
-                  description: "The app keeps playing clips until it's confident it knows what Alex likes.",
+                  id: "auto-approve-nice",
+                  label: "Auto-Approve Nice Ones",
+                  description: "Comments with positive words get posted automatically. Only questionable ones need review.",
                 },
               ],
             },
           },
           {
-            id: "welcome-back",
-            label: "Tell Us About You",
+            id: "smart-filter",
+            label: "Smart Comment Filter",
             description:
-              "Ask Alex a few quick questions: \"What kind of music do you like? What changed recently?\"",
+              "A smart computer reads every comment and automatically hides mean, scary, or inappropriate ones. Only nice and helpful comments show up.",
             followUp: {
-              scenarioText: "What if Alex already has playlists from another music app?",
+              scenarioText:
+                "What if the filter accidentally hides a nice comment?",
               choices: [
                 {
-                  id: "restore-all",
-                  label: "Bring Everything Over",
-                  description: "Copy all their old playlists and favorites from the other app.",
+                  id: "hidden-folder",
+                  label: "\"Maybe\" Folder",
+                  description: "Comments the computer isn't sure about go into a special folder Jordan can check.",
                 },
                 {
-                  id: "selective-restore",
-                  label: "Let Alex Pick What to Keep",
-                  description: "Show the old playlists and let Alex choose which ones to bring over.",
+                  id: "appeal-button",
+                  label: "\"This Was Nice!\" Button",
+                  description: "The person who wrote the comment can tap a button to ask Jordan to review it.",
                 },
                 {
-                  id: "fresh-start-option",
-                  label: "Fresh Start",
-                  description: "Give Alex the choice: start fresh or bring over old stuff.",
+                  id: "strict-is-fine",
+                  label: "Better Safe Than Sorry",
+                  description: "It's okay to hide a few nice comments if it means zero mean ones get through.",
                 },
               ],
             },
           },
           {
-            id: "skip-and-learn",
-            label: "Skip — Just Start Playing",
+            id: "reactions-only",
+            label: "Reactions Only (No Text Comments)",
             description:
-              "No questions at all. Start playing popular songs and learn what Alex likes over time.",
+              "Replace text comments with emoji reactions and stickers. People can show they liked a video with a thumbs up, heart, or laughing face — no words allowed.",
             followUp: {
-              scenarioText: "Without asking any questions, the first songs might not be great. How do you fix that?",
+              scenarioText:
+                "Viewers can't give specific feedback with just emojis. How do you fix that?",
               choices: [
                 {
-                  id: "trending-local",
-                  label: "Play What's Popular Nearby",
-                  description: "Play songs that are popular in Alex's city — feels more personal.",
+                  id: "quick-phrases",
+                  label: "Pre-Written Phrases",
+                  description: "Viewers pick from nice phrases like \"Great video!\" \"So creative!\" \"Made me smile!\"",
                 },
                 {
-                  id: "genre-quick-pick",
-                  label: "Tap a Few Genres",
-                  description: "Show 6 big bubbles like \"Pop\", \"Hip-Hop\", \"Rock\" — just tap a couple.",
+                  id: "video-responses",
+                  label: "Video Replies",
+                  description: "Instead of typing, viewers record a short video response. Harder to be mean on camera!",
                 },
                 {
-                  id: "trust-the-algo",
-                  label: "Just Play Hits",
-                  description: "Play the most popular songs everywhere. The app will figure Alex out within a day.",
+                  id: "emoji-plus-topic",
+                  label: "Emoji + What You Liked",
+                  description: "Pick an emoji AND tap what you liked: \"The building,\" \"The music,\" \"The ending.\"",
                 },
               ],
             },
@@ -429,89 +407,89 @@ export const CASE_STUDIES: CaseStudy[] = [
       },
       // ── TEST ──────────────────────────────
       {
-        id: "spotify-testing",
+        id: "youtube-testing",
         order: 4,
         round: 4,
         type: "branching_path",
         scenarioText:
-          "Before launching the redesign to everyone, how should Spotify test it?",
+          "Before launching these changes to all of YouTube, how should the team test them?",
         context:
-          "A bad update could make millions of people upset. Spotify needs to make sure the new design actually works better before giving it to everyone. Testing helps catch problems early.",
+          "YouTube has over 2 billion users. If a new feature doesn't work well or makes things less safe for kids, it could be a huge problem. Testing with a small group first helps catch issues before they affect everyone.",
         branches: [
           {
-            id: "ab-test",
-            label: "Show It to Half the Users",
+            id: "kid-testers",
+            label: "Kid Testing Squad",
             description:
-              "Give the new design to half the users and keep the old design for the other half. Compare which group likes theirs more.",
+              "Invite kids (with parent permission) to try the new features and share what they think. Like a secret club for testing!",
             followUp: {
-              scenarioText: "How long should the test run before deciding?",
+              scenarioText: "How should the kid testers share their feedback?",
               choices: [
                 {
-                  id: "one-week",
-                  label: "1 Week",
-                  description: "Quick results. But some people need more time to get used to changes.",
+                  id: "fun-survey",
+                  label: "Fun Survey with Emojis",
+                  description: "A quick survey where kids rate features with emojis — super easy and fun to fill out.",
                 },
                 {
-                  id: "one-month",
-                  label: "1 Month",
-                  description: "More accurate. Gives people time to really try the new design.",
+                  id: "video-diary",
+                  label: "Video Diary",
+                  description: "Kids record themselves using the new features and talking about what they like and don't like.",
                 },
                 {
-                  id: "until-clear",
-                  label: "Until the Data Is Clear",
-                  description: "Keep running until there's a clear winner. Could be short or long.",
+                  id: "play-session",
+                  label: "Watch Them Use It",
+                  description: "YouTube team members watch kids use the features (with parents there) and take notes.",
                 },
               ],
             },
           },
           {
-            id: "beta-testers",
-            label: "Ask Volunteers to Try It",
-            description:
-              "Let people sign up to try the new design early and give feedback. Only people who want to test it will see it.",
-            followUp: {
-              scenarioText: "How should testers give feedback?",
-              choices: [
-                {
-                  id: "in-app-survey",
-                  label: "Quick Survey Inside the App",
-                  description: "Pop up a short survey after they've used it for a few days.",
-                },
-                {
-                  id: "feedback-button",
-                  label: "\"Tell Us What You Think\" Button",
-                  description: "A button always visible so testers can share thoughts anytime.",
-                },
-                {
-                  id: "watch-behavior",
-                  label: "Just Watch What They Do",
-                  description: "Don't ask anything. Track what they tap, how long they stay, what they skip.",
-                },
-              ],
-            },
-          },
-          {
-            id: "gradual-rollout",
+            id: "slow-rollout",
             label: "Roll It Out Slowly",
             description:
-              "Give the new design to 1% of users first, then 10%, then 50%, then everyone. Stop if something goes wrong.",
+              "Give the new features to 1% of users first, then 10%, then 50%, then everyone. Stop and fix things if anything goes wrong.",
             followUp: {
-              scenarioText: "What should make Spotify stop the rollout?",
+              scenarioText: "What should make the team stop and fix things?",
               choices: [
                 {
-                  id: "complaints-spike",
-                  label: "Too Many Complaints",
-                  description: "Stop if the number of people contacting support goes up a lot.",
+                  id: "safety-reports",
+                  label: "Safety Reports Go Up",
+                  description: "Stop if more kids or parents report safety problems than before.",
                 },
                 {
-                  id: "usage-drops",
-                  label: "People Use It Less",
-                  description: "Stop if people are opening the app less than before.",
+                  id: "watch-time-spikes",
+                  label: "Kids Watch WAY More",
+                  description: "Stop if kids start watching way more than before — the new design might be too addictive.",
                 },
                 {
-                  id: "auto-monitor",
-                  label: "Computer Watches Everything",
-                  description: "A smart computer watches all the numbers and stops automatically if anything looks bad.",
+                  id: "creator-drops",
+                  label: "Creators Stop Posting",
+                  description: "Stop if small creators start posting fewer videos than before.",
+                },
+              ],
+            },
+          },
+          {
+            id: "school-testing",
+            label: "Test at Schools",
+            description:
+              "Partner with schools and let students try the new YouTube in class. Teachers and students give feedback together.",
+            followUp: {
+              scenarioText: "What should the team pay the most attention to during school testing?",
+              choices: [
+                {
+                  id: "safety-first",
+                  label: "Is It Safe?",
+                  description: "Watch if any inappropriate content slips through the new filters.",
+                },
+                {
+                  id: "engagement-quality",
+                  label: "Are Kids Finding Good Stuff?",
+                  description: "Watch if students find educational and fun videos more easily than before.",
+                },
+                {
+                  id: "creator-experience",
+                  label: "Do Kids Want to Create?",
+                  description: "See if the new tools make students excited to make their own videos.",
                 },
               ],
             },
@@ -520,45 +498,45 @@ export const CASE_STUDIES: CaseStudy[] = [
       },
     ],
     scoringCriteria: [
-      "Thinking about what the user needs",
+      "Thinking about what young viewers and creators need",
       "Making choices that work well together",
-      "Understanding the tradeoffs",
+      "Balancing fun with safety",
       "Explaining your thinking clearly",
     ],
     difficulty: "beginner",
     learningObjectives: [
-      "Understand how the home screen affects what people do in the app",
-      "Learn to balance keeping things simple vs. having lots of features",
-      "Think about whether adding friend features makes a music app better or worse",
-      "See how the first experience shapes whether someone keeps using an app",
-      "Learn why testing a design before launching it is important",
+      "Understand how the home page affects what videos kids watch",
+      "Learn to define screen time problems and design real solutions",
+      "Brainstorm creative ways to help small creators get discovered",
+      "Design safety features that protect kids without ruining the fun",
+      "Learn why testing with real users catches problems you'd never expect",
     ],
     whatsBroken: [
-      "Home screen is the same for everyone — no personalization",
-      "The buttons at the bottom hide popular features",
-      "No way to share music with friends inside the app",
+      "Home page recommends videos that keep you watching the longest, not the best ones",
+      "Small creators like Jordan are invisible — almost nobody finds their videos",
+      "Comments can be mean and unsafe, especially for young creators",
     ],
     successHints: [
-      "Think about Alex — they want the right song fast, not endless scrolling",
-      "Most people replay the same songs, but some want to discover new ones. How do you help both?",
-      "Friend features should make the music better, not turn it into a social media app",
-      "If the first experience is boring or hard, people will just delete the app",
-      "Testing helps you fix problems before millions of people see them",
+      "Jordan is both a viewer and a creator — your choices should help with both",
+      "Screen time features should feel helpful, not punishing. Nobody likes being told to stop having fun!",
+      "If small creators can't get noticed, they'll stop making videos — that's bad for everyone",
+      "Safety features should protect kids without making YouTube boring or annoying",
+      "Testing with real kids catches problems adults would never think of",
     ],
     designTips: {
-      "spotify-home-layout":
-        "The best home screen shows you what you need without making you think. What does Alex need in the morning vs. at the gym?",
-      "spotify-nav-complexity":
-        "Apps with 3-5 buttons work best. Too few hides stuff. Too many is confusing.",
-      "spotify-social":
-        "Social features in a music app should help you discover songs, not distract from listening.",
-      "spotify-onboarding":
-        "The best first experience is fast, fun, and teaches the app what you like right away.",
-      "spotify-testing":
-        "Testing with real people catches problems you'd never think of on your own.",
+      "youtube-home-feed":
+        "The home page decides what kids watch. Think about how to help Jordan find great videos without getting stuck in an endless scroll.",
+      "youtube-screen-time":
+        "The best screen time tools feel like a helpful friend, not a strict parent. How can you make stopping feel okay?",
+      "youtube-creator-tools":
+        "If nobody watches small creators' videos, they'll stop making them. That means less cool content for everyone!",
+      "youtube-comments-safety":
+        "Comments should make creators feel good and get useful feedback. One mean comment can ruin a kid's whole day.",
+      "youtube-testing":
+        "Testing with real kids catches problems adults would never think of. Kids use apps in surprising ways!",
     },
     funFact:
-      "Did you know? Spotify's Discover Weekly playlist has been listened to for over 2.3 billion hours. That's like listening to music non-stop for over 260,000 years!",
+      "Did you know? Over 500 hours of video are uploaded to YouTube every single minute! That means if you tried to watch everything uploaded in just one day, it would take you over 80 years of non-stop watching!",
   },
   {
     id: "roblox",

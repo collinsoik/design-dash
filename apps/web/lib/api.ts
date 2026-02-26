@@ -23,10 +23,10 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return data as T;
 }
 
-export function createGame(caseStudyId: string) {
+export function createGame() {
   return request<CreateGameResponse>("/api/games", {
     method: "POST",
-    body: JSON.stringify({ caseStudyId }),
+    body: JSON.stringify({}),
   });
 }
 
@@ -50,12 +50,13 @@ export function goBackGame(code: string, adminToken: string) {
 
 export function submitDesign(
   code: string,
-  teamName: string,
-  decisions: SubmittedDecision[]
+  caseStudyId: string,
+  decisions: SubmittedDecision[],
+  teamName?: string
 ) {
   return request<SubmitDesignResponse>(`/api/games/${code}/submit`, {
     method: "POST",
-    body: JSON.stringify({ teamName, decisions }),
+    body: JSON.stringify({ caseStudyId, decisions, ...(teamName ? { teamName } : {}) }),
   });
 }
 

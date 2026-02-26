@@ -132,6 +132,7 @@ export interface GamePublic {
 
 export interface Submission {
   teamName: string;
+  caseStudyId: string;
   decisions: SubmittedDecision[];
   submittedAt: number;
 }
@@ -147,7 +148,7 @@ export interface SubmittedDecision {
 // ── REST API Request / Response Types ───────
 
 export interface CreateGameRequest {
-  caseStudyId: string;
+  caseStudyId?: string;
 }
 
 export interface CreateGameResponse {
@@ -160,7 +161,8 @@ export interface AdvanceRequest {
 }
 
 export interface SubmitDesignRequest {
-  teamName: string;
+  teamName?: string;
+  caseStudyId: string;
   decisions: SubmittedDecision[];
 }
 
@@ -180,7 +182,7 @@ export interface VoteResponse {
 }
 
 export interface DesignsResponse {
-  caseStudy: CaseStudy;
+  caseStudy: CaseStudy | null;
   submissions: Submission[];
   phase: RestGamePhase;
   votedTeams: string[];

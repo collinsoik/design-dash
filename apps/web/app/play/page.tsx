@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   CASE_STUDIES,
@@ -58,10 +58,45 @@ function PlayPageContent() {
 
   // Submission
   const [gameCode, setGameCode] = useState(initialCode);
-  const [teamName, setTeamName] = useState("");
+  const [assignedTeamName, setAssignedTeamName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+
+  // Decision timer
+  const [decisionTimer, setDecisionTimer] = useState<number | null>(null);
+  const [timerRunning, setTimerRunning] = useState(false);
+
+  // Timer countdown
+  useEffect(() => {
+    if (!timerRunning || decisionTimer === null || decisionTimer <= 0) return;
+    const interval = setInterval(() => {
+      setDecisionTimer((prev) => {
+        if (prev === null || prev <= 1) {
+          setTimerRunning(false);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [timerRunning, decisionTimer]);
+
+  // Reset timer when decision changes
+  useEffect(() => {
+    setDecisionTimer(null);
+    setTimerRunning(false);
+  }, [currentDecisionIndex]);
+
+  const startTimer = useCallback((minutes: number) => {
+    setDecisionTimer(minutes * 60);
+    setTimerRunning(true);
+  }, []);
+
+  const stopTimer = useCallback(() => {
+    setDecisionTimer(null);
+    setTimerRunning(false);
+  }, []);
 
   function selectCaseStudy(cs: CaseStudy) {
     setCaseStudy(cs);
@@ -80,6 +115,13 @@ function PlayPageContent() {
     }
     setDrafts(initial);
     setCurrentDecisionIndex(0);
+
+    console.log(
+      `[DesignDash] ${cs.productName} scenario selected\n` +
+      `  Decisions: ${cs.decisions.length}\n` +
+      `  Estimated time: ~25 minutes\n` +
+      `  Breakdown: 3min briefing + ${cs.decisions.length}x4min decisions + 2min submission`
+    );
   }
 
   function revealDecision(id: string) {
@@ -109,7 +151,7 @@ function PlayPageContent() {
   }
 
   async function handleSubmit() {
-    if (!caseStudy || !teamName.trim() || gameCode.length !== 4) return;
+    if (!caseStudy || gameCode.length !== 4) return;
 
     const decisions: SubmittedDecision[] = [];
     for (const dp of caseStudy.decisions) {
@@ -143,7 +185,12 @@ function PlayPageContent() {
     setError("");
 
     try {
-      await submitDesign(gameCode, teamName.trim(), decisions);
+      // Check sessionStorage for retry name (previously assigned)
+      const retryName = sessionStorage.getItem(`team-${gameCode}`);
+      const result = await submitDesign(gameCode, caseStudy.id, decisions, retryName || undefined);
+      setAssignedTeamName(result.teamName);
+      // Store assigned name for retries and voting
+      sessionStorage.setItem(`team-${gameCode}`, result.teamName);
       setSubmitted(true);
     } catch (err: any) {
       setError(err.message || "Submission failed. Please try again.");
@@ -174,6 +221,9 @@ function PlayPageContent() {
           <h2 className="text-xl font-bold text-text-primary mb-2">
             Design Submitted!
           </h2>
+          <p className="text-lg font-semibold text-accent-primary mb-1">
+            {assignedTeamName}
+          </p>
           <p className="text-text-secondary mb-6">
             Your team&apos;s decisions have been recorded.
           </p>
@@ -254,7 +304,7 @@ function PlayPageContent() {
             Team Setup
           </h2>
           <p className="text-text-secondary text-center mb-6">
-            Enter your team info before starting decisions
+            Enter your game code before starting decisions
           </p>
 
           <div className="space-y-4">
@@ -272,25 +322,12 @@ function PlayPageContent() {
                 className="input font-mono tracking-widest text-center text-xl"
               />
             </div>
-            <div>
-              <label className="text-sm font-medium text-text-secondary block mb-1">
-                Team Name
-              </label>
-              <input
-                type="text"
-                value={teamName}
-                onChange={(e) => setTeamName(e.target.value)}
-                placeholder="e.g. The Innovators"
-                maxLength={30}
-                className="input"
-              />
-            </div>
           </div>
 
           <div className="text-center mt-6">
             <button
               onClick={() => setTeamInfoReady(true)}
-              disabled={!teamName.trim() || gameCode.length !== 4}
+              disabled={gameCode.length !== 4}
               className="btn-primary text-lg px-8 py-3 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Start Decisions
@@ -374,43 +411,28 @@ function PlayPageContent() {
 
             {groupMode && teamInfoReady ? (
               <p className="text-base text-text-secondary text-center">
-                Submitting as <strong>{teamName}</strong> to game{" "}
+                Submitting to game{" "}
                 <strong>{gameCode}</strong>
               </p>
             ) : (
               <>
                 <p className="text-sm text-text-secondary text-center">
-                  Enter the game code from your presenter and your team name
+                  Enter the game code from your presenter
                 </p>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto">
-                  <div>
-                    <label className="text-sm font-medium text-text-secondary block mb-1">
-                      Game Code
-                    </label>
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      value={gameCode}
-                      onChange={(e) => handleCodeChange(e.target.value)}
-                      placeholder="1234"
-                      maxLength={4}
-                      className="input font-mono tracking-widest text-center text-xl"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-text-secondary block mb-1">
-                      Team Name
-                    </label>
-                    <input
-                      type="text"
-                      value={teamName}
-                      onChange={(e) => setTeamName(e.target.value)}
-                      placeholder="e.g. The Innovators"
-                      maxLength={30}
-                      className="input"
-                    />
-                  </div>
+                <div className="max-w-xs mx-auto">
+                  <label className="text-sm font-medium text-text-secondary block mb-1">
+                    Game Code
+                  </label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={gameCode}
+                    onChange={(e) => handleCodeChange(e.target.value)}
+                    placeholder="1234"
+                    maxLength={4}
+                    className="input font-mono tracking-widest text-center text-xl"
+                  />
                 </div>
               </>
             )}
@@ -428,9 +450,7 @@ function PlayPageContent() {
               </button>
               <button
                 onClick={handleSubmit}
-                disabled={
-                  submitting || !teamName.trim() || gameCode.length !== 4
-                }
+                disabled={submitting || gameCode.length !== 4}
                 className="btn-green text-lg px-10 py-3 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {submitting ? "Submitting..." : "Submit Design"}
@@ -468,12 +488,53 @@ function PlayPageContent() {
               Decision {currentDecisionIndex + 1} of {totalDecisions}
             </p>
           </div>
-          <button
-            onClick={() => setShowBriefing(true)}
-            className="btn-ghost text-sm"
-          >
-            Briefing
-          </button>
+          <div className="flex items-center gap-2">
+            {/* Decision Timer */}
+            {decisionTimer === null ? (
+              <div className="flex items-center gap-1">
+                {[3, 4, 5].map((m) => (
+                  <button
+                    key={m}
+                    onClick={() => startTimer(m)}
+                    className="px-2 py-1 text-xs font-medium rounded-md bg-surface-tertiary text-text-secondary hover:bg-accent-primary hover:text-white transition-colors cursor-pointer"
+                  >
+                    {m}m
+                  </button>
+                ))}
+              </div>
+            ) : decisionTimer === 0 ? (
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-accent-red animate-pulse">
+                  Time&apos;s up!
+                </span>
+                <button
+                  onClick={stopTimer}
+                  className="px-2 py-1 text-xs rounded-md bg-surface-tertiary text-text-secondary hover:bg-surface-secondary cursor-pointer"
+                >
+                  Dismiss
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-mono font-bold text-text-primary tabular-nums">
+                  {Math.floor(decisionTimer / 60)}:{String(decisionTimer % 60).padStart(2, "0")}
+                </span>
+                <button
+                  onClick={stopTimer}
+                  className="px-2 py-1 text-xs rounded-md bg-surface-tertiary text-text-secondary hover:bg-surface-secondary cursor-pointer"
+                >
+                  Stop
+                </button>
+              </div>
+            )}
+
+            <button
+              onClick={() => setShowBriefing(true)}
+              className="btn-ghost text-sm"
+            >
+              Briefing
+            </button>
+          </div>
         </div>
       </header>
 
