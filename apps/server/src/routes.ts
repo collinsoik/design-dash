@@ -137,6 +137,35 @@ router.post("/games/:code/advance", (req, res) => {
   res.json(toPublic(game));
 });
 
+// ─── POST /api/games/:code/go-back ───────────
+// Presenter goes back to the previous round.
+router.post("/games/:code/go-back", (req, res) => {
+  const game = games.get(req.params.code);
+  if (!game) {
+    res.status(404).json({ error: "Game not found" });
+    return;
+  }
+
+  const { adminToken } = req.body;
+  if (adminToken !== game.adminToken) {
+    res.status(403).json({ error: "Invalid admin token" });
+    return;
+  }
+
+  if (game.phase === "presenting" && game.currentRound > 0) {
+    game.currentRound--;
+  } else if (game.phase === "submission") {
+    // Go back to the last round of presenting
+    game.phase = "presenting";
+  } else {
+    res.status(400).json({ error: "Cannot go back further" });
+    return;
+  }
+
+  saveGame(game);
+  res.json(toPublic(game));
+});
+
 // ─── POST /api/games/:code/submit ────────────
 // Team submits their design decisions.
 // Idempotent: same team name overwrites previous submission (safe to retry).

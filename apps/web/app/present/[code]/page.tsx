@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { CASE_STUDIES, type CaseStudy, type GamePublic } from "@design-dash/shared";
-import { getGame, advanceGame } from "@/lib/api";
+import { getGame, advanceGame, goBackGame } from "@/lib/api";
 import CaseStudyBriefing from "@/components/tutorial/CaseStudyBriefing";
 
 export default function PresenterPage() {
@@ -15,6 +15,7 @@ export default function PresenterPage() {
   const [adminToken, setAdminToken] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [advancing, setAdvancing] = useState(false);
+  const [goingBack, setGoingBack] = useState(false);
   const [showBriefing, setShowBriefing] = useState(false);
 
   // Load admin token from sessionStorage
@@ -62,6 +63,18 @@ export default function PresenterPage() {
     setAdvancing(false);
   }
 
+  async function handleGoBack() {
+    if (!adminToken) return;
+    setGoingBack(true);
+    try {
+      const updated = await goBackGame(code, adminToken);
+      setGame(updated);
+    } catch (err: any) {
+      setError(err.message);
+    }
+    setGoingBack(false);
+  }
+
   if (error && !game) {
     return (
       <main className="min-h-screen flex items-center justify-center px-4 bg-surface-primary">
@@ -89,6 +102,7 @@ export default function PresenterPage() {
   );
 
   const isLastRound = game.currentRound >= game.totalRounds - 1;
+  const isFirstRound = game.currentRound === 0;
 
   return (
     <main className="min-h-screen bg-surface-primary">
@@ -201,12 +215,36 @@ export default function PresenterPage() {
 
             {/* Controls */}
             <div className="flex items-center justify-between pt-4">
-              <button
-                onClick={() => setShowBriefing(true)}
-                className="btn-ghost"
-              >
-                View Briefing
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setShowBriefing(true)}
+                  className="btn-ghost"
+                >
+                  View Briefing
+                </button>
+                {!isFirstRound && (
+                  <button
+                    onClick={handleGoBack}
+                    disabled={goingBack}
+                    className="btn-ghost flex items-center gap-2"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                      className="w-4 h-4"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M15.75 19.5L8.25 12l7.5-7.5"
+                      />
+                    </svg>
+                    {goingBack ? "..." : "Previous Round"}
+                  </button>
+                )}
+              </div>
               <button
                 onClick={handleAdvance}
                 disabled={advancing}

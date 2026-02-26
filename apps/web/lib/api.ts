@@ -39,6 +39,13 @@ export function advanceGame(code: string, adminToken: string) {
   });
 }
 
+export function goBackGame(code: string, adminToken: string) {
+  return request<GamePublic>(`/api/games/${code}/go-back`, {
+    method: "POST",
+    body: JSON.stringify({ adminToken }),
+  });
+}
+
 export function submitDesign(
   code: string,
   teamName: string,

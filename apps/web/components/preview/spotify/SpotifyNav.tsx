@@ -1,5 +1,5 @@
-interface MelodifyNavProps {
-  sliderValue: number | null;
+interface SpotifyNavProps {
+  variant: "minimal-nav" | "balanced-nav" | "adaptive-nav" | null;
 }
 
 function NavIcon({ type }: { type: string }) {
@@ -34,28 +34,28 @@ function NavIcon({ type }: { type: string }) {
           <path d="M2 15c0-3.5 2.5-6 6-6s6 2.5 6 6" />
         </g>
       )}
-      {type === "more" && (
-        <g fill="currentColor">
-          <circle cx="4" cy="12" r="1.5" />
-          <circle cx="8" cy="12" r="1.5" />
-          <circle cx="12" cy="12" r="1.5" />
-        </g>
+      {type === "star" && (
+        <path d="M8 1l2.2 4.5 5 .7-3.6 3.5.8 5L8 12.4 3.6 14.7l.8-5L.8 6.2l5-.7z" fill="currentColor" />
       )}
     </svg>
   );
 }
 
-function getTabConfig(sliderValue: number | null): string[] {
-  if (sliderValue === null) return [];
-  if (sliderValue <= 12) return ["home", "search", "library"];
-  if (sliderValue <= 37) return ["home", "search", "library", "more"];
-  if (sliderValue <= 62) return ["home", "search", "radio", "library", "profile"];
-  if (sliderValue <= 87) return ["home", "search", "radio", "social", "library", "profile"];
-  return ["home", "search", "radio", "social", "library", "profile", "more"];
+function getTabConfig(variant: string | null): string[] {
+  switch (variant) {
+    case "minimal-nav":
+      return ["home", "search", "library"];
+    case "balanced-nav":
+      return ["home", "search", "radio", "library", "profile"];
+    case "adaptive-nav":
+      return ["home", "search", "star", "library"];
+    default:
+      return [];
+  }
 }
 
-export default function MelodifyNav({ sliderValue }: MelodifyNavProps) {
-  const tabs = getTabConfig(sliderValue);
+export default function SpotifyNav({ variant }: SpotifyNavProps) {
+  const tabs = getTabConfig(variant);
 
   if (tabs.length === 0) {
     return (

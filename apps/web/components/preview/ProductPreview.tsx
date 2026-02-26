@@ -1,7 +1,6 @@
 import type { PlayerDecision } from "@design-dash/shared";
-import MelodifyPreview from "./melodify/MelodifyPreview";
-import GreenPlatePreview from "./greenplate/GreenPlatePreview";
-import ParkWisePreview from "./parkwise/ParkWisePreview";
+import SpotifyPreview from "./spotify/SpotifyPreview";
+import RobloxPreview from "./roblox/RobloxPreview";
 
 interface ProductPreviewProps {
   caseStudyId: string;
@@ -10,12 +9,10 @@ interface ProductPreviewProps {
 
 export default function ProductPreview({ caseStudyId, decisions }: ProductPreviewProps) {
   switch (caseStudyId) {
-    case "melodify":
-      return <MelodifyPreview decisions={decisions} />;
-    case "greenplate":
-      return <GreenPlatePreview decisions={decisions} />;
-    case "parkwise":
-      return <ParkWisePreview decisions={decisions} />;
+    case "spotify":
+      return <SpotifyPreview decisions={decisions} />;
+    case "roblox":
+      return <RobloxPreview decisions={decisions} />;
     default:
       return (
         <div className="flex-1 flex items-center justify-center">

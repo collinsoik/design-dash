@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import type { CaseStudy, Submission, PlayerDecision } from "@design-dash/shared";
+import type { CaseStudy, Submission, PlayerDecision, DecisionPoint } from "@design-dash/shared";
 import { TEAM_COLORS } from "@design-dash/shared";
 import { getDesigns } from "@/lib/api";
 import PhoneFrame from "@/components/preview/PhoneFrame";
@@ -25,6 +25,35 @@ function toDecisionRecord(
     };
   }
   return record;
+}
+
+/** Get answer text for a decision */
+function getAnswerText(dp: DecisionPoint, d: Submission["decisions"][0]): string {
+  if (dp.type === "multiple_choice" && dp.choices && d.choiceId) {
+    const choice = dp.choices.find((c) => c.id === d.choiceId);
+    return choice?.label || d.choiceId;
+  } else if (
+    dp.type === "tradeoff_slider" &&
+    dp.tradeoff &&
+    d.sliderValue != null
+  ) {
+    return `${dp.tradeoff.leftLabel} ${d.sliderValue}% ${dp.tradeoff.rightLabel}`;
+  } else if (
+    dp.type === "branching_path" &&
+    dp.branches &&
+    d.branchId
+  ) {
+    const branch = dp.branches.find((b) => b.id === d.branchId);
+    let text = branch?.label || d.branchId;
+    if (d.followUpChoiceId && branch) {
+      const followUp = branch.followUp.choices.find(
+        (c) => c.id === d.followUpChoiceId
+      );
+      if (followUp) text += ` \u2192 ${followUp.label}`;
+    }
+    return text;
+  }
+  return "Not answered";
 }
 
 export default function GalleryPage() {
@@ -115,6 +144,19 @@ export default function GalleryPage() {
   const goNext = () => setCurrentIndex((i) => (i + 1) % submissions.length);
   const goPrev = () =>
     setCurrentIndex((i) => (i - 1 + submissions.length) % submissions.length);
+
+  // Group all case study decisions by round for display
+  const roundsMap = new Map<number, DecisionPoint[]>();
+  for (const dp of caseStudy.decisions) {
+    if (!roundsMap.has(dp.round)) roundsMap.set(dp.round, []);
+    roundsMap.get(dp.round)!.push(dp);
+  }
+  const rounds = Array.from(roundsMap.entries()).sort(([a], [b]) => a - b);
+
+  // Build submitted decisions lookup
+  const submittedLookup = new Map(
+    current.decisions.map((d) => [d.decisionPointId, d])
+  );
 
   return (
     <main className="min-h-screen bg-surface-primary">
@@ -263,64 +305,68 @@ export default function GalleryPage() {
           </button>
         </div>
 
-        {/* Decision summary table */}
-        <div className="mt-12">
-          <h2 className="text-lg font-semibold text-text-secondary uppercase tracking-wide mb-4 text-center">
+        {/* All decisions grouped by round */}
+        <div className="mt-12 max-w-3xl mx-auto">
+          <h2 className="text-xl font-bold text-text-primary mb-6 text-center">
             {current.teamName}&apos;s Decisions
           </h2>
-          <div className="grid gap-3 max-w-2xl mx-auto">
-            {current.decisions.map((d) => {
-              const dp = caseStudy.decisions.find(
-                (p) => p.id === d.decisionPointId
-              );
-              if (!dp) return null;
 
-              let answerText = "";
-              if (dp.type === "multiple_choice" && dp.choices && d.choiceId) {
-                const choice = dp.choices.find((c) => c.id === d.choiceId);
-                answerText = choice?.label || d.choiceId;
-              } else if (
-                dp.type === "tradeoff_slider" &&
-                dp.tradeoff &&
-                d.sliderValue != null
-              ) {
-                answerText = `${dp.tradeoff.leftLabel} ${d.sliderValue}% ${dp.tradeoff.rightLabel}`;
-              } else if (
-                dp.type === "branching_path" &&
-                dp.branches &&
-                d.branchId
-              ) {
-                const branch = dp.branches.find((b) => b.id === d.branchId);
-                answerText = branch?.label || d.branchId;
-                if (d.followUpChoiceId && branch) {
-                  const followUp = branch.followUp.choices.find(
-                    (c) => c.id === d.followUpChoiceId
+          {rounds.map(([round, roundDecisions]) => (
+            <div key={round} className="mb-8">
+              <h3 className="text-sm font-semibold text-text-secondary uppercase tracking-wide mb-3">
+                Round {round + 1}
+              </h3>
+              <div className="grid gap-3">
+                {roundDecisions.map((dp) => {
+                  const submitted = submittedLookup.get(dp.id);
+                  const answered = !!submitted;
+                  const answerText = submitted
+                    ? getAnswerText(dp, submitted)
+                    : "Not answered";
+
+                  return (
+                    <div
+                      key={dp.id}
+                      className={`bg-white border rounded-lg p-4 ${
+                        answered
+                          ? "border-border-primary"
+                          : "border-dashed border-border-secondary opacity-60"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        <span
+                          className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                            dp.type === "multiple_choice"
+                              ? "bg-blue-50 text-blue-600"
+                              : dp.type === "tradeoff_slider"
+                                ? "bg-amber-50 text-amber-600"
+                                : "bg-purple-50 text-purple-600"
+                          }`}
+                        >
+                          {dp.type === "multiple_choice"
+                            ? "Choice"
+                            : dp.type === "tradeoff_slider"
+                              ? "Tradeoff"
+                              : "Branch"}
+                        </span>
+                      </div>
+                      <p className="text-base text-text-primary mb-1">
+                        {dp.scenarioText}
+                      </p>
+                      <p
+                        className={`text-base font-semibold ${
+                          answered ? "" : "text-text-tertiary italic"
+                        }`}
+                        style={answered ? { color: teamColor } : undefined}
+                      >
+                        {answerText}
+                      </p>
+                    </div>
                   );
-                  if (followUp) answerText += ` → ${followUp.label}`;
-                }
-              }
-
-              return (
-                <div
-                  key={d.decisionPointId}
-                  className="bg-white border border-border-primary rounded-lg p-4"
-                >
-                  <p className="text-sm text-text-tertiary mb-1">
-                    Round {dp.round + 1}
-                  </p>
-                  <p className="text-base text-text-primary mb-1">
-                    {dp.scenarioText}
-                  </p>
-                  <p
-                    className="text-base font-semibold"
-                    style={{ color: teamColor }}
-                  >
-                    {answerText}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
+                })}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </main>

@@ -1,5 +1,5 @@
-interface MelodifyHomeProps {
-  variant: "activity-based" | "social-feed" | "library-first" | "discovery-engine" | null;
+interface SpotifyHomeProps {
+  variant: "activity-based" | "social-feed" | "discovery-engine" | null;
 }
 
 function ActivityBased() {
@@ -90,51 +90,6 @@ function SocialFeed() {
   );
 }
 
-function LibraryFirst() {
-  const albums = [
-    { title: "Chill Vibes", gradient: "from-indigo-300 to-purple-400" },
-    { title: "Workout", gradient: "from-rose-300 to-red-400" },
-    { title: "Focus", gradient: "from-emerald-300 to-teal-400" },
-    { title: "Party", gradient: "from-amber-300 to-orange-400" },
-  ];
-  return (
-    <div className="space-y-1.5">
-      <p className="text-[5px] font-bold text-gray-400 uppercase">Your Library</p>
-      <div className="grid grid-cols-2 gap-1">
-        {albums.map((a, i) => (
-          <div key={i} className={`aspect-square rounded-lg bg-gradient-to-br ${a.gradient} flex items-end p-1 relative overflow-hidden`}>
-            <svg viewBox="0 0 20 20" className="absolute top-1 right-1 w-2.5 h-2.5 text-white/40">
-              <circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" strokeWidth="1.5" />
-              <circle cx="10" cy="10" r="3" fill="currentColor" />
-            </svg>
-            <p className="text-[4px] font-bold text-white leading-tight">{a.title}</p>
-          </div>
-        ))}
-      </div>
-      <p className="text-[5px] font-semibold text-gray-400">Recently Played</p>
-      <div className="flex gap-1">
-        {["bg-sky-200", "bg-pink-200", "bg-lime-200", "bg-orange-200"].map((c, i) => (
-          <div key={i} className={`w-5 h-5 rounded-md ${c} shrink-0`} />
-        ))}
-        <div className="w-5 h-5 rounded-md bg-gray-100 flex items-center justify-center shrink-0">
-          <p className="text-[5px] text-gray-400">+12</p>
-        </div>
-      </div>
-      <div className="flex items-center gap-1 bg-gray-50 rounded-lg px-1.5 py-1">
-        <div className="w-4 h-4 rounded-sm bg-gradient-to-br from-indigo-300 to-purple-400 shrink-0" />
-        <div className="flex-1 min-w-0">
-          <p className="text-[5px] font-semibold text-gray-600 truncate">Chill Vibes</p>
-          <p className="text-[4px] text-gray-400">Now playing</p>
-        </div>
-        <svg viewBox="0 0 12 12" className="w-2.5 h-2.5 text-emerald-400 shrink-0">
-          <rect x="2" y="2" width="3" height="8" rx="0.5" fill="currentColor" />
-          <rect x="7" y="2" width="3" height="8" rx="0.5" fill="currentColor" />
-        </svg>
-      </div>
-    </div>
-  );
-}
-
 function DiscoveryEngine() {
   return (
     <div className="space-y-1.5">
@@ -185,7 +140,7 @@ function UnknownState() {
   );
 }
 
-export default function MelodifyHome({ variant }: MelodifyHomeProps) {
+export default function SpotifyHome({ variant }: SpotifyHomeProps) {
   if (!variant) return <UnknownState />;
 
   switch (variant) {
@@ -193,8 +148,6 @@ export default function MelodifyHome({ variant }: MelodifyHomeProps) {
       return <ActivityBased />;
     case "social-feed":
       return <SocialFeed />;
-    case "library-first":
-      return <LibraryFirst />;
     case "discovery-engine":
       return <DiscoveryEngine />;
   }
