@@ -37,7 +37,7 @@ function SearchBar({ searchVariant }: { searchVariant: string | null }) {
           <svg viewBox="0 0 16 16" className="w-2.5 h-2.5 text-violet-400 shrink-0">
             <path d="M8 2l1.5 3.5L13 7l-3.5 1.5L8 12l-1.5-3.5L3 7l3.5-1.5z" fill="currentColor" />
           </svg>
-          <p className="text-[4px] text-[#838486] italic">Ask AI: &quot;Find me a scary game...&quot;</p>
+          <p className="text-[4px] text-[#838486] italic">Ask AI: &quot;Find me an adventure game...&quot;</p>
         </div>
       ) : searchVariant === "visual-browse" ? (
         <div className="flex items-center gap-1 bg-[#393b3d] rounded-lg px-1.5 py-1">
@@ -56,7 +56,7 @@ function SearchBar({ searchVariant }: { searchVariant: string | null }) {
           {searchVariant === "smart-filters" && (
             <div className="flex gap-0.5 ml-auto">
               <div className="bg-emerald-600/30 rounded-full px-1">
-                <p className="text-[3px] text-emerald-400">Horror</p>
+                <p className="text-[3px] text-emerald-400">Adventure</p>
               </div>
               <div className="bg-blue-600/30 rounded-full px-1">
                 <p className="text-[3px] text-blue-400">Co-op</p>

@@ -38,9 +38,17 @@ function PlayPageContent() {
   const initialCode = searchParams.get("code") || "";
   const groupMode = searchParams.get("group") === "true";
 
-  // Case study selection
+  // Case study (auto-select Roblox)
   const [caseStudy, setCaseStudy] = useState<CaseStudy | null>(null);
   const [showBriefing, setShowBriefing] = useState(false);
+
+  // Auto-select the only case study (Roblox)
+  useEffect(() => {
+    if (!caseStudy && CASE_STUDIES.length > 0) {
+      selectCaseStudy(CASE_STUDIES[0]);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Team info gate (group mode)
   const [teamInfoReady, setTeamInfoReady] = useState(false);
@@ -243,54 +251,11 @@ function PlayPageContent() {
     );
   }
 
-  // ─── CASE STUDY PICKER ───
+  // Loading state while case study auto-selects
   if (!caseStudy) {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center px-4 bg-surface-primary">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-text-primary mb-2">
-            Choose Your Case Study
-          </h1>
-          <p className="text-text-secondary">
-            Pick the product scenario your presenter assigned
-          </p>
-        </div>
-
-        <div className="grid gap-4 w-full max-w-2xl">
-          {CASE_STUDIES.map((cs) => (
-            <button
-              key={cs.id}
-              onClick={() => selectCaseStudy(cs)}
-              className="card text-left hover:shadow-elevated transition-shadow cursor-pointer"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-lg font-semibold text-text-primary">
-                    {cs.productName}
-                  </h2>
-                  <p className="text-sm text-text-secondary mt-1">
-                    {cs.shortDescription}
-                  </p>
-                </div>
-                <span
-                  className={
-                    cs.difficulty === "beginner"
-                      ? "badge-green"
-                      : cs.difficulty === "intermediate"
-                        ? "badge-yellow"
-                        : "badge-red"
-                  }
-                >
-                  {cs.difficulty}
-                </span>
-              </div>
-            </button>
-          ))}
-        </div>
-
-        <button onClick={() => router.push("/")} className="btn-ghost mt-8">
-          Back
-        </button>
+      <main className="min-h-screen flex items-center justify-center bg-surface-primary">
+        <p className="text-text-tertiary animate-pulse">Loading...</p>
       </main>
     );
   }

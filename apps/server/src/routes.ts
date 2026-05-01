@@ -109,17 +109,14 @@ export function loadPersistedGames(): void {
 // Presenter creates a new game session.
 router.post("/games", (req, res) => {
   const { caseStudyId: requestedId } = req.body;
-  const caseStudyId = requestedId || "all";
+  const caseStudyId = requestedId || "roblox";
 
-  let totalRounds = 5; // default for "all" games
-  if (caseStudyId !== "all") {
-    const caseStudy = CASE_STUDIES.find((cs) => cs.id === caseStudyId);
-    if (!caseStudy) {
-      res.status(400).json({ error: "Invalid case study" });
-      return;
-    }
-    totalRounds = getTotalRounds(caseStudy);
+  const caseStudy = CASE_STUDIES.find((cs) => cs.id === caseStudyId);
+  if (!caseStudy) {
+    res.status(400).json({ error: "Invalid case study" });
+    return;
   }
+  const totalRounds = getTotalRounds(caseStudy);
 
   const code = getUniqueCode();
   const adminToken = generateAdminToken();
@@ -372,9 +369,7 @@ router.get("/games/:code/designs", (req, res) => {
     return;
   }
 
-  const caseStudy = game.caseStudyId === "all"
-    ? null
-    : CASE_STUDIES.find((cs) => cs.id === game.caseStudyId) || null;
+  const caseStudy = CASE_STUDIES.find((cs) => cs.id === game.caseStudyId) || null;
 
   // Build voted team names
   const votedTeams: string[] = [];
